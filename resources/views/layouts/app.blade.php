@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ $title ?? 'Beranda' }} | SIM-MoU</title>
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @yield('styles')
+    @stack('styles')
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Entrance Animation -->
+    <style>
+        @keyframes smoothEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+                filter: blur(3px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: smoothEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .animate-delay-100 { animation-delay: 0.08s; }
+        .animate-delay-200 { animation-delay: 0.16s; }
+        .animate-delay-300 { animation-delay: 0.24s; }
+        .swal2-container {
+            z-index: 9999999 !important;
+        }
+    </style>
+    {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
+
+    <!-- Theme Store -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('theme', {
+                init() {
+                    const savedTheme = localStorage.getItem('theme');
+                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' :
+                        'light';
+                    this.theme = savedTheme || systemTheme;
+                    this.updateTheme();
+                },
+                theme: 'light',
+                toggle() {
+                    this.theme = this.theme === 'light' ? 'dark' : 'light';
+                    localStorage.setItem('theme', this.theme);
+                    this.updateTheme();
+                },
+                updateTheme() {
+                    const html = document.documentElement;
+                    const body = document.body;
+                    if (this.theme === 'dark') {
+                        html.classList.add('dark');
+                        body.classList.add('dark', 'bg-gray-900');
+                    } else {
+                        html.classList.remove('dark');
+                        body.classList.remove('dark', 'bg-gray-900');
+                    }
+                }
+            });
+
+            Alpine.store('sidebar', {
+                // Initialize based on screen size
+                isExpanded: window.innerWidth >= 1280, // true for desktop, false for mobile
+                isMobileOpen: false,
+                isHovered: false,
+
+                toggleExpanded() {
+                    this.isExpanded = !this.isExpanded;
+                    // When toggling desktop sidebar, ensure mobile menu is closed
+                    this.isMobileOpen = false;
+                },
+
+                toggleMobileOpen() {
+                    this.isMobileOpen = !this.isMobileOpen;
+                    // Don't modify isExpanded when toggling mobile menu
+                },
+
+                setMobileOpen(val) {
+                    this.isMobileOpen = val;
+                },
+
+                setHovered(val) {
+                    // Only allow hover effects on desktop when sidebar is collapsed
+                    if (window.innerWidth >= 1280 && !this.isExpanded) {
+                        this.isHovered = val;
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Apply dark mode immediately to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const theme = savedTheme || systemTheme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark', 'bg-gray-900');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark', 'bg-gray-900');
+            }
+        })();
+    </script>
+    
+</head>
+
+<body
+    x-data="{ 'loaded': true}"
+    x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
+    const checkMobile = () => {
+        if (window.innerWidth < 1280) {
+            $store.sidebar.setMobileOpen(false);
+            $store.sidebar.isExpanded = false;
+        } else {
+            $store.sidebar.isMobileOpen = false;
+            $store.sidebar.isExpanded = true;
+        }
+    };
+    window.addEventListener('resize', checkMobile);">
+
+    <div class="min-h-screen xl:flex">
+        @include('layouts.backdrop')
+        @include('layouts.sidebar')
+
+        <div class="flex-1 transition-all duration-300 ease-in-out min-w-0 overflow-x-hidden"
+            :class="{
+                'xl:ml-[290px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
+                'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
+                'ml-0': $store.sidebar.isMobileOpen
+            }">
+            <!-- app header start -->
+            @include('layouts.app-header')
+            <!-- app header end -->
+            <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6 animate-fade-in-up">
+                @yield('content')
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+@stack('scripts')
+
+@if (session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: @json(session('success')),
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+    });
+</script>
+@endif
+
+@if (session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: @json(session('error')),
+        timer: 4000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Tutup',
+        confirmButtonColor: '#465FFF',
+    });
+</script>
+@endif
+
+</html>
