@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\KerjaSama;
+use App\Models\PerusahaanMitra;
+use App\Models\AlumniBekerja;
+use App\Models\LowonganKerja;
+use App\Models\TracerStudy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -14,6 +18,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        if (auth()->check() && auth()->user()->isBKK()) {
+            return $this->bkkDashboard();
+        }
+
         $today = Carbon::today();
         $thirtyDaysLater = Carbon::today()->addDays(30);
 
@@ -127,6 +135,116 @@ class DashboardController extends Controller
             'jenisChartData',
             'trendChartData',
             'nearestChartData',
+            'insights'
+        ));
+    }
+
+    /**
+     * Tampilkan dashboard khusus BKK.
+     */
+    private function bkkDashboard()
+    {
+        $totalAlumniBekerja = AlumniBekerja::count();
+        $totalPerusahaanMitra = PerusahaanMitra::count();
+        $totalLowonganKerja = LowonganKerja::where('status', 'Aktif')->count();
+        $totalTracerStudy = TracerStudy::count();
+
+        // 1. Grafik Persentase Alumni Bekerja (Tracer Study)
+        $tracerStats = [
+            'Bekerja' => TracerStudy::where('status_alumni', 'Bekerja')->count(),
+            'Kuliah' => TracerStudy::where('status_alumni', 'Kuliah')->count(),
+            'Wirausaha' => TracerStudy::where('status_alumni', 'Wirausaha')->count(),
+            'Mencari Kerja' => TracerStudy::where('status_alumni', 'Mencari Kerja')->count(),
+        ];
+
+        $statusChartData = [
+            'labels' => array_keys($tracerStats),
+            'series' => array_values($tracerStats),
+        ];
+
+        // 2. Grafik Perusahaan yang Paling Banyak Merekrut (Top 5)
+        $perusahaanRecruits = AlumniBekerja::select('perusahaan_nama', \DB::raw('count(*) as total'))
+            ->groupBy('perusahaan_nama')
+            ->orderBy('total', 'desc')
+            ->limit(5)
+            ->get();
+
+        $perusahaanChartData = [
+            'labels' => $perusahaanRecruits->pluck('perusahaan_nama')->toArray(),
+            'series' => $perusahaanRecruits->pluck('total')->toArray(),
+        ];
+
+        // Fill empty chart defaults
+        if (empty($perusahaanChartData['labels'])) {
+            $perusahaanChartData['labels'] = ['Belum ada data'];
+            $perusahaanChartData['series'] = [0];
+        }
+
+        // 3. Grafik Bidang Industri Terbanyak
+        $industriStats = AlumniBekerja::select('bidang_industri', \DB::raw('count(*) as total'))
+            ->groupBy('bidang_industri')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $industriChartData = [
+            'labels' => $industriStats->pluck('bidang_industri')->toArray(),
+            'series' => $industriStats->pluck('total')->toArray(),
+        ];
+
+        if (empty($industriChartData['labels'])) {
+            $industriChartData['labels'] = ['Belum ada data'];
+            $industriChartData['series'] = [0];
+        }
+
+        // 4. Grafik Penyerapan Alumni per Tahun (Berdasarkan Tahun Lulus)
+        $penyerapanStats = AlumniBekerja::select('tahun_lulus', \DB::raw('count(*) as total'))
+            ->groupBy('tahun_lulus')
+            ->orderBy('tahun_lulus', 'asc')
+            ->get();
+
+        $penyerapanChartData = [
+            'labels' => $penyerapanStats->pluck('tahun_lulus')->toArray(),
+            'series' => $penyerapanStats->pluck('total')->toArray(),
+        ];
+
+        if (empty($penyerapanChartData['labels'])) {
+            $penyerapanChartData['labels'] = [date('Y')];
+            $penyerapanChartData['series'] = [0];
+        }
+
+        // Insights BKK
+        $insights = [];
+
+        // Insight 1: Tingkat Keterserapan
+        if ($totalTracerStudy > 0) {
+            $bekerjaOrWirausaha = $tracerStats['Bekerja'] + $tracerStats['Wirausaha'];
+            $rate = ($bekerjaOrWirausaha / $totalTracerStudy) * 100;
+            $insights[] = "Tingkat keterserapan kerja & wirausaha alumni mencapai " . number_format($rate, 1) . "% (" . $bekerjaOrWirausaha . " dari " . $totalTracerStudy . " responden).";
+        } else {
+            $insights[] = "Belum ada respon Tracer Study masuk.";
+        }
+
+        // Insight 2: Bidang Industri Terpopuler
+        $topIndustri = $industriStats->first();
+        if ($topIndustri) {
+            $insights[] = "Bidang industri \"{$topIndustri->bidang_industri}\" menyerap alumni terbanyak ({$topIndustri->total} orang).";
+        }
+
+        // Insight 3: Mitra Utama
+        $topPerusahaan = $perusahaanRecruits->first();
+        if ($topPerusahaan) {
+            $insights[] = "Mitra perekrut utama alumni saat ini adalah \"{$topPerusahaan->perusahaan_nama}\" dengan total {$topPerusahaan->total} alumni.";
+        }
+
+        return view('pages.dashboard.bkk', compact(
+            'totalAlumniBekerja',
+            'totalPerusahaanMitra',
+            'totalLowonganKerja',
+            'totalTracerStudy',
+            'statusChartData',
+            'perusahaanChartData',
+            'industriChartData',
+            'penyerapanChartData',
             'insights'
         ));
     }

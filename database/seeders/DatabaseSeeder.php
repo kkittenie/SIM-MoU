@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             KerjaSamaSeeder::class,
+            BkkDataSeeder::class,
         ]);
 
         // Seed default settings row
