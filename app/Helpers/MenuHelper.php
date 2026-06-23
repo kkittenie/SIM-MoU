@@ -169,16 +169,16 @@ class MenuHelper
 
         // ════ SETTINGS (ADMIN & BKK) ════
         if ($user && ($user->isAdmin() || $user->isBKK())) {
-            $items[] = [
-                'icon' => 'settings',
-                'name' => 'Pengaturan',
-                'path' => '/pengaturan',
-            ];
             //notif
             $items[] = [
                 'icon' => 'bell',
                 'name' => 'Notifikasi',
                 'path' => '/notifikasi',
+            ];
+            $items[] = [
+                'icon' => 'settings',
+                'name' => 'Pengaturan',
+                'path' => '/pengaturan',
             ];
         }
 
