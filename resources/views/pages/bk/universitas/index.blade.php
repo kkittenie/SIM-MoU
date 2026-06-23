@@ -113,7 +113,9 @@
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-3">
                                     {{-- Detail Link (All roles) --}}
-                                    <a href="{{ route('universitas.show', $item) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-xs">
+                                    <a href="{{ auth()->user()->isAdmin()
+                                    ? route('universitas.show', $item)
+                                    : route('bk.universitas.show', $item) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-xs">
                                         Lihat
                                     </a>
 
