@@ -7,6 +7,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Beranda' }} | SIM-MoU</title>
+    <meta name="description" content="Sistem Informasi Manajemen Kerja Sama & MoU — Platform pengelolaan dokumen kemitraan institusi pendidikan.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
 
     <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.13.0/dist/apexcharts.min.js"></script>
@@ -144,8 +150,8 @@
 
         <div class="flex-1 transition-all duration-300 ease-in-out min-w-0 overflow-x-hidden"
             :class="{
-                'xl:ml-[290px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
-                'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
+                'xl:ml-[280px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
+                'xl:ml-[80px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
                 'ml-0': $store.sidebar.isMobileOpen
             }">
             <!-- app header start -->

@@ -60,10 +60,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/universitas/{universitas}/ubah', [UniversitasController::class, 'edit'])->name('universitas.edit');
         Route::put('/universitas/{universitas}', [UniversitasController::class, 'update'])->name('universitas.update');
         Route::delete('/universitas/{universitas}', [UniversitasController::class, 'destroy'])->name('universitas.destroy');
-    });
 
-    // Admin & BKK
-    Route::middleware('role:admin,bkk')->group(function () {
         //notifikasi
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
@@ -78,7 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/kerja-sama/{id}', [KerjaSamaController::class, 'destroy'])->name('kerja-sama.destroy');
         Route::post('/kerja-sama/{id}/kirim-wa', [KerjaSamaController::class, 'kirimWhatsapp'])->name('kerja-sama.kirim-wa');
 
-        // BKK - Perusahaan Mitra
+        // Perusahaan Mitra
         Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
         Route::get('/perusahaan-mitra/tambah', [PerusahaanMitraController::class, 'create'])->name('perusahaan-mitra.create');
         Route::post('/perusahaan-mitra', [PerusahaanMitraController::class, 'store'])->name('perusahaan-mitra.store');
@@ -87,6 +84,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'update'])->name('perusahaan-mitra.update');
         Route::delete('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'destroy'])->name('perusahaan-mitra.destroy');
 
+        // Kerja Sama - Laporan
+        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
+    });
+
+    // Admin & BKK
+    Route::middleware('role:admin,bkk')->group(function () {
         Route::get('/alumni-bekerja', [AlumniBekerjaController::class, 'index'])->name('alumni-bekerja.index');
         Route::get('/alumni-bekerja/tambah', [AlumniBekerjaController::class, 'create'])->name('alumni-bekerja.create');
         Route::post('/alumni-bekerja', [AlumniBekerjaController::class, 'store'])->name('alumni-bekerja.store');
@@ -112,9 +115,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/tracer-study/bulk-delete', [TracerStudyController::class, 'bulkDelete'])->name('tracer-study.bulk-delete');
 
         Route::get('/laporan-bkk', [LaporanBkkController::class, 'index'])->name('laporan-bkk.index');
-
-        // Kerja Sama - Laporan
-        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
     });
 
     // Kerja Sama (semua user)

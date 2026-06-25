@@ -117,24 +117,9 @@ class MenuHelper
                 'path' => '/dashboard',
             ];
             $items[] = [
-                'icon' => 'forms',
-                'name' => 'Kelola Kerja Sama',
-                'path' => '/kerja-sama',
-            ];
-            $items[] = [
-                'icon' => 'laporan',
-                'name' => 'Laporan Kerja Sama',
-                'path' => '/laporan-kerja-sama',
-            ];
-            $items[] = [
                 'icon' => 'alumni-bekerja',
                 'name' => 'Data Alumni Bekerja',
                 'path' => '/alumni-bekerja',
-            ];
-            $items[] = [
-                'icon' => 'perusahaan-mitra',
-                'name' => 'Data Perusahaan Mitra',
-                'path' => '/perusahaan-mitra',
             ];
             $items[] = [
                 'icon' => 'lowongan-kerja',
@@ -182,8 +167,8 @@ class MenuHelper
             ];
         }
 
-        // ════ NOTIFIKASI (ADMIN & BKK) ════
-        if ($user && ($user->isAdmin() || $user->isBKK())) {
+        // ════ NOTIFIKASI (ADMIN ONLY) ════
+        if ($user && $user->isAdmin()) {
             $items[] = [
                 'icon' => 'bell',
                 'name' => 'Notifikasi',

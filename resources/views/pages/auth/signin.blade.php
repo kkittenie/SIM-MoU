@@ -1,132 +1,454 @@
 @extends('layouts.fullscreen-layout')
 
+@push('styles')
+<style>
+    /* ═══════════════════════════════════════════════ */
+    /*  LOGIN PAGE STYLES                              */
+    /* ═══════════════════════════════════════════════ */
+
+    .login-page {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        background: #F8FBFF;
+        min-height: 100dvh;
+    }
+    .dark .login-page {
+        background: #0f172a;
+    }
+
+    /* ── Left Branding Panel ── */
+    .login-brand-panel {
+        background: linear-gradient(155deg, #2278D8 0%, #399EF2 45%, #5BB6FF 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .login-brand-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    /* Subtle floating academic shapes */
+    .login-shapes {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    .login-shape {
+        position: absolute;
+        border: 1.5px solid rgba(255,255,255,0.08);
+        border-radius: 50%;
+        animation: floatShape 20s ease-in-out infinite;
+    }
+    .login-shape:nth-child(1) {
+        width: 200px; height: 200px;
+        top: 10%; left: -5%;
+        animation-delay: 0s;
+        animation-duration: 22s;
+    }
+    .login-shape:nth-child(2) {
+        width: 120px; height: 120px;
+        top: 60%; right: 10%;
+        animation-delay: -5s;
+        animation-duration: 18s;
+    }
+    .login-shape:nth-child(3) {
+        width: 80px; height: 80px;
+        bottom: 15%; left: 20%;
+        animation-delay: -10s;
+        border-radius: 12px;
+        transform: rotate(45deg);
+    }
+    .login-shape:nth-child(4) {
+        width: 160px; height: 160px;
+        top: 25%; right: -3%;
+        animation-delay: -7s;
+        animation-duration: 25s;
+    }
+
+    @keyframes floatShape {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(10px, -15px) rotate(5deg); }
+        50% { transform: translate(-5px, 10px) rotate(-3deg); }
+        75% { transform: translate(8px, 5px) rotate(2deg); }
+    }
+
+    /* Grid pattern overlay */
+    .login-grid-pattern {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+    }
+
+    /* ── Login Card ── */
+    .login-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow:
+            0 1px 3px rgba(16, 24, 40, 0.06),
+            0 8px 32px -4px rgba(16, 24, 40, 0.08);
+        border: 1px solid #E4E7EC;
+    }
+    .dark .login-card {
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.2),
+            0 8px 32px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ── Input Styling ── */
+    .login-input {
+        height: 48px;
+        width: 100%;
+        border-radius: 10px;
+        border: 1.5px solid #D9E8F7;
+        background: #F8FBFF;
+        padding: 0 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1E293B;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+    }
+    .login-input::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+    .login-input:focus {
+        border-color: #5BB6FF;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(91, 182, 255, 0.15);
+    }
+    .dark .login-input {
+        background: #0f172a;
+        border-color: #334155;
+        color: #e2e8f0;
+    }
+    .dark .login-input:focus {
+        border-color: #5BB6FF;
+        background: #1e293b;
+        box-shadow: 0 0 0 3px rgba(91, 182, 255, 0.15);
+    }
+    .dark .login-input::placeholder {
+        color: #475569;
+    }
+
+    /* ── Button ── */
+    .login-btn {
+        height: 48px;
+        width: 100%;
+        border-radius: 10px;
+        background: #5BB6FF;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 1px 3px rgba(91, 182, 255, 0.3);
+    }
+    .login-btn:hover {
+        background: #399EF2;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(57, 158, 242, 0.35);
+    }
+    .login-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 3px rgba(91, 182, 255, 0.3);
+    }
+
+    /* ── Entrance Animations ── */
+    @keyframes loginFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes loginSlideUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes loginSlideLeft {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .anim-fade {
+        animation: loginFadeIn 0.6s ease-out both;
+    }
+    .anim-slide-up {
+        animation: loginSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .anim-slide-left {
+        animation: loginSlideLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .anim-d1 { animation-delay: 100ms; }
+    .anim-d2 { animation-delay: 200ms; }
+    .anim-d3 { animation-delay: 300ms; }
+    .anim-d4 { animation-delay: 400ms; }
+    .anim-d5 { animation-delay: 500ms; }
+
+    /* ── Checkbox ── */
+    .login-checkbox {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        border: 1.5px solid #D0D5DD;
+        background: #fff;
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .login-checkbox:checked {
+        background: #5BB6FF;
+        border-color: #5BB6FF;
+    }
+    .login-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 5px; top: 2px;
+        width: 5px; height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    .dark .login-checkbox {
+        background: #1e293b;
+        border-color: #475569;
+    }
+</style>
+@endpush
+
 @section('content')
-    <div class="relative z-1 bg-white p-6 sm:p-0 dark:bg-gray-900">
-        <div class="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
-            <!-- Form -->
-            <div class="flex w-full flex-1 flex-col lg:w-1/2">
-                <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-                    <div>
-                        <div class="mb-5 sm:mb-8">
-                            <h1 class="text-title-sm sm:text-title-md mb-2 font-semibold text-gray-800 dark:text-white/90">
-                                Masuk ke Akun
-                            </h1>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Masukkan email dan password Anda untuk masuk ke sistem!
-                            </p>
-                        </div>
-                        <div>
-                            @if ($errors->any())
-                                <div class="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400" role="alert">
-                                    <ul class="list-disc pl-5 space-y-1">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
+    <div class="login-page">
+        <div class="flex min-h-dvh flex-col lg:flex-row">
 
-                            @if (session('success'))
-                                <div class="mb-4 rounded-lg bg-green-50 p-4 text-sm text-green-800 dark:bg-gray-800 dark:text-green-400" role="alert">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
-                            <form action="{{ route('login') }}" method="POST">
-                                @csrf
-                                <div class="space-y-5">
-                                    <!-- Email -->
-                                    <div>
-                                        <label for="email" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            Email <span class="text-error-500">*</span>
-                                        </label>
-                                        <input type="email" id="email" name="email" placeholder="contoh@gmail.com" value="{{ old('email') }}" required autofocus
-                                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                                    </div>
-                                    <!-- Password -->
-                                    <div>
-                                        <label for="password" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            Password <span class="text-error-500">*</span>
-                                        </label>
-                                        <div x-data="{ showPassword: false }" class="relative">
-                                            <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
-                                                placeholder="Masukkan password Anda"
-                                                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pr-11 pl-4 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                                            <span @click="showPassword = !showPassword"
-                                                class="absolute top-1/2 right-4 z-30 -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400">
-                                                <svg x-show="!showPassword" class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" fill="#98A2B3" />
-                                                </svg>
-                                                <svg x-show="showPassword" class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                                        d="M4.63803 3.57709C4.34513 3.2842 3.87026 3.2842 3.57737 3.57709C3.28447 3.86999 3.28447 4.34486 3.57737 4.63775L4.85323 5.91362C3.74609 6.84199 2.89363 8.06395 2.4155 9.45936C2.3615 9.61694 2.3615 9.78801 2.41549 9.94558C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C11.255 15.3619 12.4422 15.0737 13.4994 14.5598L15.3625 16.4229C15.6554 16.7158 16.1302 16.7158 16.4231 16.4229C16.716 16.13 16.716 15.6551 16.4231 15.3622L4.63803 3.57709ZM12.3608 13.4212L10.4475 11.5079C10.3061 11.5423 10.1584 11.5606 10.0064 11.5606H9.99151C8.96527 11.5606 8.13333 10.7286 8.13333 9.70237C8.13333 9.5461 8.15262 9.39434 8.18895 9.24933L5.91885 6.97923C5.03505 7.69015 4.34057 8.62704 3.92328 9.70247C4.86803 12.1373 7.23361 13.8619 10.0002 13.8619C10.8326 13.8619 11.6287 13.7058 12.3608 13.4212ZM16.0771 9.70249C15.7843 10.4569 15.3552 11.1432 14.8199 11.7311L15.8813 12.7925C16.6329 11.9813 17.2187 11.0143 17.5849 9.94561C17.6389 9.78803 17.6389 9.61696 17.5849 9.45938C16.5055 6.30925 13.5184 4.04303 10.0002 4.04303C9.13525 4.04303 8.30244 4.17999 7.52218 4.43338L8.75139 5.66259C9.1556 5.58413 9.57311 5.54303 10.0002 5.54303C12.7667 5.54303 15.1323 7.26768 16.0771 9.70249Z"
-                                                        fill="#98A2B3" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <!-- Checkbox -->
-                                    <div class="flex items-center justify-between">
-                                        <div x-data="{ checkboxToggle: false }">
-                                            <label for="checkboxLabelOne"
-                                                class="flex cursor-pointer items-center text-sm font-normal text-gray-700 select-none dark:text-gray-400">
-                                                <div class="relative">
-                                                    <input type="checkbox" id="checkboxLabelOne" name="remember" class="sr-only" @change="checkboxToggle = !checkboxToggle" />
-                                                    <div :class="checkboxToggle ? 'border-brand-500 bg-brand-500' :
-                                                        'bg-transparent border-gray-300 dark:border-gray-700'"
-                                                        class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
-                                                        <span :class="checkboxToggle ? '' : 'opacity-0'">
-                                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="1.94437" stroke-linecap="round" stroke-linejoin="round" />
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                Ingat Saya
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <!-- Button -->
-                                    <div>
-                                        <button type="submit"
-                                            class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition">
-                                            Masuk
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+            {{-- ════════════════════════════════════════════════ --}}
+            {{--  LEFT: BRANDING PANEL                           --}}
+            {{-- ════════════════════════════════════════════════ --}}
+            <div class="login-brand-panel hidden lg:flex lg:w-[52%] items-center justify-center p-12 relative">
+                <div class="login-shapes">
+                    <div class="login-shape"></div>
+                    <div class="login-shape"></div>
+                    <div class="login-shape"></div>
+                    <div class="login-shape"></div>
                 </div>
-            </div>
+                <div class="login-grid-pattern"></div>
 
-            <!-- Side Graphic / Logo -->
-            <div class="bg-brand-950 relative hidden h-full w-full items-center lg:grid lg:w-1/2 dark:bg-white/5">
-                <div class="z-1 flex items-center justify-center">
-                    <!-- ===== Common Grid Shape Start ===== -->
-                    <x-common.common-grid-shape/>
-                    <div class="flex max-w-xs flex-col items-center">
-                        <div class="mb-4 text-3xl font-extrabold text-white">
-                            SIM-MoU
+                <div class="relative z-10 max-w-md anim-slide-left">
+                    {{-- Logo / Brand --}}
+                    <div class="mb-10">
+                        <div class="inline-flex items-center gap-3 mb-6">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm border border-white/10">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <span class="text-2xl font-bold text-white tracking-tight">SIM-MoU</span>
                         </div>
-                        <p class="text-center text-gray-400 dark:text-white/60 text-sm">
-                            Sistem Informasi Kerja Sama & Memorandum of Understanding (MoU)
+                        <h1 class="text-3xl font-bold text-white leading-tight tracking-tight mb-4">
+                            Sistem Informasi<br>Kerja Sama & MoU
+                        </h1>
+                        <p class="text-[15px] text-white/70 leading-relaxed max-w-sm">
+                            Platform terpadu untuk mengelola dokumen kemitraan, monitoring masa berlaku, dan administrasi kerja sama institusi pendidikan.
                         </p>
                     </div>
+
+                    {{-- Feature List --}}
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-white/90">Kelola dokumen MoU</p>
+                                <p class="text-xs text-white/50 mt-0.5">Pantau dan kelola seluruh dokumen kemitraan secara digital</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-white/90">Monitoring otomatis</p>
+                                <p class="text-xs text-white/50 mt-0.5">Notifikasi masa berlaku dan peringatan kontrak berakhir</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                                <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-white/90">Laporan & analitik</p>
+                                <p class="text-xs text-white/50 mt-0.5">Dashboard visual untuk evaluasi dan pengambilan keputusan</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- Toggler -->
-            <div class="fixed right-6 bottom-6 z-50">
-                <button
-                    class="bg-brand-500 hover:bg-brand-600 inline-flex size-14 items-center justify-center rounded-full text-white transition-colors"
-                    @click.prevent="$store.theme.toggle()">
-                    <svg class="hidden fill-current dark:block" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" clip-rule="evenodd" d="M9.99998 1.5415C10.4142 1.5415 10.75 1.87729 10.75 2.2915V3.5415C10.75 3.95572 10.4142 4.2915 9.99998 4.2915C9.58577 4.2915 9.24998 3.95572 9.24998 3.5415V2.2915C9.24998 1.87729 9.58577 1.5415 9.99998 1.5415ZM10.0009 6.79327C8.22978 6.79327 6.79402 8.22904 6.79402 10.0001C6.79402 11.7712 8.22978 13.207 10.0009 13.207C11.772 13.207 13.2078 11.7712 13.2078 10.0001C13.2078 8.22904 11.772 6.79327 10.0009 6.79327ZM5.29402 10.0001C5.29402 7.40061 7.40135 5.29327 10.0009 5.29327C12.6004 5.29327 14.7078 7.40061 14.7078 10.0001C14.7078 12.5997 12.6004 14.707 10.0009 14.707C7.40135 14.707 5.29402 12.5997 5.29402 10.0001ZM15.9813 5.08035C16.2742 4.78746 16.2742 4.31258 15.9813 4.01969C15.6884 3.7268 15.2135 3.7268 14.9207 4.01969L14.0368 4.90357C13.7439 5.19647 13.7439 5.67134 14.0368 5.96423C14.3297 6.25713 14.8045 6.25713 15.0974 5.96423L15.9813 5.08035ZM18.4577 10.0001C18.4577 10.4143 18.1219 10.7501 17.7077 10.7501H16.4577C16.0435 10.7501 15.7077 10.4143 15.7077 10.0001C15.7077 9.58592 16.0435 9.25013 16.4577 9.25013H17.7077C18.1219 9.25013 18.4577 9.58592 18.4577 10.0001ZM14.9207 15.9806C15.2135 16.2735 15.6884 16.2735 15.9813 15.9806C16.2742 15.6877 16.2742 15.2128 15.9813 14.9199L15.0974 14.036C14.8045 13.7431 14.3297 13.7431 14.0368 14.036C13.7439 14.3289 13.7439 14.8038 14.0368 15.0967L14.9207 15.9806ZM9.99998 15.7088C10.4142 15.7088 10.75 16.0445 10.75 16.4588V17.7088C10.75 18.123 10.4142 18.4588 9.99998 18.4588C9.58577 18.4588 9.24998 18.123 9.24998 17.7088V16.4588C9.24998 16.0445 9.58577 15.7088 9.99998 15.7088ZM5.96356 15.0972C6.25646 14.8043 6.25646 14.3295 5.96356 14.0366C5.67067 13.7437 5.1958 13.7437 4.9029 14.0366L4.01902 14.9204C3.72613 15.2133 3.72613 15.6882 4.01902 15.9811C4.31191 16.274 4.78679 16.274 5.07968 15.9811L5.96356 15.0972ZM4.29224 10.0001C4.29224 10.4143 3.95645 10.7501 3.54224 10.7501H2.29224C1.87802 10.7501 1.54224 10.4143 1.54224 10.0001C1.54224 9.58592 1.87802 9.25013 2.29224 9.25013H3.54224C3.95645 9.25013 4.29224 9.58592 4.29224 10.0001ZM4.9029 5.9637C5.1958 6.25659 5.67067 6.25659 5.96356 5.9637C6.25646 5.6708 6.25646 5.19593 5.96356 4.90303L5.07968 4.01915C4.78679 3.72626 4.31191 3.72626 4.01902 4.01915C3.72613 4.31204 3.72613 4.78692 4.01902 5.07981L4.9029 5.9637Z" fill="" />
-                    </svg>
-                    <svg class="fill-current dark:hidden" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.4547 11.97L18.1799 12.1611C18.265 11.8383 18.1265 11.4982 17.8401 11.3266C17.5538 11.1551 17.1885 11.1934 16.944 11.4207L17.4547 11.97ZM8.0306 2.5459L8.57989 3.05657C8.80718 2.81209 8.84554 2.44682 8.67398 2.16046C8.50243 1.8741 8.16227 1.73559 7.83948 1.82066L8.0306 2.5459ZM12.9154 13.0035C9.64678 13.0035 6.99707 10.3538 6.99707 7.08524H5.49707C5.49707 11.1823 8.81835 14.5035 12.9154 14.5035V13.0035ZM16.944 11.4207C15.8869 12.4035 14.4721 13.0035 12.9154 13.0035V14.5035C14.8657 14.5035 16.6418 13.7499 17.9654 12.5193L16.944 11.4207ZM16.7295 11.7789C15.9437 14.7607 13.2277 16.9586 10.0003 16.9586V18.4586C13.9257 18.4586 17.2249 15.7853 18.1799 12.1611L16.7295 11.7789ZM10.0003 16.9586C6.15734 16.9586 3.04199 13.8433 3.04199 10.0003H1.54199C1.54199 14.6717 5.32892 18.4586 10.0003 18.4586V16.9586ZM3.04199 10.0003C3.04199 6.77289 5.23988 4.05695 8.22173 3.27114L7.83948 1.82066C4.21532 2.77574 1.54199 6.07486 1.54199 10.0003H3.04199ZM6.99707 7.08524C6.99707 5.52854 7.5971 4.11366 8.57989 3.05657L7.48132 2.03522C6.25073 3.35885 5.49707 5.13487 5.49707 7.08524H6.99707Z" fill="" />
-                    </svg>
-                </button>
+
+            {{-- ════════════════════════════════════════════════ --}}
+            {{--  RIGHT: LOGIN FORM                              --}}
+            {{-- ════════════════════════════════════════════════ --}}
+            <div class="flex flex-1 flex-col items-center justify-center px-5 py-10 lg:px-12 lg:w-[48%]">
+                {{-- Mobile Logo --}}
+                <div class="mb-8 flex items-center gap-2 lg:hidden anim-fade">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-gray-800 dark:text-white">SIM-MoU</span>
+                </div>
+
+                <div class="login-card w-full max-w-[420px] p-8 sm:p-10 anim-slide-up anim-d1">
+                    {{-- Header --}}
+                    <div class="mb-7">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white tracking-tight">
+                            Masuk ke akun Anda
+                        </h2>
+                        <p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Masukkan kredensial untuk mengakses sistem
+                        </p>
+                    </div>
+
+                    {{-- Error Messages --}}
+                    @if ($errors->any())
+                        <div class="mb-5 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 anim-fade" role="alert">
+                            <div class="flex items-start gap-3">
+                                <svg class="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    @foreach ($errors->all() as $error)
+                                        <p class="text-sm text-red-700 dark:text-red-400 font-medium">{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (session('success'))
+                        <div class="mb-5 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 p-4 anim-fade" role="alert">
+                            <div class="flex items-center gap-3">
+                                <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-sm text-green-700 dark:text-green-400 font-medium">{{ session('success') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Form --}}
+                    <form action="{{ route('login') }}" method="POST" id="loginForm">
+                        @csrf
+                        <div class="space-y-5">
+                            {{-- Email --}}
+                            <div class="anim-slide-up anim-d2">
+                                <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                    Email
+                                </label>
+                                <div class="relative">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                                        <svg class="h-[18px] w-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value="{{ old('email') }}"
+                                        required
+                                        autofocus
+                                        placeholder="nama@email.com"
+                                        class="login-input !pl-11"
+                                    />
+                                </div>
+                            </div>
+
+                            {{-- Password --}}
+                            <div x-data="{ showPassword: false }" class="anim-slide-up anim-d3">
+                                <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                    Password
+                                </label>
+                                <div class="relative">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                                        <svg class="h-[18px] w-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                    </div>
+                                    <input
+                                        :type="showPassword ? 'text' : 'password'"
+                                        id="password"
+                                        name="password"
+                                        required
+                                        placeholder="Masukkan password"
+                                        class="login-input !pl-11 !pr-12"
+                                    />
+                                    <button
+                                        type="button"
+                                        @click="showPassword = !showPassword"
+                                        class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                        aria-label="Toggle password visibility"
+                                    >
+                                        <svg x-show="!showPassword" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        <svg x-show="showPassword" x-cloak class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Remember Me --}}
+                            <div class="flex items-center gap-2.5 anim-slide-up anim-d4">
+                                <input type="checkbox" id="remember" name="remember" class="login-checkbox">
+                                <label for="remember" class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                                    Ingat saya
+                                </label>
+                            </div>
+
+                            {{-- Submit Button --}}
+                            <div class="anim-slide-up anim-d5">
+                                <button type="submit" class="login-btn">
+                                    <svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                    </svg>
+                                    Masuk
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Footer --}}
+                <p class="mt-8 text-xs text-gray-400 dark:text-gray-500 text-center anim-fade anim-d5">
+                    &copy; {{ date('Y') }} SIM-MoU &mdash; Sistem Informasi Kerja Sama
+                </p>
             </div>
+
         </div>
     </div>
 @endsection
