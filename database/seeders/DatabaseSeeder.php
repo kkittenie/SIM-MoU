@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             KerjaSamaSeeder::class,
             BkkDataSeeder::class,
+            UniversitasSeeder::class,
+            AlumniKuliahSeeder::class,
+            TracerKuliahSeeder::class
         ]);
 
         // Seed default settings row

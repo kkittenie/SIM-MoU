@@ -114,4 +114,33 @@ class TracerStudyController extends Controller
         return redirect()->route('tracer-study.index')
             ->with('success', 'Data Tracer Study berhasil dihapus.');
     }
+
+    /**
+     * Hapus multiple respon Tracer Study sekaligus (Bulk Delete).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada data yang dipilih.'
+            ], 400);
+        }
+
+        try {
+            TracerStudy::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Tracer Study berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data. Silakan coba lagi.'
+            ], 500);
+        }
+    }
 }

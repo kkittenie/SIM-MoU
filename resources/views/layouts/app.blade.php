@@ -8,6 +8,8 @@
 
     <title>{{ $title ?? 'Beranda' }} | SIM-MoU</title>
 
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.13.0/dist/apexcharts.min.js"></script>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -119,7 +121,7 @@
             }
         })();
     </script>
-    
+
 </head>
 
 <body

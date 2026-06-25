@@ -9,86 +9,195 @@ class MenuHelper
      */
     public static function getMainNavItems()
     {
-        $items = [
-            [
+        $user = auth()->user();
+        $items = [];
+
+        // adm
+        if ($user && $user->isAdmin()) {
+            $items[] = [
                 'icon' => 'dashboard',
                 'name' => 'Dashboard',
                 'path' => '/dashboard',
-            ],
-        ];
+            ];
+            $items[] = [
+                'icon' => 'user-profile',
+                'name' => 'Kelola Pengguna',
+                'path' => '/pengguna',
+            ];
+            $items[] = [
+                'icon' => 'forms',
+                'name' => 'Kelola Kerja Sama',
+                'path' => '/kerja-sama',
+            ];
 
-        $user = auth()->user();
+            // data alumni sub-menu
+            $items[] = [
+                'icon' => 'alumni-bekerja',
+                'name' => 'Data Alumni',
+                'path' => '#',
+                'subItems' => [
+                    [
+                        'icon' => 'alumni-bekerja',
+                        'name' => 'Alumni Bekerja',
+                        'path' => '/alumni-bekerja',
+                    ],
+                    [
+                        'icon' => 'alumni-kuliah',
+                        'name' => 'Alumni Kuliah',
+                        'path' => '/bk/alumni-kuliah',
+                    ],
+                ],
+            ];
 
-        if ($user) {
-            // Admin only
-            if ($user->isAdmin()) {
-                $items[] = [
-                    'icon' => 'user-profile',
-                    'name' => 'Kelola Pengguna',
-                    'path' => '/pengguna',
-                ];
-            }
+            $items[] = [
+                'icon' => 'perusahaan-mitra',
+                'name' => 'Data Perusahaan Mitra',
+                'path' => '/perusahaan-mitra',
+            ];
+            $items[] = [
+                'icon' => 'universitas',
+                'name' => 'Universitas',
+                'path' => '/universitas',
+            ];
+            $items[] = [
+                'icon' => 'lowongan-kerja',
+                'name' => 'Lowongan Kerja',
+                'path' => '/lowongan-kerja',
+            ];
 
-            // Admin & BKK: Kelola Kerja Sama & Laporan Kerja Sama
-            if ($user->isAdmin() || $user->isBKK()) {
-                $items[] = [
-                    'icon' => 'forms',
-                    'name' => 'Kelola Kerja Sama',
-                    'path' => '/kerja-sama',
-                ];
-                $items[] = [
-                    'icon' => 'laporan',
-                    'name' => 'Laporan Kerja Sama',
-                    'path' => '/laporan-kerja-sama',
-                ];
-            }
+            // tracer sub-menu
+            $items[] = [
+                'icon' => 'tracer-study',
+                'name' => 'Tracer Study',
+                'path' => '#',
+                'subItems' => [
+                    [
+                        'icon' => 'tracer-study',
+                        'name' => 'Tracer Bekerja',
+                        'path' => '/tracer-study',
+                    ],
+                    [
+                        'icon' => 'tracer-study',
+                        'name' => 'Tracer Kuliah',
+                        'path' => '/bk/tracer-kuliah',
+                    ],
+                ],
+            ];
 
-            // BKK menus: visible to BKK and Admin (for monitoring)
-            if ($user->isBKK() || $user->isAdmin()) {
-                $items[] = [
-                    'icon' => 'alumni-bekerja',
-                    'name' => 'Data Alumni Bekerja',
-                    'path' => '/alumni-bekerja',
-                ];
-                $items[] = [
-                    'icon' => 'perusahaan-mitra',
-                    'name' => 'Data Perusahaan Mitra',
-                    'path' => '/perusahaan-mitra',
-                ];
-                $items[] = [
-                    'icon' => 'lowongan-kerja',
-                    'name' => 'Lowongan Kerja',
-                    'path' => '/lowongan-kerja',
-                ];
-                $items[] = [
-                    'icon' => 'tracer-study',
-                    'name' => 'Tracer Study',
-                    'path' => '/tracer-study',
-                ];
-                $items[] = [
-                    'icon' => 'laporan',
-                    'name' => 'Laporan BKK',
-                    'path' => '/laporan-bkk',
-                ];
-            }
+            // laporn sub-menu
+            $items[] = [
+                'icon' => 'laporan',
+                'name' => 'Laporan',
+                'path' => '#',
+                'subItems' => [
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan BKK',
+                        'path' => '/laporan-bkk',
+                    ],
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan BK',
+                        'path' => '/bk/laporan',
+                    ],
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan Kerja Sama',
+                        'path' => '/laporan-kerja-sama',
+                    ],
+                ],
+            ];
+        }
 
-            // Notifications for Admin only
-            if ($user->isAdmin()) {
-                $items[] = [
-                    'icon' => 'bell',
-                    'name' => 'Notifikasi',
-                    'path' => '/notifikasi',
-                ];
-            }
+        // ════ BKK ONLY ════
+        elseif ($user && $user->isBKK()) {
+            $items[] = [
+                'icon' => 'dashboard',
+                'name' => 'Dashboard',
+                'path' => '/dashboard',
+            ];
+            $items[] = [
+                'icon' => 'forms',
+                'name' => 'Kelola Kerja Sama',
+                'path' => '/kerja-sama',
+            ];
+            $items[] = [
+                'icon' => 'laporan',
+                'name' => 'Laporan Kerja Sama',
+                'path' => '/laporan-kerja-sama',
+            ];
+            $items[] = [
+                'icon' => 'alumni-bekerja',
+                'name' => 'Data Alumni Bekerja',
+                'path' => '/alumni-bekerja',
+            ];
+            $items[] = [
+                'icon' => 'perusahaan-mitra',
+                'name' => 'Data Perusahaan Mitra',
+                'path' => '/perusahaan-mitra',
+            ];
+            $items[] = [
+                'icon' => 'lowongan-kerja',
+                'name' => 'Lowongan Kerja',
+                'path' => '/lowongan-kerja',
+            ];
+            $items[] = [
+                'icon' => 'tracer-study',
+                'name' => 'Tracer Study',
+                'path' => '/tracer-study',
+            ];
+            $items[] = [
+                'icon' => 'laporan',
+                'name' => 'Laporan BKK',
+                'path' => '/laporan-bkk',
+            ];
+        }
 
-            // Settings for Admin only
-            if ($user->isAdmin()) {
-                $items[] = [
-                    'icon' => 'settings',
-                    'name' => 'Pengaturan',
-                    'path' => '/pengaturan',
-                ];
-            }
+        // bk
+        elseif ($user && $user->isBK()) {
+            $items[] = [
+                'icon' => 'dashboard',
+                'name' => 'Dashboard BK',
+                'path' => '/dashboard',
+            ];
+            $items[] = [
+                'icon' => 'alumni-kuliah',
+                'name' => 'Alumni Kuliah',
+                'path' => '/bk/alumni-kuliah',
+            ];
+            $items[] = [
+                'icon' => 'universitas',
+                'name' => 'Universitas',
+                'path' => '/bk/universitas',
+            ];
+            $items[] = [
+                'icon' => 'tracer-study',
+                'name' => 'Tracer Study Kuliah',
+                'path' => '/bk/tracer-kuliah',
+            ];
+            $items[] = [
+                'icon' => 'laporan',
+                'name' => 'Laporan',
+                'path' => '/bk/laporan',
+            ];
+        }
+
+        // ════ NOTIFIKASI (ADMIN & BKK) ════
+        if ($user && ($user->isAdmin() || $user->isBKK())) {
+            $items[] = [
+                'icon' => 'bell',
+                'name' => 'Notifikasi',
+                'path' => '/notifikasi',
+            ];
+        }
+
+        // ════ PENGATURAN (ADMIN ONLY) ════
+        if ($user && $user->isAdmin()) {
+            $items[] = [
+                'icon' => 'settings',
+                'name' => 'Pengaturan',
+                'path' => '/pengaturan',
+            ];
         }
 
         return $items;
@@ -114,11 +223,11 @@ class MenuHelper
     {
         $currentPath = request()->path();
         $targetPath = ltrim($path, '/');
-        
+
         if ($targetPath === '') {
             return $currentPath === '/' || $currentPath === 'dashboard';
         }
-        
+
         return request()->is($targetPath) || request()->is($targetPath . '/*');
     }
 
@@ -133,12 +242,13 @@ class MenuHelper
             'forms' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H18.5001C19.7427 20.75 20.7501 19.7426 20.7501 18.5V5.5C20.7501 4.25736 19.7427 3.25 18.5001 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H18.5001C18.9143 4.75 19.2501 5.08579 19.2501 5.5V18.5C19.2501 18.9142 18.9143 19.25 18.5001 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V5.5ZM6.25005 9.7143C6.25005 9.30008 6.58583 8.9643 7.00005 8.9643L17 8.96429C17.4143 8.96429 17.75 9.30008 17.75 9.71429C17.75 10.1285 17.4143 10.4643 17 10.4643L7.00005 10.4643C6.58583 10.4643 6.25005 10.1285 6.25005 9.7143ZM6.25005 14.2857C6.25005 13.8715 6.58583 13.5357 7.00005 13.5357H17C17.4143 13.5357 17.75 13.8715 17.75 14.2857C17.75 14.6999 17.4143 15.0357 17 15.0357H7.00005C6.58583 15.0357 6.25005 14.6999 6.25005 14.2857Z" fill="currentColor"></path></svg>',
             'bell' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22zm7-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 5.36 7 7.92 7 11v5l-2 2v1h14v-1l-2-2z" fill="currentColor"/></svg>',
             'settings' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84a.483.483 0 0 0-.48.4l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>',
-            // BKK Icons
             'alumni-bekerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-            'perusahaan-mitra' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="10" width="20" height="11" rx="2"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>',
+            'perusahaan-mitra' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="10" width="20" height="11" rx="2" ry="2"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>',
             'lowongan-kerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
             'tracer-study' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>',
             'laporan' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+            'alumni-kuliah' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>',
+            'universitas' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="10" width="20" height="11" rx="2"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>',
         ];
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';
