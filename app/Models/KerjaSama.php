@@ -65,7 +65,7 @@ class KerjaSama extends Model
 
     /**
      * Get the computed status of the MoU.
-     * Status can be: 'Expired', 'Akan Berakhir', or 'Aktif'
+     * Status can be: 'Berakhir', 'Akan Berakhir', or 'Aktif'
      */
     public function getStatusAttribute(): string
     {
@@ -73,7 +73,7 @@ class KerjaSama extends Model
         $endDate = Carbon::parse($this->tanggal_berakhir);
 
         if ($endDate->lt($today)) {
-            return 'Expired';
+            return 'Berakhir';
         }
 
         if ($endDate->diffInDays($today, true) <= 30) {

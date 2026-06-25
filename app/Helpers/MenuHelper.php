@@ -29,12 +29,17 @@ class MenuHelper
                 ];
             }
 
-            // Admin & Bagian MoU (in this case, since only Admin, BK, BKK seeded, Admin can see it)
-            if ($user->isAdmin()) {
+            // Admin & BKK: Kelola Kerja Sama & Laporan Kerja Sama
+            if ($user->isAdmin() || $user->isBKK()) {
                 $items[] = [
                     'icon' => 'forms',
                     'name' => 'Kelola Kerja Sama',
                     'path' => '/kerja-sama',
+                ];
+                $items[] = [
+                    'icon' => 'laporan',
+                    'name' => 'Laporan Kerja Sama',
+                    'path' => '/laporan-kerja-sama',
                 ];
             }
 
@@ -67,15 +72,17 @@ class MenuHelper
                 ];
             }
 
-            // All authenticated users
-            $items[] = [
-                'icon' => 'bell',
-                'name' => 'Notifikasi',
-                'path' => '/notifikasi',
-            ];
+            // Notifications for Admin only
+            if ($user->isAdmin()) {
+                $items[] = [
+                    'icon' => 'bell',
+                    'name' => 'Notifikasi',
+                    'path' => '/notifikasi',
+                ];
+            }
 
-            // Settings for Admin & BKK
-            if ($user->isAdmin() || $user->isBKK()) {
+            // Settings for Admin only
+            if ($user->isAdmin()) {
                 $items[] = [
                     'icon' => 'settings',
                     'name' => 'Pengaturan',

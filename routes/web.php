@@ -12,6 +12,7 @@ use App\Http\Controllers\AlumniBekerjaController;
 use App\Http\Controllers\LowonganKerjaController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\LaporanBkkController;
+use App\Http\Controllers\LaporanKerjaSamaController;
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
@@ -28,14 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // Kelola Notifikasi
-    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
-    Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
-    Route::patch('/notifikasi/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.read');
-    Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.mark-all-read');
-    Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
-
-    // Kelola Pengguna (Admin Only)
+    // Kelola Pengguna, Pengaturan, & Notifikasi (Admin Only)
     Route::middleware('role:admin')->group(function () {
         Route::get('/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
         Route::get('/pengguna/tambah', [PenggunaController::class, 'create'])->name('pengguna.create');
@@ -44,9 +38,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengguna/{id}/ubah', [PenggunaController::class, 'edit'])->name('pengguna.edit');
         Route::put('/pengguna/{id}', [PenggunaController::class, 'update'])->name('pengguna.update');
         Route::delete('/pengguna/{id}', [PenggunaController::class, 'destroy'])->name('pengguna.destroy');
+
+        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
+        Route::post('/pengaturan/kategori', [SettingController::class, 'storeKategori'])->name('setting.kategori.store');
+        Route::delete('/pengaturan/kategori/{id}', [SettingController::class, 'destroyKategori'])->name('setting.kategori.destroy');
+
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+        Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
+        Route::patch('/notifikasi/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.read');
+        Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.mark-all-read');
+        Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     });
 
-    // Admin & BKK can manage Kerja Sama (tambah/ubah/hapus) & Settings
+    // Admin & BKK can manage Kerja Sama (tambah/ubah/hapus)
     Route::middleware('role:admin,bkk')->group(function () {
         Route::get('/kerja-sama/tambah', [KerjaSamaController::class, 'create'])->name('kerja-sama.create');
         Route::post('/kerja-sama', [KerjaSamaController::class, 'store'])->name('kerja-sama.store');
@@ -54,11 +59,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/kerja-sama/{id}', [KerjaSamaController::class, 'update'])->name('kerja-sama.update');
         Route::delete('/kerja-sama/{id}', [KerjaSamaController::class, 'destroy'])->name('kerja-sama.destroy');
         Route::post('/kerja-sama/{id}/kirim-wa', [KerjaSamaController::class, 'kirimWhatsapp'])->name('kerja-sama.kirim-wa');
-
-        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
-        Route::post('/pengaturan/kategori', [SettingController::class, 'storeKategori'])->name('setting.kategori.store');
-        Route::delete('/pengaturan/kategori/{id}', [SettingController::class, 'destroyKategori'])->name('setting.kategori.destroy');
 
         // BKK - Perusahaan Mitra
         Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
@@ -97,6 +97,9 @@ Route::middleware('auth')->group(function () {
 
         // BKK - Laporan
         Route::get('/laporan-bkk', [LaporanBkkController::class, 'index'])->name('laporan-bkk.index');
+
+        // Kerja Sama - Laporan
+        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
     });
 
     // Kelola Kerja Sama (All Authenticated Users can view/download)

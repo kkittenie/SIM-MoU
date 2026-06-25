@@ -81,7 +81,7 @@
                             </span>
                         @else
                             <span class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20">
-                                Expired
+                                Berakhir
                             </span>
                         @endif
                     </span>

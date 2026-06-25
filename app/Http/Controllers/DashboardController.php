@@ -36,7 +36,7 @@ class DashboardController extends Controller
         // 1. Grafik Status MoU
         $statusChartData = [
             'series' => [$totalAktif, $totalAkanBerakhir, $totalExpired],
-            'labels' => ['Aktif', 'Akan Berakhir', 'Expired']
+            'labels' => ['Aktif', 'Akan Berakhir', 'Berakhir']
         ];
 
         // 2. Grafik Jenis Mitra

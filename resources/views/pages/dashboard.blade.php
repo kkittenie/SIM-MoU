@@ -293,11 +293,11 @@
             </div>
         </div>
 
-        {{-- MoU Expired --}}
+        {{-- MoU Berakhir --}}
         <div class="metric-card card-expired border border-gray-200/80 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-sm anim-pop delay-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Expired</span>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Berakhir</span>
                     <h4 class="mt-2 text-2xl font-extrabold text-red-600 dark:text-red-400 anim-count" data-count="{{ $totalExpired }}">{{ $totalExpired }}</h4>
                 </div>
                 <div class="metric-icon icon-expired">
