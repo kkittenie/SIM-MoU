@@ -115,3 +115,76 @@ test('authorized users can paginate Kerja Sama list', function () {
     $response->assertSee('Mitra Ke-1');
     $response->assertDontSee('Mitra Ke-15');
 });
+
+test('authorized users (admin, bkk) can access Laporan Kerja Sama and filter by year', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+    $bkk = User::factory()->create(['role' => 'bkk', 'status' => 'aktif']);
+    $bk = User::factory()->create(['role' => 'bk', 'status' => 'aktif']);
+
+    $cat = KategoriMitra::firstOrCreate(['nama' => 'Perusahaan']);
+
+    KerjaSama::create([
+        'kategori_mitra_id' => $cat->id,
+        'nama_mitra' => 'Mitra 2025',
+        'jenis_mitra' => 'Perusahaan',
+        'alamat' => 'Alamat A',
+        'email' => 'a@test.com',
+        'nomor_telepon' => '081',
+        'pic' => 'PIC A',
+        'nomor_mou' => 'MOU-2025',
+        'tanggal_mulai' => '2025-01-10',
+        'tanggal_berakhir' => '2026-01-10',
+    ]);
+
+    KerjaSama::create([
+        'kategori_mitra_id' => $cat->id,
+        'nama_mitra' => 'Mitra 2026',
+        'jenis_mitra' => 'Perusahaan',
+        'alamat' => 'Alamat B',
+        'email' => 'b@test.com',
+        'nomor_telepon' => '082',
+        'pic' => 'PIC B',
+        'nomor_mou' => 'MOU-2026',
+        'tanggal_mulai' => '2026-02-15',
+        'tanggal_berakhir' => '2027-02-15',
+    ]);
+
+    // Admin can access
+    $response = $this->actingAs($admin)->get(route('laporan-kerja-sama.index'));
+    $response->assertStatus(200);
+    $response->assertSee('Mitra 2025');
+    $response->assertSee('Mitra 2026');
+
+    // BKK can access
+    $response = $this->actingAs($bkk)->get(route('laporan-kerja-sama.index'));
+    $response->assertStatus(200);
+
+    // BK cannot access
+    $response = $this->actingAs($bk)->get(route('laporan-kerja-sama.index'));
+    $response->assertStatus(403);
+
+    // Filter by year 2026
+    $response = $this->actingAs($admin)->get(route('laporan-kerja-sama.index', ['year' => '2026']));
+    $response->assertStatus(200);
+    $response->assertSee('Mitra 2026');
+    $response->assertDontSee('Mitra 2025');
+});
+
+test('bkk and bk cannot access settings or notifications', function () {
+    $bkk = User::factory()->create(['role' => 'bkk', 'status' => 'aktif']);
+    $bk = User::factory()->create(['role' => 'bk', 'status' => 'aktif']);
+
+    // Check BKK cannot access settings
+    $this->actingAs($bkk)->get(route('setting.index'))->assertStatus(403);
+    $this->actingAs($bkk)->post(route('setting.kategori.store'), ['nama' => 'Forbidden'])->assertStatus(403);
+
+    // Check BKK cannot access notifications
+    $this->actingAs($bkk)->get(route('notifikasi.index'))->assertStatus(403);
+
+    // Check BK cannot access settings
+    $this->actingAs($bk)->get(route('setting.index'))->assertStatus(403);
+
+    // Check BK cannot access notifications
+    $this->actingAs($bk)->get(route('notifikasi.index'))->assertStatus(403);
+});
+

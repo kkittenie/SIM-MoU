@@ -91,8 +91,10 @@
                     </svg>
                 </button>
 
-                <!-- Notification Dropdown -->
-                <x-header.notification-dropdown />
+                @if (auth()->user()->isAdmin())
+                    <!-- Notification Dropdown -->
+                    <x-header.notification-dropdown />
+                @endif
             </div>
 
             <!-- User Dropdown -->

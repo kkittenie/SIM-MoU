@@ -100,6 +100,11 @@ class MenuHelper
                         'name' => 'Laporan BK',
                         'path' => '/bk/laporan',
                     ],
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan Kerja Sama',
+                        'path' => '/laporan-kerja-sama',
+                    ],
                 ],
             ];
         }
@@ -115,11 +120,6 @@ class MenuHelper
                 'icon' => 'alumni-bekerja',
                 'name' => 'Data Alumni Bekerja',
                 'path' => '/alumni-bekerja',
-            ];
-            $items[] = [
-                'icon' => 'perusahaan-mitra',
-                'name' => 'Data Perusahaan Mitra',
-                'path' => '/perusahaan-mitra',
             ];
             $items[] = [
                 'icon' => 'lowongan-kerja',
@@ -167,14 +167,17 @@ class MenuHelper
             ];
         }
 
-        // ════ SETTINGS (ADMIN & BKK) ════
-        if ($user && ($user->isAdmin() || $user->isBKK())) {
-            //notif
+        // ════ NOTIFIKASI (ADMIN ONLY) ════
+        if ($user && $user->isAdmin()) {
             $items[] = [
                 'icon' => 'bell',
                 'name' => 'Notifikasi',
                 'path' => '/notifikasi',
             ];
+        }
+
+        // ════ PENGATURAN (ADMIN ONLY) ════
+        if ($user && $user->isAdmin()) {
             $items[] = [
                 'icon' => 'settings',
                 'name' => 'Pengaturan',

@@ -38,7 +38,7 @@
 
                 <!-- Jenis Mitra -->
                 <div>
-                    <select name="jenis_mitra" 
+                    <select name="jenis_mitra" onchange="this.form.submit()"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         <option value="">Semua Jenis Mitra</option>
                         @foreach ($categories as $cat)
@@ -51,7 +51,7 @@
 
                 <!-- Tahun MoU -->
                 <div>
-                    <select name="year" 
+                    <select name="year" onchange="this.form.submit()"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         <option value="">Semua Tahun</option>
                         @foreach ($years as $y)
@@ -64,25 +64,21 @@
 
                 <!-- Status -->
                 <div>
-                    <select name="status" 
+                    <select name="status" onchange="this.form.submit()"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         <option value="">Semua Status MoU</option>
                         <option value="Aktif" {{ $status === 'Aktif' ? 'selected' : '' }}>Aktif</option>
                         <option value="Akan Berakhir" {{ $status === 'Akan Berakhir' ? 'selected' : '' }}>Akan Berakhir (<=30 hari)</option>
-                        <option value="Expired" {{ $status === 'Expired' ? 'selected' : '' }}>Expired</option>
+                        <option value="Berakhir" {{ $status === 'Berakhir' ? 'selected' : '' }}>Berakhir</option>
                     </select>
                 </div>
 
-                <!-- Action Button -->
-                <div class="flex items-center gap-2">
-                    <button type="submit"
-                        class="bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 h-10 text-gray-700 dark:text-white/95 rounded-lg px-4 py-2 text-sm font-medium transition w-full sm:w-auto">
-                        Filter
-                    </button>
+                <!-- Reset Button -->
+                <div class="flex items-center">
                     @if ($search || $jenisMitra || $status || $year)
                         <a href="{{ route('kerja-sama.index') }}"
-                            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm whitespace-nowrap px-2">
-                            Reset
+                            class="bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 h-10 text-gray-700 dark:text-white/95 rounded-lg px-4 py-2.5 text-sm font-medium transition inline-flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
+                            Reset Filter
                         </a>
                     @endif
                 </div>
@@ -130,7 +126,7 @@
                                     </span>
                                 @else
                                     <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20">
-                                        Expired
+                                        Berakhir
                                     </span>
                                 @endif
                             </td>

@@ -14,6 +14,7 @@ use App\Http\Controllers\LaporanBKController;
 use App\Http\Controllers\LowonganKerjaController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\LaporanBkkController;
+use App\Http\Controllers\LaporanKerjaSamaController;
 use App\Http\Controllers\TracerKuliahController;
 use App\Http\Controllers\UniversitasController;
 
@@ -46,6 +47,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/pengguna/{id}', [PenggunaController::class, 'update'])->name('pengguna.update');
         Route::delete('/pengguna/{id}', [PenggunaController::class, 'destroy'])->name('pengguna.destroy');
 
+        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
+        Route::post('/pengaturan/kategori', [SettingController::class, 'storeKategori'])->name('setting.kategori.store');
+        Route::delete('/pengaturan/kategori/{id}', [SettingController::class, 'destroyKategori'])->name('setting.kategori.destroy');
+
         // ╔═══ Universitas CRUD ═══╗
         Route::get('/universitas', [UniversitasController::class, 'index'])->name('universitas.index');
         Route::get('/universitas/tambah', [UniversitasController::class, 'create'])->name('universitas.create');
@@ -54,10 +60,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/universitas/{universitas}/ubah', [UniversitasController::class, 'edit'])->name('universitas.edit');
         Route::put('/universitas/{universitas}', [UniversitasController::class, 'update'])->name('universitas.update');
         Route::delete('/universitas/{universitas}', [UniversitasController::class, 'destroy'])->name('universitas.destroy');
-    });
 
-    // Admin & BKK
-    Route::middleware('role:admin,bkk')->group(function () {
         //notifikasi
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
@@ -72,11 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/kerja-sama/{id}', [KerjaSamaController::class, 'destroy'])->name('kerja-sama.destroy');
         Route::post('/kerja-sama/{id}/kirim-wa', [KerjaSamaController::class, 'kirimWhatsapp'])->name('kerja-sama.kirim-wa');
 
-        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
-        Route::post('/pengaturan/kategori', [SettingController::class, 'storeKategori'])->name('setting.kategori.store');
-        Route::delete('/pengaturan/kategori/{id}', [SettingController::class, 'destroyKategori'])->name('setting.kategori.destroy');
-
+        // Perusahaan Mitra
         Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
         Route::get('/perusahaan-mitra/tambah', [PerusahaanMitraController::class, 'create'])->name('perusahaan-mitra.create');
         Route::post('/perusahaan-mitra', [PerusahaanMitraController::class, 'store'])->name('perusahaan-mitra.store');
@@ -85,6 +84,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'update'])->name('perusahaan-mitra.update');
         Route::delete('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'destroy'])->name('perusahaan-mitra.destroy');
 
+        // Kerja Sama - Laporan
+        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
+    });
+
+    // Admin & BKK
+    Route::middleware('role:admin,bkk')->group(function () {
         Route::get('/alumni-bekerja', [AlumniBekerjaController::class, 'index'])->name('alumni-bekerja.index');
         Route::get('/alumni-bekerja/tambah', [AlumniBekerjaController::class, 'create'])->name('alumni-bekerja.create');
         Route::post('/alumni-bekerja', [AlumniBekerjaController::class, 'store'])->name('alumni-bekerja.store');

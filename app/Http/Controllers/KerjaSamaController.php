@@ -41,7 +41,7 @@ class KerjaSamaController extends Controller
         }
 
         if ($status) {
-            if ($status === 'Expired') {
+            if ($status === 'Berakhir') {
                 $query->where('tanggal_berakhir', '<', $today);
             } elseif ($status === 'Akan Berakhir') {
                 $query->whereBetween('tanggal_berakhir', [$today, $thirtyDaysLater]);

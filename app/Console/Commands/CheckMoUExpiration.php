@@ -94,7 +94,7 @@ class CheckMoUExpiration extends Command
             case 'warning_7':
                 return "Peringatan: MoU dengan {$ks->nama_mitra} Berakhir dalam 7 Hari";
             case 'expired':
-                return "MoU dengan {$ks->nama_mitra} Telah Kadaluarsa";
+                return "MoU dengan {$ks->nama_mitra} Telah Berakhir";
             default:
                 return "Pemberitahuan Kerja Sama";
         }
@@ -114,7 +114,7 @@ class CheckMoUExpiration extends Command
             case 'warning_7':
                 return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} tinggal 7 hari lagi! Berakhir pada {$dateStr}. Hubungi PIC: {$ks->pic} ({$ks->nomor_telepon}).";
             case 'expired':
-                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} telah kadaluarsa sejak tanggal {$dateStr}.";
+                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} telah berakhir sejak tanggal {$dateStr}.";
             default:
                 return "Detail kerja sama telah diperbarui.";
         }

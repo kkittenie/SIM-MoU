@@ -105,7 +105,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs">
                                         @if($log->type === 'expired')
-                                            <span class="text-red-500 font-semibold">Expired</span>
+                                            <span class="text-red-500 font-semibold">Berakhir</span>
                                         @else
                                             <span class="text-amber-500 font-semibold">{{ str_replace('warning_', '', $log->type) }} Hari</span>
                                         @endif
