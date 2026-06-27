@@ -1,15 +1,15 @@
-@extends('layouts.app', ['title' => 'Tambah Tracer Study'])
+@extends('layouts.app', ['title' => 'Tambah Tracer Bekerja'])
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Tambah Tracer Study" />
+    <x-common.page-breadcrumb pageTitle="Tambah Tracer Bekerja" />
 
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs max-w-2xl">
         <div class="p-6 border-b border-gray-100 dark:border-gray-800">
             <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">
-                Formulir Tambah Data Tracer Study
+                Formulir Tambah Data Tracer Bekerja
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Isi data di bawah ini untuk mendokumentasikan pelacakan alumni (Tracer Study).
+                Isi data di bawah ini untuk mendokumentasikan pelacakan alumni bekerja (Tracer Bekerja).
             </p>
         </div>
 
@@ -24,9 +24,9 @@
                 </div>
             @endif
 
-            <form action="{{ route('tracer-study.store') }}" method="POST" class="space-y-6" 
+            <form action="{{ route('bkk.tracer-study.store') }}" method="POST" class="space-y-6" 
                 x-data="{ 
-                    status: '{{ old('status_alumni', '') }}',
+                    status: 'Bekerja',
                     get detailLabel() {
                         if (this.status === 'Bekerja') return 'Nama Perusahaan';
                         if (this.status === 'Kuliah') return 'Nama Kampus / Universitas';
@@ -62,17 +62,13 @@
 
                 <!-- Status Alumni -->
                 <div>
-                    <label for="status_alumni" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Status Alumni Saat Ini <span class="text-error-500">*</span>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Status Alumni Saat Ini
                     </label>
-                    <select id="status_alumni" name="status_alumni" required x-model="status"
-                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Status Alumni --</option>
-                        <option value="Bekerja">Bekerja</option>
-                        <option value="Kuliah">Kuliah / Studi Lanjut</option>
-                        <option value="Wirausaha">Wirausaha / Mandiri</option>
-                        <option value="Mencari Kerja">Mencari Kerja / Belum Bekerja</option>
-                    </select>
+                    <input type="hidden" name="status_alumni" value="Bekerja" />
+                    <div class="inline-flex items-center rounded-md bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400">
+                        Bekerja
+                    </div>
                 </div>
 
                 <!-- Detail Status (Conditional Label & Hint) -->
@@ -99,7 +95,7 @@
                         class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white transition">
                         Simpan
                     </button>
-                    <a href="{{ route('tracer-study.index') }}"
+                    <a href="{{ route('bkk.tracer-study.index') }}"
                         class="border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5 inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition">
                         Batal
                     </a>

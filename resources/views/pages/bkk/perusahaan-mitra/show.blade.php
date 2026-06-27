@@ -89,11 +89,11 @@
                 </div>
 
                 <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2">
-                    <a href="{{ route('perusahaan-mitra.edit', $mitra->id) }}"
+                    <a href="{{ route('bkk.perusahaan-mitra.edit', $mitra->id) }}"
                         class="flex-1 bg-yellow-500 hover:bg-yellow-600 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                         Ubah Data
                     </a>
-                    <a href="{{ route('perusahaan-mitra.index') }}"
+                    <a href="{{ route('bkk.perusahaan-mitra.index') }}"
                         class="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition">
                         Kembali
                     </a>
@@ -125,7 +125,7 @@
                             @forelse ($mitra->alumniBekerja as $alumni)
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
                                     <td class="px-6 py-3.5 whitespace-nowrap font-medium text-gray-800 dark:text-white/90">
-                                        <a href="{{ route('alumni-bekerja.show', $alumni->id) }}" class="text-brand-600 hover:underline dark:text-brand-400">
+                                        <a href="{{ route('bkk.alumni-bekerja.show', $alumni->id) }}" class="text-brand-600 hover:underline dark:text-brand-400">
                                             {{ $alumni->nama_alumni }}
                                         </a>
                                     </td>
@@ -172,7 +172,7 @@
                             @forelse ($mitra->lowonganKerja as $loker)
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
                                     <td class="px-6 py-3.5 whitespace-nowrap font-medium text-gray-800 dark:text-white/90">
-                                        <a href="{{ route('lowongan-kerja.show', $loker->id) }}" class="text-brand-600 hover:underline dark:text-brand-400">
+                                        <a href="{{ route('bkk.lowongan-kerja.show', $loker->id) }}" class="text-brand-600 hover:underline dark:text-brand-400">
                                             {{ $loker->judul }}
                                         </a>
                                     </td>

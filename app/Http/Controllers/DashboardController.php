@@ -7,6 +7,7 @@ use App\Models\KerjaSama;
 use App\Models\PerusahaanMitra;
 use App\Models\AlumniBekerja;
 use App\Models\AlumniKuliah;
+use App\Models\AlumniWirausaha;
 use App\Models\LowonganKerja;
 use App\Models\TracerStudy;
 use App\Models\Universitas;
@@ -152,13 +153,11 @@ class DashboardController extends Controller
         $totalAlumniBekerja = AlumniBekerja::count();
         $totalPerusahaanMitra = PerusahaanMitra::count();
         $totalLowonganKerja = LowonganKerja::where('status', 'Aktif')->count();
-        $totalTracerStudy = TracerStudy::count();
+        $totalTracerStudy = TracerStudy::whereIn('status_alumni', ['Bekerja', 'Mencari Kerja'])->count();
 
         // 1. Grafik Persentase Alumni Bekerja (Tracer Study)
         $tracerStats = [
             'Bekerja' => TracerStudy::where('status_alumni', 'Bekerja')->count(),
-            'Kuliah' => TracerStudy::where('status_alumni', 'Kuliah')->count(),
-            'Wirausaha' => TracerStudy::where('status_alumni', 'Wirausaha')->count(),
             'Mencari Kerja' => TracerStudy::where('status_alumni', 'Mencari Kerja')->count(),
         ];
 
@@ -222,9 +221,9 @@ class DashboardController extends Controller
 
         // Insight 1: Tingkat Keterserapan
         if ($totalTracerStudy > 0) {
-            $bekerjaOrWirausaha = $tracerStats['Bekerja'] + $tracerStats['Wirausaha'];
-            $rate = ($bekerjaOrWirausaha / $totalTracerStudy) * 100;
-            $insights[] = "Tingkat keterserapan kerja & wirausaha alumni mencapai " . number_format($rate, 1) . "% (" . $bekerjaOrWirausaha . " dari " . $totalTracerStudy . " responden).";
+            $bekerja = $tracerStats['Bekerja'];
+            $rate = ($bekerja / $totalTracerStudy) * 100;
+            $insights[] = "Tingkat keterserapan kerja alumni mencapai " . number_format($rate, 1) . "% (" . $bekerja . " dari " . $totalTracerStudy . " responden BKK).";
         } else {
             $insights[] = "Belum ada respon Tracer Study masuk.";
         }
@@ -241,7 +240,7 @@ class DashboardController extends Controller
             $insights[] = "Mitra perekrut utama alumni saat ini adalah \"{$topPerusahaan->perusahaan_nama}\" dengan total {$topPerusahaan->total} alumni.";
         }
 
-        return view('pages.dashboard.bkk', compact(
+        return view('pages.bkk.dashboard', compact(
             'totalAlumniBekerja',
             'totalPerusahaanMitra',
             'totalLowonganKerja',
@@ -257,21 +256,16 @@ class DashboardController extends Controller
     private function bkDashboard()
     {
         $totalAlumniKuliah = AlumniKuliah::count();
+        $totalAlumniWirausaha = AlumniWirausaha::count();
         $totalUniversitas = Universitas::where('status', 'aktif')->count();
 
-        // Hitung status alumni
-        $totalAktif = AlumniKuliah::where('status_alumni', 'aktif')->count();
-        $totalLulus = AlumniKuliah::where('status_alumni', 'lulus')->count();
-        $totalCuti = AlumniKuliah::where('status_alumni', 'cuti')->count();
-        $totalBelumTerdata = AlumniKuliah::where('status_alumni', 'belum_terdata')->count();
-
-        // 1. Grafik Status Alumni Kuliah (Donut)
-        $statusChartData = [
-            'series' => [$totalAktif, $totalLulus, $totalCuti],
-            'labels' => ['Aktif', 'Lulus', 'Cuti']
+        // 1. Grafik Persentase Penyaluran BK (Kuliah vs Wirausaha) - Donut
+        $distribChartData = [
+            'series' => [$totalAlumniKuliah, $totalAlumniWirausaha],
+            'labels' => ['Kuliah', 'Wirausaha']
         ];
 
-        // 2. Grafik Distribusi Alumni per Universitas (Bar Horizontal)
+        // 2. Grafik Distribusi Alumni per Universitas (Kampus Tujuan Terbanyak)
         $alumniPerUniversitas = AlumniKuliah::select('universitas_id')
             ->with('universitas')
             ->groupBy('universitas_id')
@@ -293,7 +287,24 @@ class DashboardController extends Controller
             $universChartData['series'] = [0];
         }
 
-        // 3. Grafik Tren Alumni per Tahun Lulus (Area)
+        // 3. Grafik Bidang Usaha Terbanyak
+        $wirausahaStats = AlumniWirausaha::select('bidang_usaha', \DB::raw('count(*) as total'))
+            ->groupBy('bidang_usaha')
+            ->orderBy('total', 'desc')
+            ->limit(6)
+            ->get();
+
+        $wirausahaChartData = [
+            'labels' => $wirausahaStats->pluck('bidang_usaha')->toArray(),
+            'series' => $wirausahaStats->pluck('total')->toArray()
+        ];
+
+        if (empty($wirausahaChartData['labels'])) {
+            $wirausahaChartData['labels'] = ['Belum ada data'];
+            $wirausahaChartData['series'] = [0];
+        }
+
+        // 4. Grafik Tren Alumni per Tahun Lulus (Area)
         $trendAlumni = AlumniKuliah::select('tahun_lulus')
             ->selectRaw('count(*) as total')
             ->groupBy('tahun_lulus')
@@ -310,70 +321,33 @@ class DashboardController extends Controller
             $trendChartData['series'] = [0];
         }
 
-        // 4. Grafik Program Studi Terbanyak (Bar)
-        $programStats = AlumniKuliah::select('program_studi')
-            ->selectRaw('count(*) as total')
-            ->groupBy('program_studi')
-            ->orderBy('total', 'desc')
-            ->limit(6)
-            ->get();
-
-        $programChartData = [
-            'labels' => $programStats->pluck('program_studi')->toArray(),
-            'series' => $programStats->pluck('total')->toArray()
-        ];
-
-        if (empty($programChartData['labels'])) {
-            $programChartData['labels'] = ['Belum ada data'];
-            $programChartData['series'] = [0];
-        }
-
-        // 5. Dynamic Insights ✅ FIXED
+        // 5. Dynamic Insights
         $insights = [];
+        $insights[] = "Terdapat <strong>{$totalAlumniKuliah} alumni</strong> melanjutkan kuliah dan <strong>{$totalAlumniWirausaha} alumni</strong> yang berwirausaha.";
 
-        // Insight 1: Total alumni
-        $insights[] = "Terdapat <strong>{$totalAlumniKuliah} alumni</strong> yang tercatat melanjutkan pendidikan tinggi.";
-
-        // Check apakah ada data sebelum hitung
         if ($totalAlumniKuliah > 0) {
-            // Insight 2: Status terbanyak
-            $statusTerbanyak = ['Aktif' => $totalAktif, 'Lulus' => $totalLulus, 'Cuti' => $totalCuti];
-            $maxStatus = array_key_first($statusTerbanyak);
-            $maxValue = max($statusTerbanyak);
-            $insights[] = "Status alumni terbanyak adalah <strong>{$maxStatus}</strong> dengan {$maxValue} orang (" .
-                        number_format(($maxValue / $totalAlumniKuliah) * 100, 1) . "%).";
-
-            // Insight 3: Universitas terpopuler
             $topUniv = $alumniPerUniversitas->first();
             if ($topUniv && $topUniv->universitas) {
                 $univName = $topUniv->universitas->nama_universitas;
-                $insights[] = "Universitas <strong>{$univName}</strong> menerima alumni terbanyak dengan {$topUniv->total} orang.";
+                $insights[] = "Perguruan tinggi terpopuler adalah <strong>{$univName}</strong> dengan {$topUniv->total} alumni.";
             }
+        }
 
-            // Insight 4: Program studi terpopuler
-            $topProgram = $programStats->first();
-            if ($topProgram) {
-                $insights[] = "Program studi <strong>{$topProgram->program_studi}</strong> dipilih oleh {$topProgram->total} alumni.";
+        if ($totalAlumniWirausaha > 0) {
+            $topBidang = $wirausahaStats->first();
+            if ($topBidang) {
+                $insights[] = "Bidang usaha terpopuler adalah <strong>{$topBidang->bidang_usaha}</strong> dengan {$topBidang->total} alumni wirausaha.";
             }
-
-            // Insight 5: Distribusi tahun lulus
-            $currentYear = date('Y');
-            $countCurrentYear = AlumniKuliah::whereYear('tahun_lulus', $currentYear)->count();
-            $insights[] = "Alumni yang lulus tahun {$currentYear} berjumlah <strong>{$countCurrentYear} orang</strong>.";
-        } else {
-            $insights[] = "Belum ada data alumni. Silakan mulai input data alumni kuliah untuk melihat insight.";
         }
 
         return view('pages.bk.dashboard', compact(
             'totalAlumniKuliah',
+            'totalAlumniWirausaha',
             'totalUniversitas',
-            'totalAktif',
-            'totalLulus',
-            'totalCuti',
-            'statusChartData',
+            'distribChartData',
             'universChartData',
+            'wirausahaChartData',
             'trendChartData',
-            'programChartData',
             'insights'
         ));
     }

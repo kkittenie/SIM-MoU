@@ -50,7 +50,7 @@
                 Laporan Bimbingan Konseling (BK)
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                Pantau metrik alumni kuliah dan tracer study.
+                Pantau metrik alumni kuliah, wirausaha, dan tracer study.
             </p>
         </div>
 
@@ -91,11 +91,17 @@
     </div>
 
     <!-- Summary Metrics Cards -->
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 md:gap-5 mb-6 print:grid-cols-4 print:gap-4 print:mb-4">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-5 md:gap-5 mb-6 print:grid-cols-5 print:gap-4 print:mb-4">
         <!-- Alumni Kuliah -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
             <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Alumni Kuliah</span>
             <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalAlumniKuliah }}</h4>
+        </div>
+
+        <!-- Alumni Wirausaha -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
+            <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Alumni Wirausaha</span>
+            <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalAlumniWirausaha }}</h4>
         </div>
 
         <!-- Universitas -->
@@ -118,7 +124,7 @@
     </div>
 
     <!-- Statistics Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 print:grid-cols-3 print:gap-4 print:mb-4">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 print:grid-cols-4 print:gap-4 print:mb-4">
         <!-- 1. Universitas Terbanyak -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
             <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Universitas Terbanyak</h3>
@@ -165,9 +171,32 @@
             </div>
         </div>
 
-        <!-- 3. Status Alumni -->
+        <!-- 3. Bidang Usaha Terbanyak -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
-            <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Status Alumni</h3>
+            <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Bidang Usaha Terbanyak</h3>
+            <div class="space-y-4">
+                @forelse($bidangUsahaStats as $row)
+                    @php
+                        $percentage = $totalAlumniWirausaha > 0 ? ($row->total / $totalAlumniWirausaha) * 100 : 0;
+                    @endphp
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 print:text-black">
+                            <span>{{ $row->bidang_usaha }}</span>
+                            <span>{{ $row->total }} alumni ({{ number_format($percentage, 1) }}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 dark:bg-gray-800 print:bg-gray-200">
+                            <div class="bg-amber-500 h-2 rounded-full print:bg-black" style="width: {{ $percentage }}%"></div>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-xs text-gray-400 text-center">Belum ada data bidang usaha.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- 4. Status Alumni Kuliah -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
+            <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Status Alumni Kuliah</h3>
             <div class="space-y-4">
                 @foreach($statusStats as $status => $count)
                     @php
@@ -179,7 +208,7 @@
                             <span>{{ $count }} org ({{ number_format($percentage, 1) }}%)</span>
                         </div>
                         <div class="w-full bg-gray-100 rounded-full h-2 dark:bg-gray-800 print:bg-gray-200">
-                            <div class="bg-amber-500 h-2 rounded-full print:bg-black" style="width: {{ $percentage }}%"></div>
+                            <div class="bg-indigo-500 h-2 rounded-full print:bg-black" style="width: {{ $percentage }}%"></div>
                         </div>
                     </div>
                 @endforeach
@@ -195,7 +224,7 @@
                     Daftar Alumni Kuliah
                 </h3>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 no-print">
-                    Menampilkan daftar detail alumni yang terdaftar di universitas.
+                    Menampilkan daftar detail alumni yang melanjutkan kuliah.
                 </p>
             </div>
             <!-- Year filter buttons -->
@@ -275,6 +304,80 @@
         </div>
     </div>
 
+    <!-- Detailed Table of Alumni Wirausaha -->
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300 mt-6">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-800 print:border-none print:p-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h3 class="text-base font-bold text-gray-800 dark:text-white/90 print:text-black print:text-sm">
+                    Daftar Alumni Wirausaha
+                </h3>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 no-print">
+                    Menampilkan daftar detail alumni yang berwirausaha.
+                </p>
+            </div>
+            <!-- Year filter buttons for wirausaha -->
+            <div class="flex flex-wrap gap-1.5 no-print" id="tahun-wirausaha-filters">
+                <button data-tahun="all"
+                    class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 bg-brand-500 text-white border-brand-500 shadow-theme-xs">
+                    Semua
+                </button>
+                @foreach($tahunLulusList as $tahun)
+                    <button data-tahun="{{ $tahun }}"
+                        class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-white/5">
+                        {{ $tahun }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400 print:text-black">
+                <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 print:bg-gray-100 print:text-black">
+                    <tr>
+                        <th class="px-6 py-4">Nama Alumni</th>
+                        <th class="px-6 py-4">Nama Usaha</th>
+                        <th class="px-6 py-4">Bidang Usaha</th>
+                        <th class="px-6 py-4">Lama Usaha</th>
+                        <th class="px-6 py-4">Tahun Lulus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
+                    @forelse ($alumniWirausahaList as $row)
+                        <tr class="wirausaha-row hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors print:hover:bg-transparent" data-tahun="{{ $row->tahun_lulus }}">
+                            <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black print:font-semibold">
+                                {{ $row->nama_alumni }}
+                            </td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                {{ $row->nama_usaha }}
+                            </td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                {{ $row->bidang_usaha }}
+                            </td>
+                            <td class="px-6 py-3.5 whitespace-nowrap">
+                                {{ $row->lama_usaha }}
+                            </td>
+                            <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black">{{ $row->tahun_lulus }}</td>
+                        </tr>
+                    @empty
+                        <tr id="empty-wirausaha-row">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                                Tidak ada data alumni wirausaha ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
+
+                    @if(count($alumniWirausahaList) > 0)
+                        <tr id="empty-wirausaha-row" style="display: none;">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                                Tidak ada data alumni wirausaha ditemukan untuk tahun yang dipilih.
+                            </td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Tracer Study Section (jika ada data) -->
     @if(count($tracerList) > 0)
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300 mt-6">
@@ -334,16 +437,16 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('#tahun-alumni-filters .filter-btn');
-        const rows = document.querySelectorAll('.alumni-row');
-        const emptyRow = document.getElementById('empty-alumni-row');
+        // Alumni Kuliah Filters
+        const alumniButtons = document.querySelectorAll('#tahun-alumni-filters .filter-btn');
+        const alumniRows = document.querySelectorAll('.alumni-row');
+        const emptyAlumniRow = document.getElementById('empty-alumni-row');
 
-        buttons.forEach(btn => {
+        alumniButtons.forEach(btn => {
             btn.addEventListener('click', function () {
                 const selectedYear = this.getAttribute('data-tahun');
 
-                // Update active button styling
-                buttons.forEach(b => {
+                alumniButtons.forEach(b => {
                     b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
                     b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
                 });
@@ -352,8 +455,7 @@
                 this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
 
                 let shownCount = 0;
-
-                rows.forEach(row => {
+                alumniRows.forEach(row => {
                     const rowYear = row.getAttribute('data-tahun');
                     if (selectedYear === 'all' || rowYear === selectedYear) {
                         row.style.display = '';
@@ -363,12 +465,42 @@
                     }
                 });
 
-                if (emptyRow) {
-                    if (shownCount === 0) {
-                        emptyRow.style.display = '';
+                if (emptyAlumniRow) {
+                    emptyAlumniRow.style.display = shownCount === 0 ? '' : 'none';
+                }
+            });
+        });
+
+        // Wirausaha Filters
+        const wirausahaButtons = document.querySelectorAll('#tahun-wirausaha-filters .filter-btn');
+        const wirausahaRows = document.querySelectorAll('.wirausaha-row');
+        const emptyWirausahaRow = document.getElementById('empty-wirausaha-row');
+
+        wirausahaButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const selectedYear = this.getAttribute('data-tahun');
+
+                wirausahaButtons.forEach(b => {
+                    b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
+                    b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
+                });
+
+                this.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
+                this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
+
+                let shownCount = 0;
+                wirausahaRows.forEach(row => {
+                    const rowYear = row.getAttribute('data-tahun');
+                    if (selectedYear === 'all' || rowYear === selectedYear) {
+                        row.style.display = '';
+                        shownCount++;
                     } else {
-                        emptyRow.style.display = 'none';
+                        row.style.display = 'none';
                     }
+                });
+
+                if (emptyWirausahaRow) {
+                    emptyWirausahaRow.style.display = shownCount === 0 ? '' : 'none';
                 }
             });
         });

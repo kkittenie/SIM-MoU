@@ -39,12 +39,17 @@ class MenuHelper
                     [
                         'icon' => 'alumni-bekerja',
                         'name' => 'Alumni Bekerja',
-                        'path' => '/alumni-bekerja',
+                        'path' => '/bkk/alumni-bekerja',
                     ],
                     [
                         'icon' => 'alumni-kuliah',
                         'name' => 'Alumni Kuliah',
                         'path' => '/bk/alumni-kuliah',
+                    ],
+                    [
+                        'icon' => 'tracer-study',
+                        'name' => 'Alumni Wirausaha',
+                        'path' => '/bk/alumni-wirausaha',
                     ],
                 ],
             ];
@@ -52,7 +57,7 @@ class MenuHelper
             $items[] = [
                 'icon' => 'perusahaan-mitra',
                 'name' => 'Data Perusahaan Mitra',
-                'path' => '/perusahaan-mitra',
+                'path' => '/bkk/perusahaan-mitra',
             ];
             $items[] = [
                 'icon' => 'universitas',
@@ -62,7 +67,7 @@ class MenuHelper
             $items[] = [
                 'icon' => 'lowongan-kerja',
                 'name' => 'Lowongan Kerja',
-                'path' => '/lowongan-kerja',
+                'path' => '/bkk/lowongan-kerja',
             ];
 
             // tracer sub-menu
@@ -74,7 +79,7 @@ class MenuHelper
                     [
                         'icon' => 'tracer-study',
                         'name' => 'Tracer Bekerja',
-                        'path' => '/tracer-study',
+                        'path' => '/bkk/tracer-study',
                     ],
                     [
                         'icon' => 'tracer-study',
@@ -93,7 +98,7 @@ class MenuHelper
                     [
                         'icon' => 'laporan',
                         'name' => 'Laporan BKK',
-                        'path' => '/laporan-bkk',
+                        'path' => '/bkk/laporan',
                     ],
                     [
                         'icon' => 'laporan',
@@ -119,22 +124,22 @@ class MenuHelper
             $items[] = [
                 'icon' => 'alumni-bekerja',
                 'name' => 'Data Alumni Bekerja',
-                'path' => '/alumni-bekerja',
+                'path' => '/bkk/alumni-bekerja',
             ];
             $items[] = [
                 'icon' => 'lowongan-kerja',
                 'name' => 'Lowongan Kerja',
-                'path' => '/lowongan-kerja',
+                'path' => '/bkk/lowongan-kerja',
             ];
             $items[] = [
                 'icon' => 'tracer-study',
-                'name' => 'Tracer Study',
-                'path' => '/tracer-study',
+                'name' => 'Tracer Bekerja',
+                'path' => '/bkk/tracer-study',
             ];
             $items[] = [
                 'icon' => 'laporan',
                 'name' => 'Laporan BKK',
-                'path' => '/laporan-bkk',
+                'path' => '/bkk/laporan',
             ];
         }
 
@@ -147,17 +152,17 @@ class MenuHelper
             ];
             $items[] = [
                 'icon' => 'alumni-kuliah',
-                'name' => 'Alumni Kuliah',
+                'name' => 'Data Alumni Kuliah',
                 'path' => '/bk/alumni-kuliah',
             ];
             $items[] = [
-                'icon' => 'universitas',
-                'name' => 'Universitas',
-                'path' => '/bk/universitas',
+                'icon' => 'tracer-study',
+                'name' => 'Data Alumni Wirausaha',
+                'path' => '/bk/alumni-wirausaha',
             ];
             $items[] = [
                 'icon' => 'tracer-study',
-                'name' => 'Tracer Study Kuliah',
+                'name' => 'Tracer Study',
                 'path' => '/bk/tracer-kuliah',
             ];
             $items[] = [

@@ -19,7 +19,7 @@ class LaporanBkkController extends Controller
 
         // Metrik Ringkasan
         $queryAlumni = AlumniBekerja::query();
-        $queryTracer = TracerStudy::query();
+        $queryTracer = TracerStudy::query()->whereIn('status_alumni', ['Bekerja', 'Mencari Kerja']);
 
         if ($tahunLulus) {
             $queryAlumni->where('tahun_lulus', $tahunLulus);
@@ -34,8 +34,6 @@ class LaporanBkkController extends Controller
         // Hitung persentase tracer study
         $tracerStats = [
             'Bekerja' => (clone $queryTracer)->where('status_alumni', 'Bekerja')->count(),
-            'Kuliah' => (clone $queryTracer)->where('status_alumni', 'Kuliah')->count(),
-            'Wirausaha' => (clone $queryTracer)->where('status_alumni', 'Wirausaha')->count(),
             'Mencari Kerja' => (clone $queryTracer)->where('status_alumni', 'Mencari Kerja')->count(),
         ];
 
@@ -62,7 +60,7 @@ class LaporanBkkController extends Controller
         // Data list untuk dicetak
         $alumniList = (clone $queryAlumni)->latest()->get();
 
-        return view('pages.laporan.bkk', compact(
+        return view('pages.bkk.laporan.index', compact(
             'totalAlumniBekerja',
             'totalMitra',
             'totalTracer',

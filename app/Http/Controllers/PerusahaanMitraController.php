@@ -31,7 +31,7 @@ class PerusahaanMitraController extends Controller
         // Ambil daftar bidang industri unik untuk filter
         $industriList = PerusahaanMitra::distinct()->pluck('bidang_industri')->filter()->toArray();
 
-        return view('pages.perusahaan-mitra.index', compact('mitras', 'search', 'industri', 'industriList'));
+        return view('pages.bkk.perusahaan-mitra.index', compact('mitras', 'search', 'industri', 'industriList'));
     }
 
     /**
@@ -39,7 +39,7 @@ class PerusahaanMitraController extends Controller
      */
     public function create()
     {
-        return view('pages.perusahaan-mitra.create');
+        return view('pages.bkk.perusahaan-mitra.create');
     }
 
     /**
@@ -71,7 +71,7 @@ class PerusahaanMitraController extends Controller
 
         PerusahaanMitra::create($validated);
 
-        return redirect()->route('perusahaan-mitra.index')
+        return redirect()->route('bkk.perusahaan-mitra.index')
             ->with('success', 'Perusahaan mitra berhasil ditambahkan.');
     }
 
@@ -81,7 +81,7 @@ class PerusahaanMitraController extends Controller
     public function show($id)
     {
         $mitra = PerusahaanMitra::with(['alumniBekerja', 'lowonganKerja'])->findOrFail($id);
-        return view('pages.perusahaan-mitra.show', compact('mitra'));
+        return view('pages.bkk.perusahaan-mitra.show', compact('mitra'));
     }
 
     /**
@@ -90,7 +90,7 @@ class PerusahaanMitraController extends Controller
     public function edit($id)
     {
         $mitra = PerusahaanMitra::findOrFail($id);
-        return view('pages.perusahaan-mitra.edit', compact('mitra'));
+        return view('pages.bkk.perusahaan-mitra.edit', compact('mitra'));
     }
 
     /**
@@ -124,7 +124,7 @@ class PerusahaanMitraController extends Controller
 
         $mitra->update($validated);
 
-        return redirect()->route('perusahaan-mitra.index')
+        return redirect()->route('bkk.perusahaan-mitra.index')
             ->with('success', 'Data perusahaan mitra berhasil diperbarui.');
     }
 
@@ -136,7 +136,7 @@ class PerusahaanMitraController extends Controller
         $mitra = PerusahaanMitra::findOrFail($id);
         $mitra->delete();
 
-        return redirect()->route('perusahaan-mitra.index')
+        return redirect()->route('bkk.perusahaan-mitra.index')
             ->with('success', 'Perusahaan mitra berhasil dihapus.');
     }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\LaporanBkkController;
 use App\Http\Controllers\LaporanKerjaSamaController;
 use App\Http\Controllers\TracerKuliahController;
 use App\Http\Controllers\UniversitasController;
+use App\Http\Controllers\AlumniWirausahaController;
 
 // ════════════════════════════════════════════════
 // GUEST ROUTES
@@ -74,47 +75,53 @@ Route::middleware('auth')->group(function () {
         Route::put('/kerja-sama/{id}', [KerjaSamaController::class, 'update'])->name('kerja-sama.update');
         Route::delete('/kerja-sama/{id}', [KerjaSamaController::class, 'destroy'])->name('kerja-sama.destroy');
         Route::post('/kerja-sama/{id}/kirim-wa', [KerjaSamaController::class, 'kirimWhatsapp'])->name('kerja-sama.kirim-wa');
-
-        // Perusahaan Mitra
-        Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
-        Route::get('/perusahaan-mitra/tambah', [PerusahaanMitraController::class, 'create'])->name('perusahaan-mitra.create');
-        Route::post('/perusahaan-mitra', [PerusahaanMitraController::class, 'store'])->name('perusahaan-mitra.store');
-        Route::get('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'show'])->name('perusahaan-mitra.show');
-        Route::get('/perusahaan-mitra/{id}/ubah', [PerusahaanMitraController::class, 'edit'])->name('perusahaan-mitra.edit');
-        Route::put('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'update'])->name('perusahaan-mitra.update');
-        Route::delete('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'destroy'])->name('perusahaan-mitra.destroy');
-
-        // Kerja Sama - Laporan
-        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
     });
 
     // Admin & BKK
     Route::middleware('role:admin,bkk')->group(function () {
-        Route::get('/alumni-bekerja', [AlumniBekerjaController::class, 'index'])->name('alumni-bekerja.index');
-        Route::get('/alumni-bekerja/tambah', [AlumniBekerjaController::class, 'create'])->name('alumni-bekerja.create');
-        Route::post('/alumni-bekerja', [AlumniBekerjaController::class, 'store'])->name('alumni-bekerja.store');
-        Route::get('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'show'])->name('alumni-bekerja.show');
-        Route::get('/alumni-bekerja/{id}/ubah', [AlumniBekerjaController::class, 'edit'])->name('alumni-bekerja.edit');
-        Route::put('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'update'])->name('alumni-bekerja.update');
-        Route::delete('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'destroy'])->name('alumni-bekerja.destroy');
+        // Kerja Sama - Laporan
+        Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
 
-        Route::get('/lowongan-kerja', [LowonganKerjaController::class, 'index'])->name('lowongan-kerja.index');
-        Route::get('/lowongan-kerja/tambah', [LowonganKerjaController::class, 'create'])->name('lowongan-kerja.create');
-        Route::post('/lowongan-kerja', [LowonganKerjaController::class, 'store'])->name('lowongan-kerja.store');
-        Route::get('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'show'])->name('lowongan-kerja.show');
-        Route::get('/lowongan-kerja/{id}/ubah', [LowonganKerjaController::class, 'edit'])->name('lowongan-kerja.edit');
-        Route::put('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'update'])->name('lowongan-kerja.update');
-        Route::delete('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'destroy'])->name('lowongan-kerja.destroy');
+        Route::prefix('bkk')->name('bkk.')->group(function () {
+            // Perusahaan Mitra
+            Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
+            Route::get('/perusahaan-mitra/tambah', [PerusahaanMitraController::class, 'create'])->name('perusahaan-mitra.create');
+            Route::post('/perusahaan-mitra', [PerusahaanMitraController::class, 'store'])->name('perusahaan-mitra.store');
+            Route::get('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'show'])->name('perusahaan-mitra.show');
+            Route::get('/perusahaan-mitra/{id}/ubah', [PerusahaanMitraController::class, 'edit'])->name('perusahaan-mitra.edit');
+            Route::put('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'update'])->name('perusahaan-mitra.update');
+            Route::delete('/perusahaan-mitra/{id}', [PerusahaanMitraController::class, 'destroy'])->name('perusahaan-mitra.destroy');
 
-        Route::get('/tracer-study', [TracerStudyController::class, 'index'])->name('tracer-study.index');
-        Route::get('/tracer-study/tambah', [TracerStudyController::class, 'create'])->name('tracer-study.create');
-        Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer-study.store');
-        Route::get('/tracer-study/{id}/ubah', [TracerStudyController::class, 'edit'])->name('tracer-study.edit');
-        Route::put('/tracer-study/{id}', [TracerStudyController::class, 'update'])->name('tracer-study.update');
-        Route::delete('/tracer-study/{id}', [TracerStudyController::class, 'destroy'])->name('tracer-study.destroy');
-        Route::post('/tracer-study/bulk-delete', [TracerStudyController::class, 'bulkDelete'])->name('tracer-study.bulk-delete');
+            // Alumni Bekerja
+            Route::get('/alumni-bekerja', [AlumniBekerjaController::class, 'index'])->name('alumni-bekerja.index');
+            Route::get('/alumni-bekerja/tambah', [AlumniBekerjaController::class, 'create'])->name('alumni-bekerja.create');
+            Route::post('/alumni-bekerja', [AlumniBekerjaController::class, 'store'])->name('alumni-bekerja.store');
+            Route::get('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'show'])->name('alumni-bekerja.show');
+            Route::get('/alumni-bekerja/{id}/ubah', [AlumniBekerjaController::class, 'edit'])->name('alumni-bekerja.edit');
+            Route::put('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'update'])->name('alumni-bekerja.update');
+            Route::delete('/alumni-bekerja/{id}', [AlumniBekerjaController::class, 'destroy'])->name('alumni-bekerja.destroy');
 
-        Route::get('/laporan-bkk', [LaporanBkkController::class, 'index'])->name('laporan-bkk.index');
+            // Lowongan Kerja
+            Route::get('/lowongan-kerja', [LowonganKerjaController::class, 'index'])->name('lowongan-kerja.index');
+            Route::get('/lowongan-kerja/tambah', [LowonganKerjaController::class, 'create'])->name('lowongan-kerja.create');
+            Route::post('/lowongan-kerja', [LowonganKerjaController::class, 'store'])->name('lowongan-kerja.store');
+            Route::get('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'show'])->name('lowongan-kerja.show');
+            Route::get('/lowongan-kerja/{id}/ubah', [LowonganKerjaController::class, 'edit'])->name('lowongan-kerja.edit');
+            Route::put('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'update'])->name('lowongan-kerja.update');
+            Route::delete('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'destroy'])->name('lowongan-kerja.destroy');
+
+            // Tracer Study
+            Route::get('/tracer-study', [TracerStudyController::class, 'index'])->name('tracer-study.index');
+            Route::get('/tracer-study/tambah', [TracerStudyController::class, 'create'])->name('tracer-study.create');
+            Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer-study.store');
+            Route::get('/tracer-study/{id}/ubah', [TracerStudyController::class, 'edit'])->name('tracer-study.edit');
+            Route::put('/tracer-study/{id}', [TracerStudyController::class, 'update'])->name('tracer-study.update');
+            Route::delete('/tracer-study/{id}', [TracerStudyController::class, 'destroy'])->name('tracer-study.destroy');
+            Route::post('/tracer-study/bulk-delete', [TracerStudyController::class, 'bulkDelete'])->name('tracer-study.bulk-delete');
+
+            // Laporan BKK
+            Route::get('/laporan', [LaporanBkkController::class, 'index'])->name('laporan.index');
+        });
     });
 
     // Kerja Sama (semua user)
@@ -145,6 +152,16 @@ Route::middleware('auth')->group(function () {
 
         // Bulk Delete
         Route::post('/bk/alumni-kuliah/bulk-delete', [AlumniKuliahController::class, 'bulkDelete'])->name('bk.alumni-kuliah.bulk-delete');
+
+        // ╔═══ Alumni Wirausaha CRUD ═══╗
+        Route::get('/bk/alumni-wirausaha', [AlumniWirausahaController::class, 'index'])->name('bk.alumni-wirausaha.index');
+        Route::get('/bk/alumni-wirausaha/tambah', [AlumniWirausahaController::class, 'create'])->name('bk.alumni-wirausaha.create');
+        Route::post('/bk/alumni-wirausaha', [AlumniWirausahaController::class, 'store'])->name('bk.alumni-wirausaha.store');
+        Route::get('/bk/alumni-wirausaha/{alumniWirausaha}', [AlumniWirausahaController::class, 'show'])->name('bk.alumni-wirausaha.show');
+        Route::get('/bk/alumni-wirausaha/{alumniWirausaha}/ubah', [AlumniWirausahaController::class, 'edit'])->name('bk.alumni-wirausaha.edit');
+        Route::put('/bk/alumni-wirausaha/{alumniWirausaha}', [AlumniWirausahaController::class, 'update'])->name('bk.alumni-wirausaha.update');
+        Route::delete('/bk/alumni-wirausaha/{alumniWirausaha}', [AlumniWirausahaController::class, 'destroy'])->name('bk.alumni-wirausaha.destroy');
+        Route::post('/bk/alumni-wirausaha/bulk-delete', [AlumniWirausahaController::class, 'bulkDelete'])->name('bk.alumni-wirausaha.bulk-delete');
 
         // ╔═══ Universitas - BK (Read-Only) ═══╗
         Route::get('/bk/universitas', [UniversitasController::class, 'index'])->name('bk.universitas.index');

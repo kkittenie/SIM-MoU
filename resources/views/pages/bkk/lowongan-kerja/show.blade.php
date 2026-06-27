@@ -29,7 +29,7 @@
                     <div>
                         <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Perusahaan</span>
                         @if($lowongan->perusahaanMitra)
-                            <a href="{{ route('perusahaan-mitra.show', $lowongan->perusahaan_mitra_id) }}" class="mt-1 inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 font-medium">
+                            <a href="{{ route('bkk.perusahaan-mitra.show', $lowongan->perusahaan_mitra_id) }}" class="mt-1 inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 font-medium">
                                 {{ $lowongan->nama_perusahaan }}
                                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             </a>
@@ -72,11 +72,11 @@
                 </div>
 
                 <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2">
-                    <a href="{{ route('lowongan-kerja.edit', $lowongan->id) }}"
+                    <a href="{{ route('bkk.lowongan-kerja.edit', $lowongan->id) }}"
                         class="flex-1 bg-yellow-500 hover:bg-yellow-600 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                         Ubah Data
                     </a>
-                    <a href="{{ route('lowongan-kerja.index') }}"
+                    <a href="{{ route('bkk.lowongan-kerja.index') }}"
                         class="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition">
                         Kembali
                     </a>

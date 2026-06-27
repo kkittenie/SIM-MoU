@@ -56,7 +56,7 @@
         
         <div class="flex items-center gap-3">
             <!-- Filter Tahun Lulus -->
-            <form action="{{ route('laporan-bkk.index') }}" method="GET" class="flex gap-2 items-center">
+            <form action="{{ route('bkk.laporan.index') }}" method="GET" class="flex gap-2 items-center">
                 <select name="tahun_lulus" onchange="this.form.submit()"
                     class="dark:bg-dark-900 h-10 rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
                     <option value="">Semua Tahun Lulus</option>

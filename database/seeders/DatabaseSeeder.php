@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             BkkDataSeeder::class,
             UniversitasSeeder::class,
             AlumniKuliahSeeder::class,
-            TracerKuliahSeeder::class
+            TracerKuliahSeeder::class,
+            AlumniWirausahaSeeder::class,
         ]);
 
         // Seed default settings row

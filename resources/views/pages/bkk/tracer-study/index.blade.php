@@ -1,13 +1,13 @@
-@extends('layouts.app', ['title' => 'Tracer Study'])
+@extends('layouts.app', ['title' => 'Tracer Study Bekerja'])
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Tracer Study" />
+    <x-common.page-breadcrumb pageTitle="Tracer Study Bekerja" />
 
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs">
         <!-- Table Header Actions -->
         <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800">
             <!-- Search & Filters -->
-            <form action="{{ route('tracer-study.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:max-w-2xl">
+            <form action="{{ route('bkk.tracer-study.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:max-w-xl">
                 <!-- Search input -->
                 <div class="relative flex-1">
                     <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
@@ -29,27 +29,15 @@
                         @endforeach
                     </select>
                 </div>
-
-                <!-- Filter Status -->
-                <div class="w-full sm:w-36">
-                    <select name="status" onchange="this.form.submit()"
-                        class="dark:bg-dark-900 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
-                        <option value="">Status Alumni</option>
-                        <option value="Bekerja" {{ $status === 'Bekerja' ? 'selected' : '' }}>Bekerja</option>
-                        <option value="Kuliah" {{ $status === 'Kuliah' ? 'selected' : '' }}>Kuliah</option>
-                        <option value="Wirausaha" {{ $status === 'Wirausaha' ? 'selected' : '' }}>Wirausaha</option>
-                        <option value="Mencari Kerja" {{ $status === 'Mencari Kerja' ? 'selected' : '' }}>Mencari Kerja</option>
-                    </select>
-                </div>
             </form>
 
             <!-- Add Button -->
-            <a href="{{ route('tracer-study.create') }}"
+            <a href="{{ route('bkk.tracer-study.create') }}"
                 class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition whitespace-nowrap">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                Tambah Tracer Study
+                Tambah Tracer Bekerja
             </a>
         </div>
 
@@ -107,7 +95,7 @@
                                 {{ $row->testimoni ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
-                                <a href="{{ route('tracer-study.edit', $row->id) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
+                                <a href="{{ route('bkk.tracer-study.edit', $row->id) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
                                     Ubah
                                 </a>
                             </td>
@@ -181,7 +169,7 @@ document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch('{{ route("tracer-study.bulk-delete") }}', {
+            fetch('{{ route("bkk.tracer-study.bulk-delete") }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

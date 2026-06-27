@@ -28,7 +28,7 @@
                     <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Perusahaan</span>
                     <div class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">
                         @if($alumni->perusahaanMitra)
-                            <a href="{{ route('perusahaan-mitra.show', $alumni->perusahaan_mitra_id) }}" class="text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1">
+                            <a href="{{ route('bkk.perusahaan-mitra.show', $alumni->perusahaan_mitra_id) }}" class="text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1">
                                 {{ $alumni->nama_perusahaan }}
                                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4"/></svg>
                             </a>
@@ -103,11 +103,11 @@
 
         <!-- Tombol Aksi -->
         <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
-            <a href="{{ route('alumni-bekerja.edit', $alumni->id) }}"
+            <a href="{{ route('bkk.alumni-bekerja.edit', $alumni->id) }}"
                 class="flex-1 bg-yellow-500 hover:bg-yellow-600 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                 Ubah Data
             </a>
-            <a href="{{ route('alumni-bekerja.index') }}"
+            <a href="{{ route('bkk.alumni-bekerja.index') }}"
                 class="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5 inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition">
                 Kembali
             </a>

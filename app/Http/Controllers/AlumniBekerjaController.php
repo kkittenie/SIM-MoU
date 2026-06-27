@@ -35,7 +35,7 @@ class AlumniBekerjaController extends Controller
 
         $tahunLulusList = AlumniBekerja::distinct()->pluck('tahun_lulus')->sort()->toArray();
 
-        return view('pages.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'tahunLulusList'));
+        return view('pages.bkk.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'tahunLulusList'));
     }
 
     /**
@@ -44,7 +44,7 @@ class AlumniBekerjaController extends Controller
     public function create()
     {
         $mitras = PerusahaanMitra::where('status_aktif', 'Aktif')->orderBy('nama_perusahaan')->get();
-        return view('pages.alumni-bekerja.create', compact('mitras'));
+        return view('pages.bkk.alumni-bekerja.create', compact('mitras'));
     }
 
     /**
@@ -87,7 +87,7 @@ class AlumniBekerjaController extends Controller
 
         AlumniBekerja::create($validated);
 
-        return redirect()->route('alumni-bekerja.index')
+        return redirect()->route('bkk.alumni-bekerja.index')
             ->with('success', 'Data alumni bekerja berhasil ditambahkan.');
     }
 
@@ -97,7 +97,7 @@ class AlumniBekerjaController extends Controller
     public function show($id)
     {
         $alumni = AlumniBekerja::findOrFail($id);
-        return view('pages.alumni-bekerja.show', compact('alumni'));
+        return view('pages.bkk.alumni-bekerja.show', compact('alumni'));
     }
 
     /**
@@ -107,7 +107,7 @@ class AlumniBekerjaController extends Controller
     {
         $alumni = AlumniBekerja::findOrFail($id);
         $mitras = PerusahaanMitra::where('status_aktif', 'Aktif')->orderBy('nama_perusahaan')->get();
-        return view('pages.alumni-bekerja.edit', compact('alumni', 'mitras'));
+        return view('pages.bkk.alumni-bekerja.edit', compact('alumni', 'mitras'));
     }
 
     /**
@@ -151,7 +151,7 @@ class AlumniBekerjaController extends Controller
 
         $alumni->update($validated);
 
-        return redirect()->route('alumni-bekerja.index')
+        return redirect()->route('bkk.alumni-bekerja.index')
             ->with('success', 'Data alumni bekerja berhasil diperbarui.');
     }
 
@@ -163,7 +163,7 @@ class AlumniBekerjaController extends Controller
         $alumni = AlumniBekerja::findOrFail($id);
         $alumni->delete();
 
-        return redirect()->route('alumni-bekerja.index')
+        return redirect()->route('bkk.alumni-bekerja.index')
             ->with('success', 'Data alumni bekerja berhasil dihapus.');
     }
 }

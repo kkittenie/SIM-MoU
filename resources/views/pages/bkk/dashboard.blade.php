@@ -102,7 +102,7 @@
                     Selamat datang, {{ auth()->user()->name }}. Kelola data penyerapan alumni, perusahaan mitra, lowongan kerja, dan pantau hasil tracer study.
                 </p>
             </div>
-            <a href="{{ route('alumni-bekerja.create') }}"
+            <a href="{{ route('bkk.alumni-bekerja.create') }}"
                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-brand-700 text-sm font-semibold transition-all duration-200 hover:bg-blue-50 shadow-xs whitespace-nowrap">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Tambah data alumni
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
         series: @json($statusChartData['series']),
         labels: @json($statusChartData['labels']),
-        colors: ['#5BB6FF', '#22C55E', '#F59E0B', '#EF4444'],
+        colors: ['#5BB6FF', '#EF4444'],
         legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
         stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
         plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', formatter: v => v }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500, formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0) } } } } },
@@ -236,8 +236,20 @@ document.addEventListener('DOMContentLoaded', function () {
     new ApexCharts(document.querySelector("#perusahaanChart"), {
         chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 600 } },
         series: [{ name: 'Jumlah Alumni', data: @json($perusahaanChartData['series']) }],
-        xaxis: { categories: @json($perusahaanChartData['labels']), axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: labelColor, fontSize: '11px' } } },
-        yaxis: { labels: { style: { colors: labelColor, fontSize: '11px', fontWeight: 500 }, formatter: v => Math.floor(v) } },
+        xaxis: { 
+            categories: @json($perusahaanChartData['labels']), 
+            axisBorder: { show: false }, 
+            axisTicks: { show: false }, 
+            labels: { 
+                style: { colors: labelColor, fontSize: '11px' },
+                formatter: v => Math.floor(v)
+            } 
+        },
+        yaxis: { 
+            labels: { 
+                style: { colors: labelColor, fontSize: '11px', fontWeight: 500 }
+            } 
+        },
         colors: ['#22C55E'],
         plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '50%' } },
         legend: { show: false },

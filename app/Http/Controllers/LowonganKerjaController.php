@@ -29,7 +29,7 @@ class LowonganKerjaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('pages.lowongan-kerja.index', compact('lowongans', 'search', 'status'));
+        return view('pages.bkk.lowongan-kerja.index', compact('lowongans', 'search', 'status'));
     }
 
     /**
@@ -38,7 +38,7 @@ class LowonganKerjaController extends Controller
     public function create()
     {
         $mitras = PerusahaanMitra::where('status_aktif', 'Aktif')->orderBy('nama_perusahaan')->get();
-        return view('pages.lowongan-kerja.create', compact('mitras'));
+        return view('pages.bkk.lowongan-kerja.create', compact('mitras'));
     }
 
     /**
@@ -76,7 +76,7 @@ class LowonganKerjaController extends Controller
 
         LowonganKerja::create($validated);
 
-        return redirect()->route('lowongan-kerja.index')
+        return redirect()->route('bkk.lowongan-kerja.index')
             ->with('success', 'Lowongan kerja berhasil dipublikasikan.');
     }
 
@@ -86,7 +86,7 @@ class LowonganKerjaController extends Controller
     public function show($id)
     {
         $lowongan = LowonganKerja::findOrFail($id);
-        return view('pages.lowongan-kerja.show', compact('lowongan'));
+        return view('pages.bkk.lowongan-kerja.show', compact('lowongan'));
     }
 
     /**
@@ -96,7 +96,7 @@ class LowonganKerjaController extends Controller
     {
         $lowongan = LowonganKerja::findOrFail($id);
         $mitras = PerusahaanMitra::where('status_aktif', 'Aktif')->orderBy('nama_perusahaan')->get();
-        return view('pages.lowongan-kerja.edit', compact('lowongan', 'mitras'));
+        return view('pages.bkk.lowongan-kerja.edit', compact('lowongan', 'mitras'));
     }
 
     /**
@@ -136,7 +136,7 @@ class LowonganKerjaController extends Controller
 
         $lowongan->update($validated);
 
-        return redirect()->route('lowongan-kerja.index')
+        return redirect()->route('bkk.lowongan-kerja.index')
             ->with('success', 'Data lowongan kerja berhasil diperbarui.');
     }
 
@@ -148,7 +148,7 @@ class LowonganKerjaController extends Controller
         $lowongan = LowonganKerja::findOrFail($id);
         $lowongan->delete();
 
-        return redirect()->route('lowongan-kerja.index')
+        return redirect()->route('bkk.lowongan-kerja.index')
             ->with('success', 'Lowongan kerja berhasil dihapus.');
     }
 }

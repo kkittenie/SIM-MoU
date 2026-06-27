@@ -99,28 +99,31 @@
         <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-xl font-bold text-white tracking-tight">
-                    Selamat datang, {{ auth()->user()->nama_lengkap ?? 'BK' }}
+                    Selamat datang, {{ auth()->user()->name ?? 'BK User' }}
                 </h1>
                 <p class="mt-1.5 text-sm text-blue-100/80 leading-relaxed max-w-xl">
-                    Monitor perkembangan alumni yang melanjutkan pendidikan tinggi. Kelola data alumni, tracer study, dan laporan statistik.
+                    Monitor perkembangan alumni yang melanjutkan kuliah dan wirausaha. Kelola data alumni kuliah, alumni wirausaha, tracer study, dan laporan statistik.
                 </p>
             </div>
-            <a href="{{ route('bk.alumni-kuliah.index') }}"
-               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-sm font-semibold transition-all duration-200 whitespace-nowrap border border-white/10">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-                Kelola alumni
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('bk.alumni-kuliah.index') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-sm font-semibold transition-all duration-200 whitespace-nowrap border border-white/10">
+                    Data Kuliah
+                </a>
+                <a href="{{ route('bk.alumni-wirausaha.index') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-sm font-semibold transition-all duration-200 whitespace-nowrap border border-white/10">
+                    Data Wirausaha
+                </a>
+            </div>
         </div>
     </div>
 
     {{-- METRIC CARDS --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 md:gap-5 mb-6">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5 mb-6">
         <div class="stat-card accent-blue anim-scale d-1">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alumni kuliah</span>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alumni Kuliah</span>
                     <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90 tabular-nums" data-count="{{ $totalAlumniKuliah }}">{{ $totalAlumniKuliah }}</h4>
                 </div>
                 <div class="stat-icon bg-blue">
@@ -128,10 +131,21 @@
                 </div>
             </div>
         </div>
-        <div class="stat-card accent-green anim-scale d-2">
+        <div class="stat-card accent-amber anim-scale d-2">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Universitas</span>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alumni Wirausaha</span>
+                    <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90 tabular-nums" data-count="{{ $totalAlumniWirausaha }}">{{ $totalAlumniWirausaha }}</h4>
+                </div>
+                <div class="stat-icon bg-amber">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card accent-green anim-scale d-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Universitas Terdaftar</span>
                     <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90 tabular-nums" data-count="{{ $totalUniversitas }}">{{ $totalUniversitas }}</h4>
                 </div>
                 <div class="stat-icon bg-green">
@@ -139,51 +153,18 @@
                 </div>
             </div>
         </div>
-        <div class="stat-card accent-indigo anim-scale d-3">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aktif</span>
-                    <h4 class="mt-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums" data-count="{{ $totalAktif }}">{{ $totalAktif }}</h4>
-                </div>
-                <div class="stat-icon bg-indigo">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card accent-amber anim-scale d-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lulus</span>
-                    <h4 class="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400 tabular-nums" data-count="{{ $totalLulus }}">{{ $totalLulus }}</h4>
-                </div>
-                <div class="stat-icon bg-amber">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card accent-red anim-scale d-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cuti</span>
-                    <h4 class="mt-2 text-2xl font-bold text-red-600 dark:text-red-400 tabular-nums" data-count="{{ $totalCuti }}">{{ $totalCuti }}</h4>
-                </div>
-                <div class="stat-icon bg-red">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                </div>
-            </div>
-        </div>
     </div>
 
     {{-- INSIGHTS --}}
     @if(count($insights) > 0)
-        <div class="dash-panel mb-6 anim-up d-5">
+        <div class="dash-panel mb-6 anim-up d-4">
             <div class="dash-panel-title">
                 <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-500 text-white">
                     <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                 </div>
                 <div>
-                    <span>Insight otomatis</span>
-                    <span class="text-[11px] font-normal text-gray-400 dark:text-gray-500 ml-2">Data alumni terkini</span>
+                    <span>Insight Otomatis</span>
+                    <span class="text-[11px] font-normal text-gray-400 dark:text-gray-500 ml-2">Analisis data alumni</span>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -199,33 +180,33 @@
 
     {{-- CHARTS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <div class="dash-panel anim-up d-6">
+        <div class="dash-panel anim-up d-5">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #22C55E"></span>
-                Proporsi status alumni
+                Persentase Penyaluran BK (Kuliah vs Wirausaha)
             </div>
-            <div class="flex justify-center"><div id="statusChart" class="w-full max-w-[320px]"></div></div>
+            <div class="flex justify-center"><div id="distribChart" class="w-full max-w-[320px]"></div></div>
         </div>
-        <div class="dash-panel anim-up d-6">
+        <div class="dash-panel anim-up d-5">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #5BB6FF"></span>
-                Alumni per universitas
+                Kampus Tujuan Terbanyak
             </div>
             <div id="universChart" class="w-full"></div>
         </div>
-        <div class="dash-panel anim-up d-7">
-            <div class="dash-panel-title">
-                <span class="dash-panel-dot" style="background: #399EF2"></span>
-                Tren alumni per tahun lulus
-            </div>
-            <div id="trendChart" class="w-full"></div>
-        </div>
-        <div class="dash-panel anim-up d-7">
+        <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #F59E0B"></span>
-                Program studi terbanyak
+                Bidang Usaha Terbanyak
             </div>
-            <div id="programChart" class="w-full"></div>
+            <div id="wirausahaChart" class="w-full"></div>
+        </div>
+        <div class="dash-panel anim-up d-6">
+            <div class="dash-panel-title">
+                <span class="dash-panel-dot" style="background: #399EF2"></span>
+                Tren Alumni Kuliah per Tahun Lulus
+            </div>
+            <div id="trendChart" class="w-full"></div>
         </div>
     </div>
 @endsection
@@ -237,64 +218,69 @@ document.addEventListener('DOMContentLoaded', function () {
     const gridBorder = isDark ? '#1e293b' : '#f1f5f9';
     const labelColor = isDark ? '#94a3b8' : '#64748b';
     const fontFamily = "'Plus Jakarta Sans', system-ui, sans-serif";
-    const palette = ['#5BB6FF', '#399EF2', '#22C55E', '#6366f1', '#F59E0B', '#EF4444', '#06b6d4', '#ec4899'];
+    const palette = ['#399EF2', '#F59E0B', '#22C55E', '#6366f1', '#EF4444', '#06b6d4', '#ec4899'];
 
-    new ApexCharts(document.querySelector("#statusChart"), {
-        chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800, animateGradually: { enabled: true, delay: 150 } } },
-        series: @json($statusChartData['series']),
-        labels: @json($statusChartData['labels']),
-        colors: ['#6366f1', '#F59E0B', '#EF4444'],
+    // 1. Donut Distribusi
+    new ApexCharts(document.querySelector("#distribChart"), {
+        chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+        series: @json($distribChartData['series']),
+        labels: @json($distribChartData['labels']),
+        colors: ['#399EF2', '#F59E0B'],
         legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
         stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
-        plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', formatter: v => v }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500, formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0) } } } } },
+        plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b' }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500 } } } } },
         dataLabels: { enabled: false }
     }).render();
 
+    // 2. Bar Kampus Tujuan Terbanyak
     const universData = @json($universChartData['labels']).map((label, index) => ({ x: label, y: @json($universChartData['series'])[index] }));
     new ApexCharts(document.querySelector("#universChart"), {
-        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 600, animateGradually: { enabled: true, delay: 80 } } },
+        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily },
         series: [{ name: 'Jumlah Alumni', data: universData }],
         xaxis: { type: 'numeric', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: labelColor, fontSize: '11px' }, formatter: v => Math.floor(v) } },
         yaxis: { labels: { maxWidth: 160, style: { colors: labelColor, fontSize: '11px', fontWeight: 500 } } },
-        colors: palette,
+        colors: ['#399EF2'],
         plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '60%', distributed: true } },
         legend: { show: false },
-        grid: { borderColor: gridBorder, strokeDashArray: 4, padding: { left: 15, right: 25 } },
+        grid: { borderColor: gridBorder, strokeDashArray: 4 },
         dataLabels: { enabled: true, formatter: v => v, style: { fontSize: '10px', fontWeight: 600 }, offsetX: 4 }
     }).render();
 
+    // 3. Bar Bidang Usaha Terbanyak
+    const wirausahaData = @json($wirausahaChartData['labels']).map((label, index) => ({ x: label, y: @json($wirausahaChartData['series'])[index] }));
+    new ApexCharts(document.querySelector("#wirausahaChart"), {
+        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily },
+        series: [{ name: 'Jumlah Alumni', data: wirausahaData }],
+        xaxis: { type: 'numeric', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: labelColor, fontSize: '11px' }, formatter: v => Math.floor(v) } },
+        yaxis: { labels: { maxWidth: 160, style: { colors: labelColor, fontSize: '11px', fontWeight: 500 } } },
+        colors: ['#F59E0B'],
+        plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '60%', distributed: true } },
+        legend: { show: false },
+        grid: { borderColor: gridBorder, strokeDashArray: 4 },
+        dataLabels: { enabled: true, formatter: v => v, style: { fontSize: '10px', fontWeight: 600 }, offsetX: 4 }
+    }).render();
+
+    // 4. Area Tren Alumni Kuliah
     new ApexCharts(document.querySelector("#trendChart"), {
-        chart: { type: 'area', height: 280, toolbar: { show: false }, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800, dynamicAnimation: { speed: 500 } } },
-        series: [{ name: 'Alumni Lulus', data: @json($trendChartData['series']) }],
+        chart: { type: 'area', height: 280, toolbar: { show: false }, fontFamily },
+        series: [{ name: 'Alumni Kuliah', data: @json($trendChartData['series']) }],
         xaxis: { categories: @json($trendChartData['labels']), axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: labelColor, fontSize: '11px', fontWeight: 500 } } },
         yaxis: { labels: { style: { colors: labelColor, fontSize: '11px' }, formatter: v => Math.floor(v) } },
-        colors: ['#5BB6FF'],
+        colors: ['#399EF2'],
         stroke: { curve: 'smooth', width: 3 },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, type: 'vertical', opacityFrom: 0.4, opacityTo: 0.02, stops: [0, 100], colorStops: [{ offset: 0, color: '#5BB6FF', opacity: 0.3 }, { offset: 100, color: '#5BB6FF', opacity: 0.02 }] } },
-        markers: { size: 4, colors: ['#5BB6FF'], strokeColors: isDark ? '#111827' : '#ffffff', strokeWidth: 2, hover: { size: 6 } },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, type: 'vertical', opacityFrom: 0.3, opacityTo: 0.02 } },
+        markers: { size: 4, colors: ['#399EF2'], strokeWidth: 2 },
         grid: { borderColor: gridBorder, strokeDashArray: 4 }
     }).render();
 
-    const programData = @json($programChartData['labels']).map((label, index) => ({ x: label, y: @json($programChartData['series'])[index] }));
-    new ApexCharts(document.querySelector("#programChart"), {
-        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 600, animateGradually: { enabled: true, delay: 80 } } },
-        series: [{ name: 'Jumlah Alumni', data: programData }],
-        xaxis: { type: 'numeric', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: labelColor, fontSize: '11px' }, formatter: v => Math.floor(v) } },
-        yaxis: { labels: { maxWidth: 180, style: { colors: labelColor, fontSize: '11px', fontWeight: 500 } } },
-        colors: ['#F59E0B', '#FBBF24', '#5BB6FF', '#399EF2', '#22C55E', '#06b6d4'],
-        plotOptions: { bar: { horizontal: true, borderRadius: 6, barHeight: '65%', distributed: true } },
-        legend: { show: false },
-        grid: { borderColor: gridBorder, strokeDashArray: 4, padding: { left: 15, right: 25 } },
-        dataLabels: { enabled: true, formatter: v => v, style: { fontSize: '10px', fontWeight: 600 }, offsetX: 4 }
-    }).render();
-
+    // Counter animations
     document.querySelectorAll('[data-count]').forEach(el => {
         const target = parseInt(el.getAttribute('data-count'), 10);
         if (isNaN(target) || target === 0) return;
-        const duration = 1200, start = performance.now();
+        const duration = 1000, start = performance.now();
         const step = ts => {
             const progress = Math.min((ts - start) / duration, 1);
-            el.textContent = Math.floor((1 - Math.pow(1 - progress, 3)) * target);
+            el.textContent = Math.floor(progress * target);
             if (progress < 1) requestAnimationFrame(step); else el.textContent = target;
         };
         el.textContent = '0'; requestAnimationFrame(step);
