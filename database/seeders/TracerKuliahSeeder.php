@@ -27,15 +27,17 @@ class TracerKuliahSeeder extends Seeder
         ];
 
         foreach ($alumni->take(20) as $alumnus) {
-            TracerKuliah::create([
-                'alumni_kuliah_id' => $alumnus->id,
-                'status_kuliah' => ['aktif', 'lulus', 'cuti', 'putus'][array_rand(['aktif', 'lulus', 'cuti', 'putus'])],
-                'kampus_tujuan' => $alumnus->universitas?->nama_universitas ?? 'Universitas XYZ',
-                'program_studi' => $alumnus->program_studi,
-                'detail_status' => 'Sedang menjalani perkuliahan semester ' . rand(1, 8),
-                'testimoni' => $testimoniList[array_rand($testimoniList)],
-                'tanggal_update' => Carbon::now()->subDays(rand(0, 60)),
-            ]);
+            TracerKuliah::firstOrCreate(
+                ['alumni_kuliah_id' => $alumnus->id],
+                [
+                    'status_kuliah' => ['aktif', 'lulus', 'cuti', 'putus'][array_rand(['aktif', 'lulus', 'cuti', 'putus'])],
+                    'kampus_tujuan' => $alumnus->universitas?->nama_universitas ?? 'Universitas XYZ',
+                    'program_studi' => $alumnus->program_studi,
+                    'detail_status' => 'Sedang menjalani perkuliahan semester ' . rand(1, 8),
+                    'testimoni' => $testimoniList[array_rand($testimoniList)],
+                    'tanggal_update' => Carbon::now()->subDays(rand(0, 60)),
+                ]
+            );
         }
     }
 }

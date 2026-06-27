@@ -77,6 +77,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
                                 <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('bk.alumni-wirausaha.show', $row->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-semibold">
+                                        Detail
+                                    </a>
+                                    <span class="text-gray-300 dark:text-gray-700">|</span>
                                     <a href="{{ route('bk.alumni-wirausaha.edit', $row->id) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 font-semibold">
                                         Ubah
                                     </a>
@@ -104,11 +108,9 @@
         </div>
 
         <!-- Pagination Links -->
-        @if ($alumni->hasPages())
-            <div class="border-t border-gray-100 p-5 dark:border-gray-800">
-                {{ $alumni->links() }}
-            </div>
-        @endif
+        <div class="border-t border-gray-100 p-5 dark:border-gray-800">
+            {{ $alumni->links() }}
+        </div>
     </div>
 @endsection
 

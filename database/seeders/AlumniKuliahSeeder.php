@@ -33,7 +33,10 @@ class AlumniKuliahSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            AlumniKuliah::create($item);
+            AlumniKuliah::firstOrCreate(
+                ['nis' => $item['nis']],
+                $item
+            );
         }
     }
 }

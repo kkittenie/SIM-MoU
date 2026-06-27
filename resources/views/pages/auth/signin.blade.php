@@ -10,9 +10,10 @@
         font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         background: #F8FBFF;
         min-height: 100dvh;
+        transition: background 0.4s ease;
     }
     .dark .login-page {
-        background: #0f172a;
+        background: #0b1120;
     }
 
     /* ── Left Branding Panel ── */
@@ -20,7 +21,13 @@
         background: linear-gradient(155deg, #2278D8 0%, #399EF2 45%, #5BB6FF 100%);
         position: relative;
         overflow: hidden;
+        transition: all 0.5s ease;
     }
+    /* In dark mode, background is dark */
+    .dark .login-brand-panel {
+        background: linear-gradient(155deg, #0f172a 0%, #1a2540 45%, #1e3050 100%);
+    }
+
     .login-brand-panel::before {
         content: '';
         position: absolute;
@@ -29,6 +36,11 @@
             radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
         pointer-events: none;
+    }
+    .dark .login-brand-panel::before {
+        background:
+            radial-gradient(ellipse at 20% 80%, rgba(91,182,255,0.06) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(91,182,255,0.03) 0%, transparent 50%);
     }
 
     /* Subtle floating academic shapes */
@@ -43,6 +55,10 @@
         border: 1.5px solid rgba(255,255,255,0.08);
         border-radius: 50%;
         animation: floatShape 20s ease-in-out infinite;
+        transition: border-color 0.4s ease;
+    }
+    .dark .login-shape {
+        border-color: rgba(91,182,255,0.1);
     }
     .login-shape:nth-child(1) {
         width: 200px; height: 200px;
@@ -87,6 +103,11 @@
         background-size: 40px 40px;
         pointer-events: none;
     }
+    .dark .login-grid-pattern {
+        background-image:
+            linear-gradient(rgba(91,182,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(91,182,255,0.03) 1px, transparent 1px);
+    }
 
     /* ── Login Card ── */
     .login-card {
@@ -96,13 +117,23 @@
             0 1px 3px rgba(16, 24, 40, 0.06),
             0 8px 32px -4px rgba(16, 24, 40, 0.08);
         border: 1px solid #E4E7EC;
+        transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     }
     .dark .login-card {
-        background: #1e293b;
-        border-color: #334155;
+        background: #111827;
+        border-color: #1e293b;
         box-shadow:
-            0 1px 3px rgba(0, 0, 0, 0.2),
-            0 8px 32px -4px rgba(0, 0, 0, 0.3);
+            0 1px 3px rgba(0, 0, 0, 0.3),
+            0 8px 32px -4px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(91,182,255,0.05);
+    }
+
+    /* ── Right form panel ── */
+    .login-form-panel {
+        transition: background 0.4s ease;
+    }
+    .dark .login-form-panel {
+        background: #0b1120;
     }
 
     /* ── Input Styling ── */
@@ -130,13 +161,13 @@
     }
     .dark .login-input {
         background: #0f172a;
-        border-color: #334155;
+        border-color: #1e293b;
         color: #e2e8f0;
     }
     .dark .login-input:focus {
         border-color: #5BB6FF;
-        background: #1e293b;
-        box-shadow: 0 0 0 3px rgba(91, 182, 255, 0.15);
+        background: #111827;
+        box-shadow: 0 0 0 3px rgba(91, 182, 255, 0.12);
     }
     .dark .login-input::placeholder {
         color: #475569;
@@ -147,7 +178,7 @@
         height: 48px;
         width: 100%;
         border-radius: 10px;
-        background: #5BB6FF;
+        background: linear-gradient(135deg, #5BB6FF 0%, #399EF2 100%);
         color: #ffffff;
         font-size: 15px;
         font-weight: 600;
@@ -162,13 +193,87 @@
         box-shadow: 0 1px 3px rgba(91, 182, 255, 0.3);
     }
     .login-btn:hover {
-        background: #399EF2;
+        background: linear-gradient(135deg, #399EF2 0%, #2278D8 100%);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(57, 158, 242, 0.35);
     }
     .login-btn:active {
         transform: translateY(0);
         box-shadow: 0 1px 3px rgba(91, 182, 255, 0.3);
+    }
+    .dark .login-btn {
+        background: linear-gradient(135deg, #2278D8 0%, #5BB6FF 100%);
+        box-shadow: 0 2px 12px rgba(91, 182, 255, 0.2);
+    }
+    .dark .login-btn:hover {
+        background: linear-gradient(135deg, #5BB6FF 0%, #399EF2 100%);
+        box-shadow: 0 4px 20px rgba(91, 182, 255, 0.3);
+    }
+
+    /* ── Floating Theme Toggle ── */
+    .login-theme-toggle {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1.5px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .login-theme-toggle:hover {
+        border-color: #5BB6FF;
+        box-shadow: 0 4px 16px rgba(91, 182, 255, 0.15);
+        transform: translateY(-1px);
+    }
+    .dark .login-theme-toggle {
+        background: rgba(17, 24, 39, 0.85);
+        border-color: #1e293b;
+        color: #94a3b8;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .dark .login-theme-toggle:hover {
+        border-color: #5BB6FF;
+        color: #e2e8f0;
+        box-shadow: 0 4px 16px rgba(91, 182, 255, 0.15);
+    }
+    .login-theme-toggle .toggle-track {
+        width: 40px;
+        height: 22px;
+        border-radius: 11px;
+        background: #e2e8f0;
+        position: relative;
+        transition: background 0.3s ease;
+    }
+    .dark .login-theme-toggle .toggle-track {
+        background: #334155;
+    }
+    .login-theme-toggle .toggle-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ffffff;
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .dark .login-theme-toggle .toggle-thumb {
+        left: 21px;
+        background: #5BB6FF;
+        box-shadow: 0 0 8px rgba(91, 182, 255, 0.4);
     }
 
     /* ── Entrance Animations ── */
@@ -226,14 +331,42 @@
         transform: rotate(45deg);
     }
     .dark .login-checkbox {
-        background: #1e293b;
-        border-color: #475569;
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    /* ── Dark mode feature icons glow ── */
+    .dark .login-feature-icon {
+        background: rgba(91, 182, 255, 0.1) !important;
+        border: 1px solid rgba(91, 182, 255, 0.15);
+    }
+    .dark .login-brand-logo {
+        background: rgba(91, 182, 255, 0.12) !important;
+        border-color: rgba(91, 182, 255, 0.2) !important;
     }
 </style>
 @endpush
 
 @section('content')
     <div class="login-page">
+        {{-- ═══════════════════════════════════════════════ --}}
+        {{--  FLOATING DARK MODE TOGGLE                      --}}
+        {{-- ═══════════════════════════════════════════════ --}}
+        <button type="button" @click="$store.theme.toggle()" class="login-theme-toggle anim-fade" aria-label="Toggle dark mode">
+            <!-- Moon icon (shown in light mode) -->
+            <svg x-show="$store.theme.theme !== 'dark'" class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+            <!-- Sun icon (shown in dark mode) -->
+            <svg x-show="$store.theme.theme === 'dark'" class="h-4 w-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+            </svg>
+            <div class="toggle-track">
+                <div class="toggle-thumb"></div>
+            </div>
+            <span x-text="$store.theme.theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'" class="hidden sm:inline"></span>
+        </button>
+
         <div class="flex min-h-dvh flex-col lg:flex-row">
 
             {{-- ════════════════════════════════════════════════ --}}
@@ -252,7 +385,7 @@
                     {{-- Logo / Brand --}}
                     <div class="mb-10">
                         <div class="inline-flex items-center gap-3 mb-6">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm border border-white/10">
+                            <div class="login-brand-logo flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm border border-white/10">
                                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
@@ -270,7 +403,7 @@
                     {{-- Feature List --}}
                     <div class="space-y-4">
                         <div class="flex items-start gap-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                            <div class="login-feature-icon flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
                                 <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -281,7 +414,7 @@
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                            <div class="login-feature-icon flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
                                 <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -292,7 +425,7 @@
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
+                            <div class="login-feature-icon flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
                                 <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
@@ -309,7 +442,7 @@
             {{-- ════════════════════════════════════════════════ --}}
             {{--  RIGHT: LOGIN FORM                              --}}
             {{-- ════════════════════════════════════════════════ --}}
-            <div class="flex flex-1 flex-col items-center justify-center px-5 py-10 lg:px-12 lg:w-[48%]">
+            <div class="login-form-panel flex flex-1 flex-col items-center justify-center px-5 py-10 lg:px-12 lg:w-[48%]">
                 {{-- Mobile Logo --}}
                 <div class="mb-8 flex items-center gap-2 lg:hidden anim-fade">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white">
@@ -369,7 +502,7 @@
                                 </label>
                                 <div class="relative">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                                        <svg class="h-[18px] w-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-[18px] w-[18px] text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
@@ -393,7 +526,7 @@
                                 </label>
                                 <div class="relative">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                                        <svg class="h-[18px] w-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-[18px] w-[18px] text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                         </svg>
                                     </div>
