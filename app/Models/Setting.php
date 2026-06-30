@@ -15,6 +15,7 @@ class Setting extends Model
         'fonnte_token',
         'whatsapp_target',
         'whatsapp_active',
+        'tahun_ajaran_aktif',
     ];
 
     protected $casts = [
@@ -32,7 +33,19 @@ class Setting extends Model
                 'fonnte_token' => null,
                 'whatsapp_target' => null,
                 'whatsapp_active' => false,
+                'tahun_ajaran_aktif' => date('Y'),
             ]
         );
+    }
+
+    /**
+     * Get the active academic year (either from session or fallback to settings).
+     */
+    public static function getActiveTahunAjaran()
+    {
+        if (session()->has('selected_tahun_ajaran')) {
+            return session('selected_tahun_ajaran');
+        }
+        return self::getSettings()->tahun_ajaran_aktif ?: date('Y');
     }
 }

@@ -45,5 +45,16 @@ class UserSeeder extends Seeder
                 'status' => 'aktif',
             ]
         );
+
+        // Admin Jurusan (Khusus Jurusan RPL)
+        User::updateOrCreate(
+            ['email' => 'adminjurusan@gmail.com'],
+            [
+                'name' => 'Admin Jurusan',
+                'password' => Hash::make('adminjurusan'),
+                'role' => 'admin_jurusan',
+                'status' => 'aktif',
+            ]
+        );
     }
 }

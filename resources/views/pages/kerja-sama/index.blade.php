@@ -11,8 +11,8 @@
                     Daftar Kerja Sama & MoU
                 </h3>
 
-                <!-- Add Button (Visible to Admin and BKK only) -->
-                @if (auth()->user()->isAdmin() || auth()->user()->isBKK())
+                <!-- Add Button (Visible to Admin, BKK, and Admin Jurusan) -->
+                @if (auth()->user()->isAdmin() || auth()->user()->isBKK() || auth()->user()->isAdminJurusan())
                     <a href="{{ route('kerja-sama.create') }}" 
                         class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -62,20 +62,33 @@
                     </select>
                 </div>
 
+                <!-- Program Keahlian -->
+                <div>
+                    <select name="program_keahlian_id" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Jurusan</option>
+                        @foreach ($programKeahlians as $pk)
+                            <option value="{{ $pk->id }}" {{ $programKeahlianId == $pk->id ? 'selected' : '' }}>
+                                {{ $pk->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Status -->
                 <div>
                     <select name="status" onchange="this.form.submit()"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         <option value="">Semua Status MoU</option>
                         <option value="Aktif" {{ $status === 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                        <option value="Akan Berakhir" {{ $status === 'Akan Berakhir' ? 'selected' : '' }}>Akan Berakhir (<=30 hari)</option>
+                        <option value="Akan Berakhir" {{ $status === 'Akan Berakhir' ? 'selected' : '' }}>Akan Berakhir (<= 6 bulan)</option>
                         <option value="Berakhir" {{ $status === 'Berakhir' ? 'selected' : '' }}>Berakhir</option>
                     </select>
                 </div>
 
                 <!-- Reset Button -->
                 <div class="flex items-center">
-                    @if ($search || $jenisMitra || $status || $year)
+                    @if ($search || $jenisMitra || $status || $year || $programKeahlianId)
                         <a href="{{ route('kerja-sama.index') }}"
                             class="bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 h-10 text-gray-700 dark:text-white/95 rounded-lg px-4 py-2.5 text-sm font-medium transition inline-flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
                             Reset Filter
@@ -92,6 +105,7 @@
                     <tr>
                         <th class="px-6 py-4 min-w-[180px]">Mitra</th>
                         <th class="px-6 py-4">Jenis</th>
+                        <th class="px-6 py-4">Program Keahlian</th>
                         <th class="px-6 py-4 min-w-[120px]">PIC</th>
                         <th class="px-6 py-4 min-w-[140px]">No. MoU</th>
                         <th class="px-6 py-4">Masa Berlaku</th>
@@ -108,6 +122,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-xs">
                                 {{ $ks->jenis_mitra }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                {{ $ks->programKeahlian ? $ks->programKeahlian->nama : 'Semua Jurusan' }}
                             </td>
                             <td class="px-6 py-4 whitespace-normal">{{ $ks->pic }}</td>
                             <td class="px-6 py-4 whitespace-normal text-xs">{{ $ks->nomor_mou }}</td>
@@ -148,15 +165,15 @@
                                     <a href="{{ route('kerja-sama.show', $ks->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                         Detail
                                     </a>
-                                    <!-- Edit & Delete are only visible to Admin & BKK -->
-                                    @if (auth()->user()->isAdmin() || auth()->user()->isBKK())
+                                    <!-- Edit & Delete are only visible to Admin, BKK & Admin Jurusan -->
+                                    @if (auth()->user()->isAdmin() || auth()->user()->isBKK() || auth()->user()->isAdminJurusan())
                                         @if ($ks->status !== 'Aktif')
                                             <span class="text-gray-300 dark:text-gray-700">|</span>
                                             <form action="{{ route('kerja-sama.kirim-wa', $ks->id) }}" method="POST" class="inline-block wa-form" 
                                                 data-name="{{ $ks->nama_mitra }}">
                                                 @csrf
                                                 <button type="submit" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                                                    Ingatkan WA
+                                                    Ingatkan
                                                 </button>
                                             </form>
                                         @endif
@@ -179,7 +196,7 @@
                          </tr>
                      @empty
                          <tr>
-                             <td colspan="8" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                             <td colspan="9" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
                                  Tidak ada data kerja sama ditemukan.
                              </td>
                          </tr>

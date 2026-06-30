@@ -25,6 +25,7 @@ class KerjaSama extends Model
         'tanggal_berakhir',
         'deskripsi',
         'dokumen_pdf',
+        'program_keahlian_id',
     ];
 
     protected $casts = [
@@ -58,6 +59,11 @@ class KerjaSama extends Model
         return $this->belongsTo(KategoriMitra::class, 'kategori_mitra_id');
     }
 
+    public function programKeahlian()
+    {
+        return $this->belongsTo(ProgramKeahlian::class, 'program_keahlian_id');
+    }
+
     public function getJenisMitraAttribute(): string
     {
         return $this->kategoriMitra ? $this->kategoriMitra->nama : ($this->attributes['jenis_mitra'] ?? 'Lainnya');
@@ -76,7 +82,7 @@ class KerjaSama extends Model
             return 'Berakhir';
         }
 
-        if ($endDate->diffInDays($today, true) <= 30) {
+        if ($endDate->diffInDays($today, true) <= 183) {
             return 'Akan Berakhir';
         }
 

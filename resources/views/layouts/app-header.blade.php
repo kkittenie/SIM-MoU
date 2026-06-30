@@ -73,6 +73,47 @@
         <div :class="isApplicationMenuOpen ? 'flex' : 'hidden'"
             class="items-center justify-between w-full gap-4 px-5 py-4 xl:flex shadow-theme-md xl:justify-end xl:px-0 xl:shadow-none">
             <div class="flex items-center gap-2 2xsm:gap-3">
+                @if (auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isBK() || auth()->user()->isBKK()))
+                    @php
+                        $selectedTahun = session('selected_tahun_ajaran') ?? (\App\Models\Setting::getSettings()->tahun_ajaran_aktif ?? date('Y'));
+                        
+                        $availableYears = collect()
+                            ->merge(\App\Models\AlumniBekerja::pluck('tahun_lulus'))
+                            ->merge(\App\Models\AlumniKuliah::pluck('tahun_lulus'))
+                            ->merge(\App\Models\AlumniWirausaha::pluck('tahun_lulus'))
+                            ->filter()
+                            ->unique()
+                            ->sort()
+                            ->values()
+                            ->toArray();
+
+                        if (empty($availableYears)) {
+                            $availableYears = [date('Y') - 1, date('Y'), date('Y') + 1];
+                        }
+                        
+                        $settingYear = \App\Models\Setting::getSettings()->tahun_ajaran_aktif;
+                        if ($settingYear && !in_array($settingYear, $availableYears)) {
+                            $availableYears[] = $settingYear;
+                            sort($availableYears);
+                        }
+                    @endphp
+                    
+                    <form action="{{ route('set-tahun-ajaran') }}" method="POST" class="inline-flex items-center mr-1">
+                        @csrf
+                        <label for="header_tahun_ajaran" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-2 hidden sm:inline-block">
+                            Tahun Ajaran:
+                        </label>
+                        <select id="header_tahun_ajaran" name="tahun_ajaran" onchange="this.form.submit()"
+                            class="h-9 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                            @foreach ($availableYears as $year)
+                                <option value="{{ $year }}" {{ $selectedTahun == $year ? 'selected' : '' }}>
+                                    {{ $year }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
+
                 <!-- Theme Toggle Button -->
                 <button
                     class="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
@@ -91,7 +132,7 @@
                     </svg>
                 </button>
 
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin() || auth()->user()->isAdminJurusan())
                     <!-- Notification Dropdown -->
                     <x-header.notification-dropdown />
                 @endif

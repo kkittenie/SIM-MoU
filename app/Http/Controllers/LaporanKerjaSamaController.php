@@ -26,11 +26,11 @@ class LaporanKerjaSamaController extends Controller
 
         // Hitung metrik ringkasan
         $today = Carbon::today();
-        $thirtyDaysLater = Carbon::today()->addDays(30);
+        $sixMonthsLater = Carbon::today()->addDays(183);
 
         $totalKerjaSama = (clone $query)->count();
-        $totalAktif = (clone $query)->where('tanggal_berakhir', '>', $thirtyDaysLater)->count();
-        $totalAkanBerakhir = (clone $query)->whereBetween('tanggal_berakhir', [$today, $thirtyDaysLater])->count();
+        $totalAktif = (clone $query)->where('tanggal_berakhir', '>', $sixMonthsLater)->count();
+        $totalAkanBerakhir = (clone $query)->whereBetween('tanggal_berakhir', [$today, $sixMonthsLater])->count();
         $totalExpired = (clone $query)->where('tanggal_berakhir', '<', $today)->count();
 
         // 1. Kategori Mitra Stats (distribusi per jenis_mitra)
@@ -70,7 +70,7 @@ class LaporanKerjaSamaController extends Controller
         sort($tahunList);
 
         // Ambil semua data untuk tabel detail
-        $kerjaSamaList = (clone $query)->orderBy('tanggal_mulai', 'desc')->get();
+        $kerjaSamaList = (clone $query)->orderBy('tanggal_mulai', 'desc')->paginate(10)->withQueryString();
 
         return view('pages.laporan.kerja-sama', compact(
             'totalKerjaSama',

@@ -45,7 +45,7 @@ class PenggunaController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:4',
-            'role' => 'required|in:admin,bk,bkk',
+            'role' => 'required|in:admin,bk,bkk,admin_jurusan',
             'status' => 'required|in:aktif,nonaktif',
         ];
 
@@ -106,7 +106,7 @@ class PenggunaController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|string|min:4',
-            'role' => 'required|in:admin,bk,bkk',
+            'role' => 'required|in:admin,bk,bkk,admin_jurusan',
             'status' => 'required|in:aktif,nonaktif',
         ];
 

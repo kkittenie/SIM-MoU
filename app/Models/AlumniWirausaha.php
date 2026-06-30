@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\FilterByTahunAjaran;
 
 class AlumniWirausaha extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterByTahunAjaran;
 
     protected $table = 'alumni_wirausahas';
 

@@ -65,6 +65,7 @@
                         <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="bk" {{ old('role', $user->role) === 'bk' ? 'selected' : '' }}>BK (Bimbingan Konseling)</option>
                         <option value="bkk" {{ old('role', $user->role) === 'bkk' ? 'selected' : '' }}>BKK (Bursa Kerja Khusus)</option>
+                        <option value="admin_jurusan" {{ old('role', $user->role) === 'admin_jurusan' ? 'selected' : '' }}>Admin Jurusan</option>
                     </select>
                 </div>
 

@@ -12,10 +12,8 @@ use App\Http\Controllers\AlumniBekerjaController;
 use App\Http\Controllers\AlumniKuliahController;
 use App\Http\Controllers\LaporanBKController;
 use App\Http\Controllers\LowonganKerjaController;
-use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\LaporanBkkController;
 use App\Http\Controllers\LaporanKerjaSamaController;
-use App\Http\Controllers\TracerKuliahController;
 use App\Http\Controllers\UniversitasController;
 use App\Http\Controllers\AlumniWirausahaController;
 
@@ -34,6 +32,15 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    // Set Active Academic Year
+    Route::post('/set-tahun-ajaran', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'tahun_ajaran' => 'required|string',
+        ]);
+        session(['selected_tahun_ajaran' => $request->input('tahun_ajaran')]);
+        return back();
+    })->name('set-tahun-ajaran');
+
     // Dashboard (auto-detect role)
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -48,27 +55,30 @@ Route::middleware('auth')->group(function () {
         Route::put('/pengguna/{id}', [PenggunaController::class, 'update'])->name('pengguna.update');
         Route::delete('/pengguna/{id}', [PenggunaController::class, 'destroy'])->name('pengguna.destroy');
 
-        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
         Route::post('/pengaturan/kategori', [SettingController::class, 'storeKategori'])->name('setting.kategori.store');
         Route::delete('/pengaturan/kategori/{id}', [SettingController::class, 'destroyKategori'])->name('setting.kategori.destroy');
 
-        // ╔═══ Universitas CRUD ═══╗
-        Route::get('/universitas', [UniversitasController::class, 'index'])->name('universitas.index');
-        Route::get('/universitas/tambah', [UniversitasController::class, 'create'])->name('universitas.create');
-        Route::post('/universitas', [UniversitasController::class, 'store'])->name('universitas.store');
-        Route::get('/universitas/{universitas}', [UniversitasController::class, 'show'])->name('universitas.show');
-        Route::get('/universitas/{universitas}/ubah', [UniversitasController::class, 'edit'])->name('universitas.edit');
-        Route::put('/universitas/{universitas}', [UniversitasController::class, 'update'])->name('universitas.update');
-        Route::delete('/universitas/{universitas}', [UniversitasController::class, 'destroy'])->name('universitas.destroy');
+        Route::post('/pengaturan/program-keahlian', [SettingController::class, 'storeProgramKeahlian'])->name('setting.program-keahlian.store');
+        Route::delete('/pengaturan/program-keahlian/{id}', [SettingController::class, 'destroyProgramKeahlian'])->name('setting.program-keahlian.destroy');
+    });
 
-        //notifikasi
+    // Admin & Admin Jurusan (Pengaturan)
+    Route::middleware('role:admin,admin_jurusan')->group(function () {
+        Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
+    });
+
+    // Admin & Admin Jurusan (Notifikasi)
+    Route::middleware('role:admin,admin_jurusan')->group(function () {
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
         Route::patch('/notifikasi/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.read');
         Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.mark-all-read');
         Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
+    });
 
+    // BKK & Admin Jurusan (Kelola MoU)
+    Route::middleware('role:bkk,admin_jurusan')->group(function () {
         Route::get('/kerja-sama/tambah', [KerjaSamaController::class, 'create'])->name('kerja-sama.create');
         Route::post('/kerja-sama', [KerjaSamaController::class, 'store'])->name('kerja-sama.store');
         Route::get('/kerja-sama/{id}/ubah', [KerjaSamaController::class, 'edit'])->name('kerja-sama.edit');
@@ -77,13 +87,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/kerja-sama/{id}/kirim-wa', [KerjaSamaController::class, 'kirimWhatsapp'])->name('kerja-sama.kirim-wa');
     });
 
-    // Admin & BKK
-    Route::middleware('role:admin,bkk')->group(function () {
+    // Admin, BKK, Admin Jurusan
+    Route::middleware('role:admin,bkk,admin_jurusan')->group(function () {
         // Kerja Sama - Laporan
         Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
+    });
 
+    // BKK Only (CRUD)
+    Route::middleware('role:bkk')->group(function () {
         Route::prefix('bkk')->name('bkk.')->group(function () {
-            // Perusahaan Mitra
+            // Perusahaan
             Route::get('/perusahaan-mitra', [PerusahaanMitraController::class, 'index'])->name('perusahaan-mitra.index');
             Route::get('/perusahaan-mitra/tambah', [PerusahaanMitraController::class, 'create'])->name('perusahaan-mitra.create');
             Route::post('/perusahaan-mitra', [PerusahaanMitraController::class, 'store'])->name('perusahaan-mitra.store');
@@ -109,17 +122,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/lowongan-kerja/{id}/ubah', [LowonganKerjaController::class, 'edit'])->name('lowongan-kerja.edit');
             Route::put('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'update'])->name('lowongan-kerja.update');
             Route::delete('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'destroy'])->name('lowongan-kerja.destroy');
+        });
+    });
 
-            // Tracer Study
-            Route::get('/tracer-study', [TracerStudyController::class, 'index'])->name('tracer-study.index');
-            Route::get('/tracer-study/tambah', [TracerStudyController::class, 'create'])->name('tracer-study.create');
-            Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer-study.store');
-            Route::get('/tracer-study/{id}/ubah', [TracerStudyController::class, 'edit'])->name('tracer-study.edit');
-            Route::put('/tracer-study/{id}', [TracerStudyController::class, 'update'])->name('tracer-study.update');
-            Route::delete('/tracer-study/{id}', [TracerStudyController::class, 'destroy'])->name('tracer-study.destroy');
-            Route::post('/tracer-study/bulk-delete', [TracerStudyController::class, 'bulkDelete'])->name('tracer-study.bulk-delete');
-
-            // Laporan BKK
+    // Admin & BKK (Laporan BKK)
+    Route::middleware('role:admin,bkk')->group(function () {
+        Route::prefix('bkk')->name('bkk.')->group(function () {
             Route::get('/laporan', [LaporanBkkController::class, 'index'])->name('laporan.index');
         });
     });
@@ -129,8 +137,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/kerja-sama/{id}', [KerjaSamaController::class, 'show'])->name('kerja-sama.show');
     Route::get('/kerja-sama/{id}/unduh', [KerjaSamaController::class, 'download'])->name('kerja-sama.download');
 
-    // BK Only
-    Route::middleware('role:admin,bk')->group(function () {
+    // BK Only (CRUD + Universitas CRUD)
+    Route::middleware('role:bk')->group(function () {
         // Index & List
         Route::get('/bk/alumni-kuliah', [AlumniKuliahController::class, 'index'])->name('bk.alumni-kuliah.index');
 
@@ -163,19 +171,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/bk/alumni-wirausaha/{alumniWirausaha}', [AlumniWirausahaController::class, 'destroy'])->name('bk.alumni-wirausaha.destroy');
         Route::post('/bk/alumni-wirausaha/bulk-delete', [AlumniWirausahaController::class, 'bulkDelete'])->name('bk.alumni-wirausaha.bulk-delete');
 
-        // ╔═══ Universitas - BK (Read-Only) ═══╗
-        Route::get('/bk/universitas', [UniversitasController::class, 'index'])->name('bk.universitas.index');
-        Route::get('/bk/universitas/{universitas}', [UniversitasController::class, 'show'])->name('bk.universitas.show');
+        // ╔═══ Universitas CRUD (BK) ═══╗
+        Route::get('/universitas', [UniversitasController::class, 'index'])->name('universitas.index');
+        Route::get('/universitas/tambah', [UniversitasController::class, 'create'])->name('universitas.create');
+        Route::post('/universitas', [UniversitasController::class, 'store'])->name('universitas.store');
+        Route::get('/universitas/{universitas}', [UniversitasController::class, 'show'])->name('universitas.show');
+        Route::get('/universitas/{universitas}/ubah', [UniversitasController::class, 'edit'])->name('universitas.edit');
+        Route::put('/universitas/{universitas}', [UniversitasController::class, 'update'])->name('universitas.update');
+        Route::delete('/universitas/{universitas}', [UniversitasController::class, 'destroy'])->name('universitas.destroy');
+    });
 
-        Route::get('/bk/tracer-kuliah', [TracerKuliahController::class, 'index'])->name('bk.tracer-kuliah.index');
-        Route::get('/bk/tracer-kuliah/tambah', [TracerKuliahController::class, 'create'])->name('bk.tracer-kuliah.create');
-        Route::post('/bk/tracer-kuliah', [TracerKuliahController::class, 'store'])->name('bk.tracer-kuliah.store');
-        Route::get('/bk/tracer-kuliah/{tracerKuliah}', [TracerKuliahController::class, 'show'])->name('bk.tracer-kuliah.show');
-        Route::get('/bk/tracer-kuliah/{tracerKuliah}/ubah', [TracerKuliahController::class, 'edit'])->name('bk.tracer-kuliah.edit');
-        Route::put('/bk/tracer-kuliah/{tracerKuliah}', [TracerKuliahController::class, 'update'])->name('bk.tracer-kuliah.update');
-        Route::delete('/bk/tracer-kuliah/{tracerKuliah}', [TracerKuliahController::class, 'destroy'])->name('bk.tracer-kuliah.destroy');
-        Route::post('/bk/tracer-kuliah/bulk-delete', [TracerKuliahController::class, 'bulkDelete'])->name('bk.tracer-kuliah.bulk-delete');
-
+    // Admin & BK (Laporan BK)
+    Route::middleware('role:admin,bk')->group(function () {
         Route::get('/bk/laporan', [LaporanBKController::class, 'index'])->name('bk.laporan.index');
     });
 });

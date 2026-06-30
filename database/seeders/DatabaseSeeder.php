@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AlumniKuliahSeeder::class,
             TracerKuliahSeeder::class,
             AlumniWirausahaSeeder::class,
+            MoUTestExpirationSeeder::class,
         ]);
 
         // Seed default settings row

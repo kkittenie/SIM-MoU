@@ -9,7 +9,6 @@ use App\Models\AlumniBekerja;
 use App\Models\AlumniKuliah;
 use App\Models\AlumniWirausaha;
 use App\Models\LowonganKerja;
-use App\Models\TracerStudy;
 use App\Models\Universitas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,17 +26,28 @@ class DashboardController extends Controller
         if (auth()->check() && auth()->user()->isBK()) {
             return $this->bkDashboard();
         }
+        if (auth()->check() && auth()->user()->isAdminJurusan()) {
+            return $this->adminJurusanDashboard();
+        }
 
+        return $this->adminDashboard();
+    }
+
+    /**
+     * Dashboard untuk Admin Jurusan (Fokus pada MoU)
+     */
+    private function adminJurusanDashboard()
+    {
         $today = Carbon::today();
-        $thirtyDaysLater = Carbon::today()->addDays(30);
+        $sixMonthsLater = Carbon::today()->addDays(183);
 
         $totalUsers = User::count();
         $totalKerjaSama = KerjaSama::count();
 
         // Hitung status MoU berdasarkan tanggal_berakhir
         $totalExpired = KerjaSama::where('tanggal_berakhir', '<', $today)->count();
-        $totalAkanBerakhir = KerjaSama::whereBetween('tanggal_berakhir', [$today, $thirtyDaysLater])->count();
-        $totalAktif = KerjaSama::where('tanggal_berakhir', '>', $thirtyDaysLater)->count();
+        $totalAkanBerakhir = KerjaSama::whereBetween('tanggal_berakhir', [$today, $sixMonthsLater])->count();
+        $totalAktif = KerjaSama::where('tanggal_berakhir', '>', $sixMonthsLater)->count();
 
         // 1. Grafik Status MoU
         $statusChartData = [
@@ -99,9 +109,9 @@ class DashboardController extends Controller
 
         // Insight 1: Expiration
         if ($totalAkanBerakhir > 0) {
-            $insights[] = "Terdapat {$totalAkanBerakhir} MoU yang akan berakhir dalam 30 hari.";
+            $insights[] = "Terdapat {$totalAkanBerakhir} MoU yang akan berakhir dalam 6 bulan.";
         } else {
-            $insights[] = "Tidak ada MoU yang akan berakhir dalam 30 hari ke depan.";
+            $insights[] = "Tidak ada MoU yang akan berakhir dalam 6 bulan ke depan.";
         }
 
         // Insight 2: Category
@@ -131,7 +141,7 @@ class DashboardController extends Controller
             $insights[] = "Jumlah kerja sama baru tahun ini ({$countThisYear}) stabil dibanding tahun sebelumnya ({$countLastYear}).";
         }
 
-        return view('pages.dashboard', compact(
+        return view('pages.admin_jurusan.dashboard', compact(
             'totalUsers',
             'totalKerjaSama',
             'totalExpired',
@@ -146,28 +156,100 @@ class DashboardController extends Controller
     }
 
     /**
+     * Dashboard untuk Super Admin (Summary Seluruh Fitur)
+     */
+    private function adminDashboard()
+    {
+        $today = Carbon::today();
+        
+        // 1. Total MoU
+        $totalKerjaSama = KerjaSama::count();
+        $totalMouAktif = KerjaSama::where('tanggal_berakhir', '>', $today->copy()->addDays(183))->count();
+        $totalMouAkanBerakhir = KerjaSama::whereBetween('tanggal_berakhir', [$today, $today->copy()->addDays(183)])->count();
+        
+        // 2. Total BK (Kuliah & Wirausaha)
+        $totalKuliah = AlumniKuliah::tahunAjaranAktif()->count();
+        $totalWirausaha = AlumniWirausaha::tahunAjaranAktif()->count();
+        
+        // 3. Total BKK (Bekerja)
+        $totalBekerja = AlumniBekerja::tahunAjaranAktif()->count();
+        
+        // 4. Statistik Notifikasi (Ringkasan)
+        $totalNotifikasiBelumDibaca = \App\Models\Notification::where('is_read', false)->count();
+
+        // Grafik Distribusi Alumni Total (Bekerja, Kuliah, Wirausaha)
+        $alumniDistribData = [
+            'labels' => ['Bekerja', 'Kuliah', 'Wirausaha'],
+            'series' => [$totalBekerja, $totalKuliah, $totalWirausaha]
+        ];
+
+        // 5. Statistik MoU per Program Keahlian
+        $mouPerJurusan = KerjaSama::select('program_keahlian_id', \DB::raw('count(*) as total'))
+            ->with('programKeahlian')
+            ->groupBy('program_keahlian_id')
+            ->orderBy('total', 'desc')
+            ->get();
+            
+        $jurusanChartData = [
+            'labels' => $mouPerJurusan->map(function($ks) {
+                return $ks->programKeahlian ? $ks->programKeahlian->nama : 'Semua Jurusan';
+            })->toArray(),
+            'series' => $mouPerJurusan->pluck('total')->toArray()
+        ];
+        
+        if (empty($jurusanChartData['labels'])) {
+            $jurusanChartData['labels'] = ['Belum ada data'];
+            $jurusanChartData['series'] = [0];
+        }
+
+        // Insights untuk Admin
+        $insights = [];
+        $insights[] = "Total kerja sama saat ini mencapai <strong>{$totalKerjaSama} mitra</strong>.";
+        if ($totalMouAkanBerakhir > 0) {
+            $insights[] = "Terdapat <strong>{$totalMouAkanBerakhir} MoU</strong> yang akan segera berakhir (<= 6 bulan).";
+        }
+        $insights[] = "Penyerapan alumni tahun ajaran aktif: <strong>{$totalBekerja} bekerja</strong>, <strong>{$totalKuliah} kuliah</strong>, <strong>{$totalWirausaha} wirausaha</strong>.";
+        if ($totalNotifikasiBelumDibaca > 0) {
+            $insights[] = "Ada <strong>{$totalNotifikasiBelumDibaca} notifikasi</strong> baru yang belum Anda baca.";
+        }
+
+        return view('pages.admin.dashboard', compact(
+            'totalKerjaSama',
+            'totalMouAktif',
+            'totalMouAkanBerakhir',
+            'totalKuliah',
+            'totalWirausaha',
+            'totalBekerja',
+            'totalNotifikasiBelumDibaca',
+            'alumniDistribData',
+            'jurusanChartData',
+            'insights'
+        ));
+    }
+
+    /**
      * Tampilkan dashboard khusus BKK.
      */
     private function bkkDashboard()
     {
-        $totalAlumniBekerja = AlumniBekerja::count();
+        $totalAlumniBekerja = AlumniBekerja::tahunAjaranAktif()->count();
         $totalPerusahaanMitra = PerusahaanMitra::count();
         $totalLowonganKerja = LowonganKerja::where('status', 'Aktif')->count();
-        $totalTracerStudy = TracerStudy::whereIn('status_alumni', ['Bekerja', 'Mencari Kerja'])->count();
 
-        // 1. Grafik Persentase Alumni Bekerja (Tracer Study)
-        $tracerStats = [
-            'Bekerja' => TracerStudy::where('status_alumni', 'Bekerja')->count(),
-            'Mencari Kerja' => TracerStudy::where('status_alumni', 'Mencari Kerja')->count(),
+        // 1. Grafik Status Pekerjaan Alumni
+        $statusStats = [
+            'Tetap' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Tetap')->count(),
+            'Kontrak' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Kontrak')->count(),
+            'Freelance' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Freelance')->count(),
         ];
 
         $statusChartData = [
-            'labels' => array_keys($tracerStats),
-            'series' => array_values($tracerStats),
+            'labels' => array_keys($statusStats),
+            'series' => array_values($statusStats),
         ];
 
         // 2. Grafik Perusahaan yang Paling Banyak Merekrut (Top 5)
-        $perusahaanRecruits = AlumniBekerja::select('perusahaan_nama', \DB::raw('count(*) as total'))
+        $perusahaanRecruits = AlumniBekerja::tahunAjaranAktif()->select('perusahaan_nama', \DB::raw('count(*) as total'))
             ->groupBy('perusahaan_nama')
             ->orderBy('total', 'desc')
             ->limit(5)
@@ -185,7 +267,7 @@ class DashboardController extends Controller
         }
 
         // 3. Grafik Bidang Industri Terbanyak
-        $industriStats = AlumniBekerja::select('bidang_industri', \DB::raw('count(*) as total'))
+        $industriStats = AlumniBekerja::tahunAjaranAktif()->select('bidang_industri', \DB::raw('count(*) as total'))
             ->groupBy('bidang_industri')
             ->orderBy('total', 'desc')
             ->get();
@@ -219,13 +301,11 @@ class DashboardController extends Controller
         // Insights BKK
         $insights = [];
 
-        // Insight 1: Tingkat Keterserapan
-        if ($totalTracerStudy > 0) {
-            $bekerja = $tracerStats['Bekerja'];
-            $rate = ($bekerja / $totalTracerStudy) * 100;
-            $insights[] = "Tingkat keterserapan kerja alumni mencapai " . number_format($rate, 1) . "% (" . $bekerja . " dari " . $totalTracerStudy . " responden BKK).";
+        // Insight 1: Total Alumni Bekerja
+        if ($totalAlumniBekerja > 0) {
+            $insights[] = "Terdapat {$totalAlumniBekerja} alumni yang tercatat bekerja pada tahun ajaran aktif.";
         } else {
-            $insights[] = "Belum ada respon Tracer Study masuk.";
+            $insights[] = "Belum ada data alumni bekerja pada tahun ajaran aktif.";
         }
 
         // Insight 2: Bidang Industri Terpopuler
@@ -244,7 +324,6 @@ class DashboardController extends Controller
             'totalAlumniBekerja',
             'totalPerusahaanMitra',
             'totalLowonganKerja',
-            'totalTracerStudy',
             'statusChartData',
             'perusahaanChartData',
             'industriChartData',
@@ -255,8 +334,8 @@ class DashboardController extends Controller
 
     private function bkDashboard()
     {
-        $totalAlumniKuliah = AlumniKuliah::count();
-        $totalAlumniWirausaha = AlumniWirausaha::count();
+        $totalAlumniKuliah = AlumniKuliah::tahunAjaranAktif()->count();
+        $totalAlumniWirausaha = AlumniWirausaha::tahunAjaranAktif()->count();
         $totalUniversitas = Universitas::where('status', 'aktif')->count();
 
         // 1. Grafik Persentase Penyaluran BK (Kuliah vs Wirausaha) - Donut
@@ -266,7 +345,7 @@ class DashboardController extends Controller
         ];
 
         // 2. Grafik Distribusi Alumni per Universitas (Kampus Tujuan Terbanyak)
-        $alumniPerUniversitas = AlumniKuliah::select('universitas_id')
+        $alumniPerUniversitas = AlumniKuliah::tahunAjaranAktif()->select('universitas_id')
             ->with('universitas')
             ->groupBy('universitas_id')
             ->selectRaw('universitas_id, count(*) as total')
@@ -288,7 +367,7 @@ class DashboardController extends Controller
         }
 
         // 3. Grafik Bidang Usaha Terbanyak
-        $wirausahaStats = AlumniWirausaha::select('bidang_usaha', \DB::raw('count(*) as total'))
+        $wirausahaStats = AlumniWirausaha::tahunAjaranAktif()->select('bidang_usaha', \DB::raw('count(*) as total'))
             ->groupBy('bidang_usaha')
             ->orderBy('total', 'desc')
             ->limit(6)

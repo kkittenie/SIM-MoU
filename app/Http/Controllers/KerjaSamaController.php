@@ -18,9 +18,10 @@ class KerjaSamaController extends Controller
         $jenisMitra = $request->input('jenis_mitra');
         $status = $request->input('status');
         $year = $request->input('year');
+        $programKeahlianId = $request->input('program_keahlian_id');
 
         $today = Carbon::today();
-        $thirtyDaysLater = Carbon::today()->addDays(30);
+        $sixMonthsLater = Carbon::today()->addDays(183);
 
         $query = KerjaSama::query();
 
@@ -40,13 +41,17 @@ class KerjaSamaController extends Controller
             $query->whereYear('tanggal_mulai', $year);
         }
 
+        if ($programKeahlianId) {
+            $query->where('program_keahlian_id', $programKeahlianId);
+        }
+
         if ($status) {
             if ($status === 'Berakhir') {
                 $query->where('tanggal_berakhir', '<', $today);
             } elseif ($status === 'Akan Berakhir') {
-                $query->whereBetween('tanggal_berakhir', [$today, $thirtyDaysLater]);
+                $query->whereBetween('tanggal_berakhir', [$today, $sixMonthsLater]);
             } elseif ($status === 'Aktif') {
-                $query->where('tanggal_berakhir', '>', $thirtyDaysLater);
+                $query->where('tanggal_berakhir', '>', $sixMonthsLater);
             }
         }
 
@@ -67,8 +72,9 @@ class KerjaSamaController extends Controller
             ->toArray();
 
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
+        $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
 
-        return view('pages.kerja-sama.index', compact('kerjaSama', 'search', 'jenisMitra', 'status', 'years', 'year', 'categories'));
+        return view('pages.kerja-sama.index', compact('kerjaSama', 'search', 'jenisMitra', 'status', 'years', 'year', 'categories', 'programKeahlians', 'programKeahlianId'));
     }
 
     /**
@@ -76,24 +82,25 @@ class KerjaSamaController extends Controller
      */
     public function create()
     {
-        // Hanya Admin dan BKK yang bisa membuat
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk menambah kerja sama.');
         }
 
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
-        return view('pages.kerja-sama.create', compact('categories'));
+        $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
+        return view('pages.kerja-sama.create', compact('categories', 'programKeahlians'));
     }
 
     public function store(Request $request)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk menambah kerja sama.');
         }
 
         $validated = $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'kategori_mitra_id' => 'required|exists:kategori_mitra,id',
+            'program_keahlian_id' => 'nullable|exists:program_keahlians,id',
             'alamat' => 'required|string',
             'email' => 'required|email|max:255',
             'nomor_telepon' => 'required|string|max:50',
@@ -107,6 +114,7 @@ class KerjaSamaController extends Controller
             'nama_mitra.required' => 'Nama mitra wajib diisi.',
             'kategori_mitra_id.required' => 'Jenis mitra wajib dipilih.',
             'kategori_mitra_id.exists' => 'Jenis mitra tidak valid.',
+            'program_keahlian_id.exists' => 'Program Keahlian tidak valid.',
             'alamat.required' => 'Alamat wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
@@ -151,18 +159,19 @@ class KerjaSamaController extends Controller
      */
     public function edit($id)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah kerja sama.');
         }
 
         $kerjaSama = KerjaSama::findOrFail($id);
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
-        return view('pages.kerja-sama.edit', compact('kerjaSama', 'categories'));
+        $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
+        return view('pages.kerja-sama.edit', compact('kerjaSama', 'categories', 'programKeahlians'));
     }
 
     public function update(Request $request, $id)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah kerja sama.');
         }
 
@@ -171,6 +180,7 @@ class KerjaSamaController extends Controller
         $validated = $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'kategori_mitra_id' => 'required|exists:kategori_mitra,id',
+            'program_keahlian_id' => 'nullable|exists:program_keahlians,id',
             'alamat' => 'required|string',
             'email' => 'required|email|max:255',
             'nomor_telepon' => 'required|string|max:50',
@@ -184,6 +194,7 @@ class KerjaSamaController extends Controller
             'nama_mitra.required' => 'Nama mitra wajib diisi.',
             'kategori_mitra_id.required' => 'Jenis mitra wajib dipilih.',
             'kategori_mitra_id.exists' => 'Jenis mitra tidak valid.',
+            'program_keahlian_id.exists' => 'Program Keahlian tidak valid.',
             'alamat.required' => 'Alamat wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
@@ -223,7 +234,7 @@ class KerjaSamaController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus kerja sama.');
         }
 
@@ -262,7 +273,7 @@ class KerjaSamaController extends Controller
      */
     public function kirimWhatsapp($id)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isBKK()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
             abort(403, 'Anda tidak memiliki akses untuk mengirim notifikasi WhatsApp.');
         }
 
@@ -287,13 +298,12 @@ class KerjaSamaController extends Controller
         $diffDays = $today->diffInDays($endDate, false);
 
         if ($diffDays <= 0) {
-            $type = 'expired';
-        } elseif ($diffDays <= 7) {
-            $type = 'warning_7';
-        } elseif ($diffDays <= 14) {
-            $type = 'warning_14';
+            $type = 'berakhir';
+        } elseif ($diffDays < 30) {
+            $type = "{$diffDays} hari";
         } else {
-            $type = 'warning_30';
+            $months = max(1, (int)round($diffDays / 30.4));
+            $type = "{$months} bulan";
         }
 
         $whatsappService = new \App\Services\WhatsappService();

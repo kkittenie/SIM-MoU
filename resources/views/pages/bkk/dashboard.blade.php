@@ -99,7 +99,7 @@
                     Dashboard Bursa Kerja Khusus (BKK)
                 </h1>
                 <p class="mt-1.5 text-sm text-blue-100/80 leading-relaxed max-w-xl">
-                    Selamat datang, {{ auth()->user()->name }}. Kelola data penyerapan alumni, perusahaan mitra, lowongan kerja, dan pantau hasil tracer study.
+                    Selamat datang, {{ auth()->user()->name }}. Kelola data penyerapan alumni, perusahaan mitra, dan lowongan kerja.
                 </p>
             </div>
             <a href="{{ route('bkk.alumni-bekerja.create') }}"
@@ -126,7 +126,7 @@
         <div class="stat-card accent-green anim-scale d-2">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Perusahaan mitra</span>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Perusahaan</span>
                     <h4 class="mt-2 text-2xl font-bold text-green-600 dark:text-green-400 tabular-nums" data-count="{{ $totalPerusahaanMitra }}">{{ $totalPerusahaanMitra }}</h4>
                 </div>
                 <div class="stat-icon bg-green">
@@ -148,11 +148,11 @@
         <div class="stat-card accent-amber anim-scale d-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Respon tracer</span>
-                    <h4 class="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400 tabular-nums" data-count="{{ $totalTracerStudy }}">{{ $totalTracerStudy }}</h4>
+                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status Tetap</span>
+                    <h4 class="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400 tabular-nums" data-count="{{ $statusChartData['series'][0] ?? 0 }}">{{ $statusChartData['series'][0] ?? 0 }}</h4>
                 </div>
                 <div class="stat-icon bg-amber">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
         </div>
@@ -186,7 +186,7 @@
         <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #5BB6FF"></span>
-                Status responden alumni (tracer study)
+                Status pekerjaan alumni
             </div>
             <div class="flex justify-center"><div id="statusChart" class="w-full max-w-[320px]"></div></div>
         </div>

@@ -50,7 +50,7 @@
                 Laporan Bimbingan Konseling (BK)
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                Pantau metrik alumni kuliah, wirausaha, dan tracer study.
+                Pantau metrik alumni kuliah dan wirausaha.
             </p>
         </div>
 
@@ -91,7 +91,7 @@
     </div>
 
     <!-- Summary Metrics Cards -->
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-5 md:gap-5 mb-6 print:grid-cols-5 print:gap-4 print:mb-4">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 md:gap-5 mb-6 print:grid-cols-4 print:gap-4 print:mb-4">
         <!-- Alumni Kuliah -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
             <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Alumni Kuliah</span>
@@ -114,12 +114,6 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
             <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Program Studi</span>
             <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalProgramStudi }}</h4>
-        </div>
-
-        <!-- Tracer Study -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
-            <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Tracer Study</span>
-            <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalTracerKuliah }}</h4>
         </div>
     </div>
 
@@ -227,19 +221,6 @@
                     Menampilkan daftar detail alumni yang melanjutkan kuliah.
                 </p>
             </div>
-            <!-- Year filter buttons -->
-            <div class="flex flex-wrap gap-1.5 no-print" id="tahun-alumni-filters">
-                <button data-tahun="all"
-                    class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 bg-brand-500 text-white border-brand-500 shadow-theme-xs">
-                    Semua
-                </button>
-                @foreach($tahunLulusList as $tahun)
-                    <button data-tahun="{{ $tahun }}"
-                        class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-white/5">
-                        {{ $tahun }}
-                    </button>
-                @endforeach
-            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -302,6 +283,11 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Links for Alumni Kuliah -->
+        <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
+            {{ $alumniList->links() }}
+        </div>
     </div>
 
     <!-- Detailed Table of Alumni Wirausaha -->
@@ -314,19 +300,6 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 no-print">
                     Menampilkan daftar detail alumni yang berwirausaha.
                 </p>
-            </div>
-            <!-- Year filter buttons for wirausaha -->
-            <div class="flex flex-wrap gap-1.5 no-print" id="tahun-wirausaha-filters">
-                <button data-tahun="all"
-                    class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 bg-brand-500 text-white border-brand-500 shadow-theme-xs">
-                    Semua
-                </button>
-                @foreach($tahunLulusList as $tahun)
-                    <button data-tahun="{{ $tahun }}"
-                        class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-white/5">
-                        {{ $tahun }}
-                    </button>
-                @endforeach
             </div>
         </div>
 
@@ -376,135 +349,10 @@
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- Tracer Study Section (jika ada data) -->
-    @if(count($tracerList) > 0)
-    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300 mt-6">
-        <div class="p-5 border-b border-gray-100 dark:border-gray-800 print:border-none print:p-2">
-            <h3 class="text-base font-bold text-gray-800 dark:text-white/90 print:text-black print:text-sm">
-                Respon Tracer Study Terbaru
-            </h3>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 no-print">
-                Menampilkan {{ count($tracerList) }} respon tracer study terbaru.
-            </p>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400 print:text-black">
-                <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 print:bg-gray-100 print:text-black">
-                    <tr>
-                        <th class="px-6 py-4">Alumni</th>
-                        <th class="px-6 py-4">Status Kuliah</th>
-                        <th class="px-6 py-4">Kampus Tujuan</th>
-                        <th class="px-6 py-4">Program Studi</th>
-                        <th class="px-6 py-4">Tanggal Respon</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
-                    @foreach($tracerList as $tracer)
-                        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors print:hover:bg-transparent">
-                            <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black print:font-semibold">
-                                {{ $tracer->alumniKuliah?->nama_alumni ?? '-' }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                <span class="no-print inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold
-                                    @if($tracer->status_kuliah === 'Masih Kuliah') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400
-                                    @elseif($tracer->status_kuliah === 'Lulus') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400
-                                    @else bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-500/10 dark:text-gray-400
-                                    @endif">
-                                    {{ $tracer->status_kuliah }}
-                                </span>
-                                <span class="hidden print:inline font-medium text-xs">{{ $tracer->status_kuliah }}</span>
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $tracer->kampus_tujuan ?? '-' }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $tracer->program_studi ?? '-' }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $tracer->created_at->format('d M Y') }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        
+        <!-- Pagination Links for Alumni Wirausaha -->
+        <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
+            {{ $alumniWirausahaList->links() }}
         </div>
     </div>
-    @endif
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Alumni Kuliah Filters
-        const alumniButtons = document.querySelectorAll('#tahun-alumni-filters .filter-btn');
-        const alumniRows = document.querySelectorAll('.alumni-row');
-        const emptyAlumniRow = document.getElementById('empty-alumni-row');
-
-        alumniButtons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const selectedYear = this.getAttribute('data-tahun');
-
-                alumniButtons.forEach(b => {
-                    b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                    b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-                });
-
-                this.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-
-                let shownCount = 0;
-                alumniRows.forEach(row => {
-                    const rowYear = row.getAttribute('data-tahun');
-                    if (selectedYear === 'all' || rowYear === selectedYear) {
-                        row.style.display = '';
-                        shownCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                if (emptyAlumniRow) {
-                    emptyAlumniRow.style.display = shownCount === 0 ? '' : 'none';
-                }
-            });
-        });
-
-        // Wirausaha Filters
-        const wirausahaButtons = document.querySelectorAll('#tahun-wirausaha-filters .filter-btn');
-        const wirausahaRows = document.querySelectorAll('.wirausaha-row');
-        const emptyWirausahaRow = document.getElementById('empty-wirausaha-row');
-
-        wirausahaButtons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const selectedYear = this.getAttribute('data-tahun');
-
-                wirausahaButtons.forEach(b => {
-                    b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                    b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-                });
-
-                this.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-
-                let shownCount = 0;
-                wirausahaRows.forEach(row => {
-                    const rowYear = row.getAttribute('data-tahun');
-                    if (selectedYear === 'all' || rowYear === selectedYear) {
-                        row.style.display = '';
-                        shownCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                if (emptyWirausahaRow) {
-                    emptyWirausahaRow.style.display = shownCount === 0 ? '' : 'none';
-                }
-            });
-        });
-    });
-</script>
-@endpush
 @endsection

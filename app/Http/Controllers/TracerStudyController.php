@@ -13,9 +13,10 @@ class TracerStudyController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $tahunLulus = $request->input('tahun_lulus');
+        $tahunLulus = $request->has('tahun_lulus') ? $request->input('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
 
         $tracers = TracerStudy::query()
+            ->tahunAjaranAktif()
             ->where('status_alumni', 'Bekerja')
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {

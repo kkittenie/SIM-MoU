@@ -24,70 +24,6 @@ class MenuHelper
                 'name' => 'Kelola Pengguna',
                 'path' => '/pengguna',
             ];
-            $items[] = [
-                'icon' => 'forms',
-                'name' => 'Kelola Kerja Sama',
-                'path' => '/kerja-sama',
-            ];
-
-            // data alumni sub-menu
-            $items[] = [
-                'icon' => 'alumni-bekerja',
-                'name' => 'Data Alumni',
-                'path' => '#',
-                'subItems' => [
-                    [
-                        'icon' => 'alumni-bekerja',
-                        'name' => 'Alumni Bekerja',
-                        'path' => '/bkk/alumni-bekerja',
-                    ],
-                    [
-                        'icon' => 'alumni-kuliah',
-                        'name' => 'Alumni Kuliah',
-                        'path' => '/bk/alumni-kuliah',
-                    ],
-                    [
-                        'icon' => 'tracer-study',
-                        'name' => 'Alumni Wirausaha',
-                        'path' => '/bk/alumni-wirausaha',
-                    ],
-                ],
-            ];
-
-            $items[] = [
-                'icon' => 'perusahaan-mitra',
-                'name' => 'Data Perusahaan Mitra',
-                'path' => '/bkk/perusahaan-mitra',
-            ];
-            $items[] = [
-                'icon' => 'universitas',
-                'name' => 'Universitas',
-                'path' => '/universitas',
-            ];
-            $items[] = [
-                'icon' => 'lowongan-kerja',
-                'name' => 'Lowongan Kerja',
-                'path' => '/bkk/lowongan-kerja',
-            ];
-
-            // tracer sub-menu
-            $items[] = [
-                'icon' => 'tracer-study',
-                'name' => 'Tracer Study',
-                'path' => '#',
-                'subItems' => [
-                    [
-                        'icon' => 'tracer-study',
-                        'name' => 'Tracer Bekerja',
-                        'path' => '/bkk/tracer-study',
-                    ],
-                    [
-                        'icon' => 'tracer-study',
-                        'name' => 'Tracer Kuliah',
-                        'path' => '/bk/tracer-kuliah',
-                    ],
-                ],
-            ];
 
             // laporn sub-menu
             $items[] = [
@@ -132,9 +68,9 @@ class MenuHelper
                 'path' => '/bkk/lowongan-kerja',
             ];
             $items[] = [
-                'icon' => 'tracer-study',
-                'name' => 'Tracer Bekerja',
-                'path' => '/bkk/tracer-study',
+                'icon' => 'perusahaan-mitra',
+                'name' => 'Perusahaan',
+                'path' => '/bkk/perusahaan-mitra',
             ];
             $items[] = [
                 'icon' => 'laporan',
@@ -161,9 +97,9 @@ class MenuHelper
                 'path' => '/bk/alumni-wirausaha',
             ];
             $items[] = [
-                'icon' => 'tracer-study',
-                'name' => 'Tracer Study',
-                'path' => '/bk/tracer-kuliah',
+                'icon' => 'universitas',
+                'name' => 'Universitas',
+                'path' => '/universitas',
             ];
             $items[] = [
                 'icon' => 'laporan',
@@ -172,8 +108,27 @@ class MenuHelper
             ];
         }
 
-        // ════ NOTIFIKASI (ADMIN ONLY) ════
-        if ($user && $user->isAdmin()) {
+        // ════ ADMIN JURUSAN ONLY ════
+        elseif ($user && $user->isAdminJurusan()) {
+            $items[] = [
+                'icon' => 'dashboard',
+                'name' => 'Dashboard',
+                'path' => '/dashboard',
+            ];
+            $items[] = [
+                'icon' => 'forms',
+                'name' => 'Kelola Kerja Sama',
+                'path' => '/kerja-sama',
+            ];
+            $items[] = [
+                'icon' => 'laporan',
+                'name' => 'Laporan Kerja Sama',
+                'path' => '/laporan-kerja-sama',
+            ];
+        }
+
+        // ════ NOTIFIKASI (ADMIN & ADMIN JURUSAN) ════
+        if ($user && ($user->isAdmin() || $user->isAdminJurusan())) {
             $items[] = [
                 'icon' => 'bell',
                 'name' => 'Notifikasi',
@@ -181,8 +136,8 @@ class MenuHelper
             ];
         }
 
-        // ════ PENGATURAN (ADMIN ONLY) ════
-        if ($user && $user->isAdmin()) {
+        // ════ PENGATURAN (ADMIN & ADMIN JURUSAN) ════
+        if ($user && ($user->isAdmin() || $user->isAdminJurusan())) {
             $items[] = [
                 'icon' => 'settings',
                 'name' => 'Pengaturan',

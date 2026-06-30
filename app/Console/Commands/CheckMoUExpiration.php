@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\KerjaSama;
 use App\Models\Notification;
-use App\Models\WhatsappLog;
 use App\Services\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -40,23 +39,30 @@ class CheckMoUExpiration extends Command
 
         foreach ($partnerships as $ks) {
             $endDate = Carbon::parse($ks->tanggal_berakhir);
-            $diffDays = $today->diffInDays($endDate, false); // false allows negative values if already expired
+            $diffDays = $today->diffInDays($endDate, false);
 
             $type = null;
 
-            // Determine check thresholds
-            if ($diffDays === 30) {
-                $type = 'warning_30';
-            } elseif ($diffDays === 14) {
-                $type = 'warning_14';
-            } elseif ($diffDays === 7) {
-                $type = 'warning_7';
-            } elseif ($diffDays <= 0) {
-                $type = 'expired';
+            // 1. Check monthly warning (from 6 months down to 1 month before expiration)
+            for ($m = 1; $m <= 6; $m++) {
+                if ($endDate->copy()->subMonths($m)->isSameDay($today)) {
+                    $type = "{$m} bulan";
+                    break;
+                }
+            }
+
+            // 2. Weekly warning: under 30 days, every 7 days (e.g. 23, 16, 9, 2 days left)
+            if (!$type && $diffDays < 30 && $diffDays > 0 && $diffDays % 7 === 2) {
+                $type = "{$diffDays} hari";
+            } 
+            
+            // 3. Expired: exactly today
+            if (!$type && $diffDays === 0) {
+                $type = 'berakhir';
             }
 
             if ($type) {
-                // 1. Database Notification
+                // Check if notification already exists
                 $notifExists = Notification::where('kerja_sama_id', $ks->id)
                     ->where('type', $type)
                     ->exists();
@@ -73,6 +79,10 @@ class CheckMoUExpiration extends Command
                         'is_read' => false,
                     ]);
 
+                    // Send WhatsApp automatically if enabled
+                    $whatsappService = new WhatsappService();
+                    $whatsappService->sendNotification($ks, $type);
+
                     $notificationsCreated++;
                 }
             }
@@ -86,18 +96,11 @@ class CheckMoUExpiration extends Command
      */
     protected function getNotificationTitle($ks, $type)
     {
-        switch ($type) {
-            case 'warning_30':
-                return "MoU dengan {$ks->nama_mitra} Berakhir dalam 30 Hari";
-            case 'warning_14':
-                return "MoU dengan {$ks->nama_mitra} Berakhir dalam 14 Hari";
-            case 'warning_7':
-                return "Peringatan: MoU dengan {$ks->nama_mitra} Berakhir dalam 7 Hari";
-            case 'expired':
-                return "MoU dengan {$ks->nama_mitra} Telah Berakhir";
-            default:
-                return "Pemberitahuan Kerja Sama";
+        if ($type === 'berakhir') {
+            return "MoU dengan {$ks->nama_mitra} Telah Berakhir";
         }
+
+        return "MoU dengan {$ks->nama_mitra} Berakhir dalam {$type}";
     }
 
     /**
@@ -106,17 +109,11 @@ class CheckMoUExpiration extends Command
     protected function getNotificationMessage($ks, $type)
     {
         $dateStr = $ks->tanggal_berakhir ? $ks->tanggal_berakhir->format('d/m/Y') : '-';
-        switch ($type) {
-            case 'warning_30':
-                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} akan berakhir pada {$dateStr}. Mohon siapkan peninjauan kembali.";
-            case 'warning_14':
-                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} akan berakhir pada {$dateStr}. Siapkan perpanjangan berkas.";
-            case 'warning_7':
-                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} tinggal 7 hari lagi! Berakhir pada {$dateStr}. Hubungi PIC: {$ks->pic} ({$ks->nomor_telepon}).";
-            case 'expired':
-                return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} telah berakhir sejak tanggal {$dateStr}.";
-            default:
-                return "Detail kerja sama telah diperbarui.";
+        
+        if ($type === 'berakhir') {
+            return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} telah berakhir hari ini tanggal {$dateStr}. Status telah diperbarui otomatis menjadi Berakhir.";
         }
+
+        return "Kerja sama No. {$ks->nomor_mou} dengan {$ks->nama_mitra} akan berakhir dalam {$type} pada {$dateStr}. Mohon siapkan peninjauan kembali.";
     }
 }

@@ -14,8 +14,8 @@
                 </p>
             </div>
             
-            <!-- Ubah Button (Visible to Admin and BKK only) -->
-            @if (auth()->user()->isAdmin() || auth()->user()->isBKK())
+            <!-- Ubah Button (Visible to Admin, BKK, and Admin Jurusan) -->
+            @if (auth()->user()->isAdmin() || auth()->user()->isBKK() || auth()->user()->isAdminJurusan())
                 <a href="{{ route('kerja-sama.edit', $kerjaSama->id) }}"
                     class="bg-yellow-500 shadow-theme-xs hover:bg-yellow-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,6 +39,14 @@
                 <div>
                     <span class="block text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Jenis Mitra</span>
                     <span class="mt-1 block text-sm font-medium text-gray-800 dark:text-white/90">{{ $kerjaSama->jenis_mitra }}</span>
+                </div>
+
+                <!-- Program Keahlian -->
+                <div>
+                    <span class="block text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Program Keahlian</span>
+                    <span class="mt-1 block text-sm font-medium text-gray-800 dark:text-white/90">
+                        {{ $kerjaSama->programKeahlian ? $kerjaSama->programKeahlian->nama : 'Semua Jurusan' }}
+                    </span>
                 </div>
 
                 <!-- PIC -->

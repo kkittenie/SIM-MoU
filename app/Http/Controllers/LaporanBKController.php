@@ -4,31 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\AlumniKuliah;
 use App\Models\AlumniWirausaha;
-use App\Models\TracerKuliah;
 use App\Models\Universitas;
 use Illuminate\Http\Request;
 
 class LaporanBKController extends Controller
 {
     /**
-     * Main laporan index - Alumni Kuliah & Tracer Study
+     * Main laporan index - Alumni Kuliah & Wirausaha
      */
     public function index(Request $request)
     {
-        $tahunLulus = $request->get('tahun_lulus');
+        $tahunLulus = $request->has('tahun_lulus') ? $request->get('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
 
         // Query base
-        $queryAlumni = AlumniKuliah::query();
-        $queryTracer = TracerKuliah::query();
-        $queryWirausaha = AlumniWirausaha::query();
+        $queryAlumni = AlumniKuliah::query()->tahunAjaranAktif();
+        $queryWirausaha = AlumniWirausaha::query()->tahunAjaranAktif();
 
         // Filter by tahun lulus
         if ($tahunLulus) {
             $queryAlumni->where('tahun_lulus', $tahunLulus);
             $queryWirausaha->where('tahun_lulus', $tahunLulus);
-            $queryTracer->whereHas('alumniKuliah', function ($q) use ($tahunLulus) {
-                $q->where('tahun_lulus', $tahunLulus);
-            });
         }
 
         // ════════════════════════════════════════════════
@@ -37,7 +32,6 @@ class LaporanBKController extends Controller
         $totalAlumniKuliah = (clone $queryAlumni)->count();
         $totalAlumniWirausaha = (clone $queryWirausaha)->count();
         $totalUniversitas = (clone $queryAlumni)->distinct('universitas_id')->count('universitas_id');
-        $totalTracerKuliah = (clone $queryTracer)->count();
         $totalProgramStudi = (clone $queryAlumni)->distinct('program_studi')->count('program_studi');
 
         // ════════════════════════════════════════════════
@@ -77,14 +71,6 @@ class LaporanBKController extends Controller
             'Belum Terdata' => (clone $queryAlumni)->where('status_alumni', 'belum_terdata')->count(),
         ];
 
-        // Tracer Study Status
-        $tracerStatusStats = (clone $queryTracer)
-            ->selectRaw('status_kuliah, COUNT(*) as total')
-            ->groupBy('status_kuliah')
-            ->get()
-            ->pluck('total', 'status_kuliah')
-            ->toArray();
-
         // ════════════════════════════════════════════════
         // DETAILED LISTS
         // ════════════════════════════════════════════════
@@ -93,19 +79,14 @@ class LaporanBKController extends Controller
         $alumniList = (clone $queryAlumni)
             ->with('universitas')
             ->orderBy('nama_alumni')
-            ->get();
+            ->paginate(10, ['*'], 'page_kuliah')
+            ->withQueryString();
 
         // Alumni Wirausaha List
         $alumniWirausahaList = (clone $queryWirausaha)
             ->orderBy('nama_alumni')
-            ->get();
-
-        // Tracer Kuliah List (top 15)
-        $tracerList = (clone $queryTracer)
-            ->with('alumniKuliah')
-            ->orderByDesc('created_at')
-            ->limit(15)
-            ->get();
+            ->paginate(10, ['*'], 'page_wirausaha')
+            ->withQueryString();
 
         // Dropdown tahun lulus
         $tahunLulusList = array_unique(array_merge(
@@ -120,16 +101,13 @@ class LaporanBKController extends Controller
             'totalAlumniKuliah',
             'totalAlumniWirausaha',
             'totalUniversitas',
-            'totalTracerKuliah',
             'totalProgramStudi',
             'universitasStats',
             'programStudiStats',
             'bidangUsahaStats',
             'statusStats',
-            'tracerStatusStats',
             'alumniList',
-            'alumniWirausahaList',
-            'tracerList'
+            'alumniWirausahaList'
         ));
     }
 }

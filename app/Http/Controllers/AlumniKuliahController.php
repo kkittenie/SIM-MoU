@@ -21,7 +21,7 @@ class AlumniKuliahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = AlumniKuliah::with('universitas');
+        $query = AlumniKuliah::with('universitas')->tahunAjaranAktif();
 
         // Search
         if ($request->has('search') && $request->search) {
@@ -46,7 +46,7 @@ class AlumniKuliahController extends Controller
 
         $search = $request->get('search', '');
         $status = $request->get('status', '');
-        $tahunLulus = $request->get('tahun_lulus', '');
+        $tahunLulus = $request->has('tahun_lulus') ? $request->get('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
 
         $alumni = $query->orderBy('created_at', 'desc')->paginate(15);
         $tahunLulusList = AlumniKuliah::distinct()->pluck('tahun_lulus')->sort()->toArray();
@@ -426,7 +426,7 @@ class AlumniKuliahController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        $query = AlumniKuliah::with('universitas');
+        $query = AlumniKuliah::with('universitas')->tahunAjaranAktif();
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;

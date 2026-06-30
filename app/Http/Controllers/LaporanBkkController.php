@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AlumniBekerja;
 use App\Models\PerusahaanMitra;
-use App\Models\TracerStudy;
 use App\Models\LowonganKerja;
 use Illuminate\Http\Request;
 
@@ -15,26 +14,24 @@ class LaporanBkkController extends Controller
      */
     public function index(Request $request)
     {
-        $tahunLulus = $request->input('tahun_lulus');
+        $tahunLulus = $request->has('tahun_lulus') ? $request->input('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
 
         // Metrik Ringkasan
-        $queryAlumni = AlumniBekerja::query();
-        $queryTracer = TracerStudy::query()->whereIn('status_alumni', ['Bekerja', 'Mencari Kerja']);
+        $queryAlumni = AlumniBekerja::query()->tahunAjaranAktif();
 
         if ($tahunLulus) {
             $queryAlumni->where('tahun_lulus', $tahunLulus);
-            $queryTracer->where('tahun_lulus', $tahunLulus);
         }
 
         $totalAlumniBekerja = $queryAlumni->count();
         $totalMitra = PerusahaanMitra::count();
-        $totalTracer = $queryTracer->count();
         $totalLoker = LowonganKerja::where('status', 'Aktif')->count();
 
-        // Hitung persentase tracer study
-        $tracerStats = [
-            'Bekerja' => (clone $queryTracer)->where('status_alumni', 'Bekerja')->count(),
-            'Mencari Kerja' => (clone $queryTracer)->where('status_alumni', 'Mencari Kerja')->count(),
+        // Hitung status pekerjaan alumni
+        $statusStats = [
+            'Tetap' => (clone $queryAlumni)->where('status_pekerjaan', 'Tetap')->count(),
+            'Kontrak' => (clone $queryAlumni)->where('status_pekerjaan', 'Kontrak')->count(),
+            'Freelance' => (clone $queryAlumni)->where('status_pekerjaan', 'Freelance')->count(),
         ];
 
         // Daftar Industri Terbanyak
@@ -50,22 +47,17 @@ class LaporanBkkController extends Controller
             ->limit(5)
             ->get();
 
-        // Ambil list tahun lulus untuk dropdown filter dari kedua tabel
-        $tahunLulusList = array_unique(array_merge(
-            AlumniBekerja::distinct()->pluck('tahun_lulus')->toArray(),
-            TracerStudy::distinct()->pluck('tahun_lulus')->toArray()
-        ));
-        sort($tahunLulusList);
+        // Ambil list tahun lulus untuk dropdown filter
+        $tahunLulusList = AlumniBekerja::distinct()->pluck('tahun_lulus')->sort()->toArray();
 
         // Data list untuk dicetak
-        $alumniList = (clone $queryAlumni)->latest()->get();
+        $alumniList = (clone $queryAlumni)->latest()->paginate(10)->withQueryString();
 
         return view('pages.bkk.laporan.index', compact(
             'totalAlumniBekerja',
             'totalMitra',
-            'totalTracer',
             'totalLoker',
-            'tracerStats',
+            'statusStats',
             'industriStats',
             'perusahaanStats',
             'tahunLulusList',

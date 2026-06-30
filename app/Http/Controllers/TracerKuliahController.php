@@ -14,7 +14,7 @@ class TracerKuliahController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TracerKuliah::query()->with('alumniKuliah');
+        $query = TracerKuliah::query()->tahunAjaranAktif()->with('alumniKuliah');
 
         // Search
         if ($request->has('search') && $request->search) {

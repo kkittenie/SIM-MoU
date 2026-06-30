@@ -205,19 +205,6 @@
                     Menampilkan daftar lengkap dokumen MoU beserta masa berlakunya.
                 </p>
             </div>
-            <!-- Year filter buttons -->
-            <div class="flex flex-wrap gap-1.5 no-print" id="tahun-kerja-sama-filters">
-                <button data-tahun="all" 
-                    class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 bg-brand-500 text-white border-brand-500 shadow-theme-xs">
-                    Semua
-                </button>
-                @foreach($tahunList as $t)
-                    <button data-tahun="{{ $t }}" 
-                        class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-white/5">
-                        {{ $t }}
-                    </button>
-                @endforeach
-            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -284,50 +271,10 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Links -->
+        <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
+            {{ $kerjaSamaList->links() }}
+        </div>
     </div>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('#tahun-kerja-sama-filters .filter-btn');
-        const rows = document.querySelectorAll('.kerja-sama-row');
-        const emptyRow = document.getElementById('empty-kerja-sama-row');
-
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const selectedYear = this.getAttribute('data-tahun');
-
-                // Update active button styling
-                buttons.forEach(b => {
-                    b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                    b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-                });
-
-                this.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-
-                let shownCount = 0;
-
-                rows.forEach(row => {
-                    const rowYear = row.getAttribute('data-tahun');
-                    if (selectedYear === 'all' || rowYear === selectedYear) {
-                        row.style.display = '';
-                        shownCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                if (emptyRow) {
-                    if (shownCount === 0) {
-                        emptyRow.style.display = '';
-                    } else {
-                        emptyRow.style.display = 'none';
-                    }
-                }
-            });
-        });
-    });
-</script>
-@endpush
 @endsection

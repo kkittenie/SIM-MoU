@@ -14,10 +14,11 @@ class AlumniBekerjaController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $tahunLulus = $request->input('tahun_lulus');
+        $tahunLulus = $request->has('tahun_lulus') ? $request->input('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
         $statusPekerjaan = $request->input('status_pekerjaan');
 
         $alumni = AlumniBekerja::query()
+            ->tahunAjaranAktif()
             ->when($search, function ($query, $search) {
                 $query->where('nama_alumni', 'like', "%{$search}%")
                       ->orWhere('perusahaan_nama', 'like', "%{$search}%")

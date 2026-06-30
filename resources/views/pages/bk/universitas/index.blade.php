@@ -9,8 +9,8 @@
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Kelola data universitas tujuan alumni</p>
         </div>
 
-        {{-- Tombol Tambah (Admin Only) --}}
-        @if(auth()->user()->isAdmin())
+        {{-- Tombol Tambah (Admin & BK) --}}
+        @if(auth()->user()->isBK() || auth()->user()->isAdmin())
             <a href="{{ route('universitas.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 transition-colors">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -112,15 +112,13 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-3">
-                                    {{-- Detail Link (All roles) --}}
-                                    <a href="{{ auth()->user()->isAdmin()
-                                    ? route('universitas.show', $item)
-                                    : route('bk.universitas.show', $item) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-xs">
+                                    {{-- Detail Link --}}
+                                    <a href="{{ route('universitas.show', $item) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-xs">
                                         Lihat
                                     </a>
 
-                                    {{-- Edit Link (Admin only) --}}
-                                    @if(auth()->user()->isAdmin())
+                                    {{-- Edit Link (Admin & BK) --}}
+                                    @if(auth()->user()->isBK() || auth()->user()->isAdmin())
                                         <a href="{{ route('universitas.edit', $item) }}" class="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 font-medium text-xs">
                                             Edit
                                         </a>

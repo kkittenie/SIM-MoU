@@ -104,16 +104,16 @@
             <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalMitra }}</h4>
         </div>
 
-        <!-- Respon Tracer Study -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
-            <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Respon Tracer</span>
-            <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalTracer }}</h4>
-        </div>
-
         <!-- Lowongan Kerja -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
             <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Lowongan Kerja</span>
             <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalLoker }}</h4>
+        </div>
+
+        <!-- Lowongan Kerja -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
+            <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider print:text-black">Perusahaan</span>
+            <h4 class="mt-2 text-2xl font-extrabold text-gray-800 dark:text-white/90 print:text-black">{{ $totalMitra }}</h4>
         </div>
     </div>
 
@@ -165,13 +165,13 @@
             </div>
         </div>
 
-        <!-- 3. Status Responden Tracer Study -->
+        <!-- 3. Status Pekerjaan Alumni -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-xs print-card print:border print:border-gray-300">
-            <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Penyebaran Status Alumni</h3>
+            <h3 class="text-sm font-bold text-gray-800 dark:text-white/90 mb-4 print:text-black">Status Pekerjaan Alumni</h3>
             <div class="space-y-4">
-                @foreach($tracerStats as $statusKey => $count)
+                @foreach($statusStats as $statusKey => $count)
                     @php
-                        $percentage = $totalTracer > 0 ? ($count / $totalTracer) * 100 : 0;
+                        $percentage = $totalAlumniBekerja > 0 ? ($count / $totalAlumniBekerja) * 100 : 0;
                     @endphp
                     <div>
                         <div class="flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 print:text-black">
@@ -197,19 +197,6 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 no-print">
                     Menampilkan daftar detail alumni yang telah terserap di dunia industri.
                 </p>
-            </div>
-            <!-- Year filter buttons -->
-            <div class="flex flex-wrap gap-1.5 no-print" id="tahun-alumni-filters">
-                <button data-tahun="all" 
-                    class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 bg-brand-500 text-white border-brand-500 shadow-theme-xs">
-                    Semua
-                </button>
-                @foreach($tahunLulusList as $tahun)
-                    <button data-tahun="{{ $tahun }}" 
-                        class="filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-white/5">
-                        {{ $tahun }}
-                    </button>
-                @endforeach
             </div>
         </div>
 
@@ -272,50 +259,10 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Links -->
+        <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
+            {{ $alumniList->links() }}
+        </div>
     </div>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('#tahun-alumni-filters .filter-btn');
-        const rows = document.querySelectorAll('.alumni-row');
-        const emptyRow = document.getElementById('empty-alumni-row');
-
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const selectedYear = this.getAttribute('data-tahun');
-
-                // Update active button styling
-                buttons.forEach(b => {
-                    b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                    b.classList.add('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-                });
-
-                this.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-theme-xs');
-                this.classList.remove('border-gray-200', 'dark:border-gray-800', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent', 'hover:bg-gray-50', 'dark:hover:bg-white/5');
-
-                let shownCount = 0;
-
-                rows.forEach(row => {
-                    const rowYear = row.getAttribute('data-tahun');
-                    if (selectedYear === 'all' || rowYear === selectedYear) {
-                        row.style.display = '';
-                        shownCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                if (emptyRow) {
-                    if (shownCount === 0) {
-                        emptyRow.style.display = '';
-                    } else {
-                        emptyRow.style.display = 'none';
-                    }
-                }
-            });
-        });
-    });
-</script>
-@endpush
 @endsection
