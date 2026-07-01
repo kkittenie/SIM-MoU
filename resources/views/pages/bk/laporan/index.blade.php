@@ -35,6 +35,13 @@
             color: #000 !important;
         }
     }
+    html {
+        scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -223,51 +230,118 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto hide-scrollbar">
+            @push('styles')
+            <style>
+            .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+
+            .hide-scrollbar {
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            </style>
+            @endpush
             <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400 print:text-black">
                 <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 print:bg-gray-100 print:text-black">
                     <tr>
-                        <th class="px-6 py-4">Nama Alumni</th>
-                        <th class="px-6 py-4">NIS</th>
-                        <th class="px-6 py-4">Universitas</th>
-                        <th class="px-6 py-4">Program Studi</th>
-                        <th class="px-6 py-4">Tahun Lulus</th>
-                        <th class="px-6 py-4">Status</th>
+                        <tr>
+                            <th class="px-6 py-4">Nama Alumni</th>
+                            <th class="px-6 py-4">NIS</th>
+                            <th class="px-6 py-4">Universitas</th>
+                            <th class="px-6 py-4">Lokasi</th>
+                            <th class="px-6 py-4">Program Studi</th>
+                            <th class="px-6 py-4">Cara Masuk</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">No. Telepon</th>
+                            <th class="px-6 py-4">Tahun Lulus</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
                     @forelse ($alumniList as $row)
-                        <tr class="alumni-row hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors print:hover:bg-transparent" data-tahun="{{ $row->tahun_lulus }}">
-                            <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black print:font-semibold">
-                                {{ $row->nama_alumni }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $row->nis }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $row->universitas->nama_universitas ?? '-' }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                {{ $row->program_studi }}
-                            </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black">{{ $row->tahun_lulus }}</td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                <span class="no-print inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold
-                                    @if($row->status_alumni === 'aktif') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400
-                                    @elseif($row->status_alumni === 'lulus') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400
-                                    @elseif($row->status_alumni === 'cuti') bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-400
-                                    @else bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-500/10 dark:text-gray-400
-                                    @endif">
-                                    {{ ucfirst($row->status_alumni) }}
-                                </span>
-                                <span class="hidden print:inline font-medium text-xs">
-                                    {{ ucfirst($row->status_alumni) }}
-                                </span>
-                            </td>
-                        </tr>
+                        <tr class="alumni-row hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors print:hover:bg-transparent"
+                        data-tahun="{{ $row->tahun_lulus }}">
+
+                        <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black print:font-semibold">
+                            {{ $row->nama_alumni }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->nis }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->universitas->nama_universitas ?? '-' }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                        @if($row->universitas)
+                            <span class="no-print inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold
+                                @if($row->universitas->lokasi_kuliah === 'dalam_negeri')
+                                    bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                                @else
+                                    bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
+                                @endif">
+
+                                @if($row->universitas->lokasi_kuliah === 'dalam_negeri')
+                                    🇮🇩 Dalam Negeri
+                                @else
+                                    Luar Negeri
+                                @endif
+
+                            </span>
+
+                            <span class="hidden print:inline">
+                                {{ $row->universitas->lokasi_kuliah === 'dalam_negeri'
+                                    ? 'Dalam Negeri'
+                                    : 'Luar Negeri' }}
+                            </span>
+                        @else
+                            -
+                        @endif
+                    </td>
+                                            <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->program_studi }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->cara_masuk ? ucwords(str_replace('_', ' ', $row->cara_masuk)) : '-' }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->email_alumni ?? '-' }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {{ $row->nomor_telepon ?? '-' }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap font-bold text-gray-800 dark:text-white/90 print:text-black">
+                            {{ $row->tahun_lulus }}
+                        </td>
+
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            <span class="no-print inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold
+                                @if($row->status_alumni === 'aktif') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
+                                @elseif($row->status_alumni === 'lulus') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                                @elseif($row->status_alumni === 'cuti') bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-600/20
+                                @else bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20
+                                @endif">
+                                {{ ucfirst($row->status_alumni) }}
+                            </span>
+
+                            <span class="hidden print:inline">
+                                {{ ucfirst($row->status_alumni) }}
+                            </span>
+                        </td>
+
+                    </tr>
                     @empty
                         <tr id="empty-alumni-row">
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="10" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
                                 Tidak ada data alumni kuliah ditemukan.
                             </td>
                         </tr>
@@ -275,7 +349,7 @@
 
                     @if(count($alumniList) > 0)
                         <tr id="empty-alumni-row" style="display: none;">
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="10" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
                                 Tidak ada data alumni kuliah ditemukan untuk tahun yang dipilih.
                             </td>
                         </tr>
@@ -283,7 +357,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination Links for Alumni Kuliah -->
         <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
             {{ $alumniList->links() }}
@@ -349,7 +423,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination Links for Alumni Wirausaha -->
         <div class="p-5 border-t border-gray-100 dark:border-gray-800 no-print">
             {{ $alumniWirausahaList->links() }}

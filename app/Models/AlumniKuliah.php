@@ -19,9 +19,24 @@ class AlumniKuliah extends Model
         'universitas_id',
         'program_studi',
         'email_alumni',
+        'cara_masuk',
         'nomor_telepon',
         'status_alumni',
     ];
+
+    public function getCaraMasukLabelAttribute(): string
+    {
+        $labels = [
+            'snbp' => 'SNBP',
+            'utbk' => 'UTBK',
+            'ujian_masuk' => 'Ujian Masuk',
+            'beasiswa' => 'Beasiswa',
+            'transfer' => 'Transfer',
+            'lainnya' => 'Lainnya',
+        ];
+
+        return $labels[$this->cara_masuk] ?? '-';
+    }
 
     public function universitas()
     {

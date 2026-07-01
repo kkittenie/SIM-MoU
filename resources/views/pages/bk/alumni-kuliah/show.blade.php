@@ -64,13 +64,13 @@
                 </div>
             </div>
 
-            <!-- Grid 3: Universitas & Program Studi -->
+            <!-- Grid 3: Universitas & Lokasi Universitas -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Universitas</span>
                     <div class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">
                         @if($alumni->universitas)
-                            <a href="{{ route('bk.universitas.show', $alumni->universitas->id) }}" class="text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1">
+                            <a href="{{ route('universitas.show', $alumni->universitas->id) }}" class="text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1">
                                 {{ $alumni->universitas->nama_universitas }}
                                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4"/></svg>
                             </a>
@@ -81,8 +81,43 @@
                 </div>
 
                 <div>
+                    <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Lokasi Universitas</span>
+                    @if($alumni->universitas)
+                        <span class="block mt-1">
+                            @if($alumni->universitas->lokasi_kuliah === 'dalam_negeri')
+                                <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400">
+                                    🇮🇩 Dalam Negeri
+                                </span>
+                            @else
+                                <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">
+                                    Luar Negeri
+                                </span>
+                            @endif
+                        </span>
+                    @else
+                        <span class="text-sm text-gray-600 dark:text-gray-300">-</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Grid 4: Program Studi & Cara Masuk -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Program Studi</span>
                     <span class="block mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium">{{ $alumni->program_studi }}</span>
+                </div>
+
+                <div>
+                    <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Cara Masuk</span>
+                    <span class="block mt-1 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        @if($alumni->cara_masuk)
+                            <span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-700 ring-1 ring-inset ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400">
+                                {{ $alumni->cara_masuk_label }}
+                            </span>
+                        @else
+                            -
+                        @endif
+                    </span>
                 </div>
             </div>
 

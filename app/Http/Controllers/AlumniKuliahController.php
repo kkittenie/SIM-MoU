@@ -75,6 +75,7 @@ class AlumniKuliahController extends Controller
             'tahun_lulus' => 'required|integer|min:2000|max:' . date('Y'),
             'universitas_id' => 'required|exists:universitas,id',
             'program_studi' => 'required|string|max:150',
+            'cara_masuk' => 'nullable|in:snbp,utbk,ujian_masuk,beasiswa,transfer,lainnya',
             'email_alumni' => 'nullable|email|max:100',
             'nomor_telepon' => 'nullable|string|max:20',
             'status_alumni' => 'required|in:aktif,lulus,cuti,belum_terdata',
@@ -114,6 +115,7 @@ class AlumniKuliahController extends Controller
             'tahun_lulus' => 'required|integer|min:2000|max:' . date('Y'),
             'universitas_id' => 'required|exists:universitas,id',
             'program_studi' => 'required|string|max:150',
+            'cara_masuk' => 'nullable|in:snbp,utbk,ujian_masuk,beasiswa,transfer,lainnya',
             'email_alumni' => 'nullable|email|max:100',
             'nomor_telepon' => 'nullable|string|max:20',
             'status_alumni' => 'required|in:aktif,lulus,cuti,belum_terdata',
@@ -167,7 +169,6 @@ class AlumniKuliahController extends Controller
 
     /**
      * DOWNLOAD TEMPLATE - Download template Excel untuk import
-     * SIMPLE & CLEAN - Sama persis seperti export Excel!
      */
     public function downloadTemplate()
     {
@@ -175,19 +176,20 @@ class AlumniKuliahController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Alumni Kuliah');
 
-        // Set column widths - SAMA DENGAN EXPORT
+        // Set column widths
         $sheet->getColumnDimension('A')->setWidth(5);
         $sheet->getColumnDimension('B')->setWidth(25);
         $sheet->getColumnDimension('C')->setWidth(15);
         $sheet->getColumnDimension('D')->setWidth(12);
         $sheet->getColumnDimension('E')->setWidth(25);
         $sheet->getColumnDimension('F')->setWidth(25);
-        $sheet->getColumnDimension('G')->setWidth(20);
-        $sheet->getColumnDimension('H')->setWidth(18);
-        $sheet->getColumnDimension('I')->setWidth(15);
+        $sheet->getColumnDimension('G')->setWidth(15);
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->getColumnDimension('I')->setWidth(18);
+        $sheet->getColumnDimension('J')->setWidth(15);
 
         // ============ TITLE ============
-        $sheet->mergeCells('A1:I1');
+        $sheet->mergeCells('A1:J1');
         $sheet->setCellValue('A1', 'Data Alumni Kuliah SMKN 1 CIREBON');
 
         $titleStyle = [
@@ -206,8 +208,8 @@ class AlumniKuliahController extends Controller
         $sheet->getRowDimension(1)->setRowHeight(22);
 
         // ============ INFO ROW ============
-        $sheet->mergeCells('A2:I2');
-        $infoText = 'Template Pengisian Data | Isi data mulai dari Baris 5 ke bawah';
+        $sheet->mergeCells('A2:J2');
+        $infoText = 'Template Pengisian Data | Isi data mulai dari Baris 5 ke bawah | Cara Masuk: SNBP, UTBK, Ujian Masuk, Beasiswa, Transfer, Lainnya';
         $sheet->setCellValue('A2', $infoText);
 
         $infoStyle = [
@@ -226,8 +228,21 @@ class AlumniKuliahController extends Controller
 
         $sheet->getRowDimension(3)->setRowHeight(8);
 
-        // ============ HEADER ROW (Baris 4) ============
-        $headers = ['No', 'Nama Alumni', 'NIS', 'Tahun Lulus', 'Universitas', 'Program Studi', 'Email', 'Telepon', 'Status'];
+            $columns = [
+            'nama_alumni' => 'Nama Alumni',
+            'nis' => 'NIS',
+            'universitas' => 'Universitas',
+            'lokasi' => 'Lokasi',
+            'tahun_lulus' => 'Tahun Lulus',
+            'program_studi' => 'Program Studi',
+            'cara_masuk' => 'Cara Masuk',
+            'email_alumni' => 'Email',
+            'nomor_telepon' => 'Telepon',
+            'status_alumni' => 'Status',
+        ];
+
+        $headers = array_merge(['No'], array_values($columns));
+
         $sheet->fromArray($headers, null, 'A4');
 
         $headerStyle = [
@@ -254,7 +269,7 @@ class AlumniKuliahController extends Controller
             ],
         ];
 
-        $sheet->getStyle('A4:I4')->applyFromArray($headerStyle);
+        $sheet->getStyle('A4:J4')->applyFromArray($headerStyle);
         $sheet->getRowDimension(4)->setRowHeight(20);
 
         // ============ EMPTY ROWS UNTUK DIISI (Baris 5-25) ============
@@ -280,7 +295,7 @@ class AlumniKuliahController extends Controller
         ];
 
         for ($row = 5; $row <= 25; $row++) {
-            $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($dataStyle);
+            $sheet->getStyle('A' . $row . ':J' . $row)->applyFromArray($dataStyle);
             $sheet->getRowDimension($row)->setRowHeight(18);
         }
 
@@ -352,8 +367,30 @@ class AlumniKuliahController extends Controller
                         continue;
                     }
 
+                    // Validate and convert cara_masuk
+                    $caraMasukInput = strtolower(trim($row[6] ?? ''));
+                    $caraMasukMap = [
+                        'snbp' => 'snbp',
+                        'utbk' => 'utbk',
+                        'ujian masuk' => 'ujian_masuk',
+                        'ujian_masuk' => 'ujian_masuk',
+                        'beasiswa' => 'beasiswa',
+                        'transfer' => 'transfer',
+                        'lainnya' => 'lainnya',
+                    ];
+
+                    $caraMasuk = null;
+                    if (!empty($caraMasukInput)) {
+                        if (!isset($caraMasukMap[$caraMasukInput])) {
+                            $errors[] = "Baris {$rowNum}: Cara Masuk '{$row[6]}' tidak valid. Gunakan: SNBP, UTBK, Ujian Masuk, Beasiswa, Transfer, atau Lainnya";
+                            $errorCount++;
+                            continue;
+                        }
+                        $caraMasuk = $caraMasukMap[$caraMasukInput];
+                    }
+
                     // Validate and convert status
-                    $statusInput = strtolower(trim($row[8]));
+                    $statusInput = strtolower(trim($row[9]));
                     $statusMap = [
                         'aktif' => 'aktif',
                         'lulus' => 'lulus',
@@ -363,7 +400,7 @@ class AlumniKuliahController extends Controller
                     ];
 
                     if (!isset($statusMap[$statusInput])) {
-                        $errors[] = "Baris {$rowNum}: Status '{$row[8]}' tidak valid. Gunakan: Aktif, Lulus, Cuti, atau Belum Terdata";
+                        $errors[] = "Baris {$rowNum}: Status '{$row[9]}' tidak valid. Gunakan: Aktif, Lulus, Cuti, atau Belum Terdata";
                         $errorCount++;
                         continue;
                     }
@@ -384,8 +421,9 @@ class AlumniKuliahController extends Controller
                         'tahun_lulus' => (int)$row[3],
                         'universitas_id' => $universitas->id,
                         'program_studi' => trim($row[5]),
-                        'email_alumni' => !empty($row[6]) ? trim($row[6]) : null,
-                        'nomor_telepon' => !empty($row[7]) ? trim($row[7]) : null,
+                        'cara_masuk' => $caraMasuk,
+                        'email_alumni' => !empty($row[7]) ? trim($row[7]) : null,
+                        'nomor_telepon' => !empty($row[8]) ? trim($row[8]) : null,
                         'status_alumni' => $status,
                     ]);
 
@@ -445,7 +483,7 @@ class AlumniKuliahController extends Controller
         $sheet->setTitle('Alumni Kuliah');
 
         // Title
-        $sheet->mergeCells('A1:I1');
+        $sheet->mergeCells('A1:J1');
         $sheet->setCellValue('A1', 'Daftar Alumni Kuliah SMKN 1 Cirebon');
 
         $titleStyle = [
@@ -464,7 +502,7 @@ class AlumniKuliahController extends Controller
         $sheet->getRowDimension(1)->setRowHeight(22);
 
         // Info
-        $sheet->mergeCells('A2:I2');
+        $sheet->mergeCells('A2:J2');
         $infoText = 'Diekspor pada: ' . date('d F Y H:i:s') . ' | Total Data: ' . count($alumni);
         $sheet->setCellValue('A2', $infoText);
 
@@ -491,12 +529,13 @@ class AlumniKuliahController extends Controller
         $sheet->getColumnDimension('D')->setWidth(12);
         $sheet->getColumnDimension('E')->setWidth(25);
         $sheet->getColumnDimension('F')->setWidth(25);
-        $sheet->getColumnDimension('G')->setWidth(20);
-        $sheet->getColumnDimension('H')->setWidth(18);
-        $sheet->getColumnDimension('I')->setWidth(15);
+        $sheet->getColumnDimension('G')->setWidth(15);
+        $sheet->getColumnDimension('H')->setWidth(20);
+        $sheet->getColumnDimension('I')->setWidth(18);
+        $sheet->getColumnDimension('J')->setWidth(15);
 
         // Header
-        $headers = ['No', 'Nama Alumni', 'NIS', 'Tahun Lulus', 'Universitas', 'Program Studi', 'Email', 'Telepon', 'Status'];
+        $headers = ['No', 'Nama Alumni', 'NIS', 'Tahun Lulus', 'Universitas', 'Program Studi', 'Cara Masuk', 'Email', 'Telepon', 'Status'];
         $sheet->fromArray($headers, null, 'A4');
 
         $headerStyle = [
@@ -523,7 +562,7 @@ class AlumniKuliahController extends Controller
             ],
         ];
 
-        $sheet->getStyle('A4:I4')->applyFromArray($headerStyle);
+        $sheet->getStyle('A4:J4')->applyFromArray($headerStyle);
         $sheet->getRowDimension(4)->setRowHeight(20);
 
         // Data rows
@@ -542,9 +581,10 @@ class AlumniKuliahController extends Controller
             $sheet->setCellValue('D' . $row, $item->tahun_lulus);
             $sheet->setCellValue('E' . $row, $item->universitas->nama_universitas ?? '-');
             $sheet->setCellValue('F' . $row, $item->program_studi);
-            $sheet->setCellValue('G' . $row, $item->email_alumni ?? '-');
-            $sheet->setCellValue('H' . $row, $item->nomor_telepon ?? '-');
-            $sheet->setCellValue('I' . $row, $this->getStatusLabel($item->status_alumni));
+            $sheet->setCellValue('G' . $row, $this->getCaraMasukLabel($item->cara_masuk));
+            $sheet->setCellValue('H' . $row, $item->email_alumni ?? '-');
+            $sheet->setCellValue('I' . $row, $item->nomor_telepon ?? '-');
+            $sheet->setCellValue('J' . $row, $this->getStatusLabel($item->status_alumni));
 
             $rowStyle = [
                 'font' => [
@@ -560,12 +600,12 @@ class AlumniKuliahController extends Controller
                 'border' => $borderStyle,
             ];
 
-            $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($rowStyle);
+            $sheet->getStyle('A' . $row . ':J' . $row)->applyFromArray($rowStyle);
             $sheet->getRowDimension($row)->setRowHeight(18);
 
             $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('D' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('I' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('J' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             $row++;
         }
@@ -590,6 +630,25 @@ class AlumniKuliahController extends Controller
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    /**
+     * Helper - Get cara masuk label
+     */
+    private function getCaraMasukLabel($caraMasuk)
+    {
+        if (!$caraMasuk) return '-';
+
+        $labels = [
+            'snbp' => 'SNBP',
+            'utbk' => 'UTBK',
+            'ujian_masuk' => 'Ujian Masuk',
+            'beasiswa' => 'Beasiswa',
+            'transfer' => 'Transfer',
+            'lainnya' => 'Lainnya',
+        ];
+
+        return $labels[$caraMasuk] ?? ucfirst(str_replace('_', ' ', $caraMasuk));
     }
 
     /**

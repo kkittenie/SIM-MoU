@@ -77,7 +77,7 @@
     .welcome-header-pattern {
         position: absolute; inset: 0;
         background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+                            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
         background-size: 32px 32px; pointer-events: none;
     }
 
@@ -87,6 +87,13 @@
     }
     .insight-item:hover { transform: translateX(2px); }
     .dark .insight-item { background: rgba(255,255,255,0.02); border-color: #1e293b; }
+    html {
+        scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
 </style>
 @endpush
 

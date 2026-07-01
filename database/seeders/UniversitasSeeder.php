@@ -3,116 +3,191 @@
 namespace Database\Seeders;
 
 use App\Models\Universitas;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UniversitasSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $data = [
+        $universitas = [
+            // ╔═══ NEGERI DALAM NEGERI ═══╗
             [
-                'nama_universitas' => 'Institut Teknologi Bandung (ITB)',
-                'kota' => 'Bandung',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.itb.ac.id',
-                'nomor_telepon' => '(022) 2534810',
-                'jenis' => 'negeri',
-                'akreditasi' => 'A',
-                'status' => 'aktif',
-            ],
-            [
-                'nama_universitas' => 'Universitas Indonesia (UI)',
+                'nama_universitas' => 'Universitas Indonesia',
                 'kota' => 'Jakarta',
                 'provinsi' => 'DKI Jakarta',
                 'website' => 'https://www.ui.ac.id',
-                'nomor_telepon' => '(021) 7270020',
+                'nomor_telepon' => '(021) 7270000',
                 'jenis' => 'negeri',
                 'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Universitas Padjadjaran (Unpad)',
+                'nama_universitas' => 'Institut Teknologi Bandung',
                 'kota' => 'Bandung',
                 'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.unpad.ac.id',
-                'nomor_telepon' => '(022) 7799696',
+                'website' => 'https://www.itb.ac.id',
+                'nomor_telepon' => '(022) 2502100',
                 'jenis' => 'negeri',
                 'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Telkom University',
-                'kota' => 'Bandung',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://telkomuniversity.ac.id',
-                'nomor_telepon' => '(022) 5220040',
-                'jenis' => 'swasta',
+                'nama_universitas' => 'Universitas Gadjah Mada',
+                'kota' => 'Yogyakarta',
+                'provinsi' => 'Daerah Istimewa Yogyakarta',
+                'website' => 'https://www.ugm.ac.id',
+                'nomor_telepon' => '(0274) 564000',
+                'jenis' => 'negeri',
                 'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Universitas Pendidikan Indonesia (UPI)',
-                'kota' => 'Bandung',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.upi.edu',
-                'nomor_telepon' => '(022) 2013163',
+                'nama_universitas' => 'Universitas Diponegoro',
+                'kota' => 'Semarang',
+                'provinsi' => 'Jawa Tengah',
+                'website' => 'https://www.undip.ac.id',
+                'nomor_telepon' => '(024) 3515985',
                 'jenis' => 'negeri',
                 'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
+            [
+                'nama_universitas' => 'Universitas Airlangga',
+                'kota' => 'Surabaya',
+                'provinsi' => 'Jawa Timur',
+                'website' => 'https://www.unair.ac.id',
+                'nomor_telepon' => '(031) 5034465',
+                'jenis' => 'negeri',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
+                'status' => 'aktif',
+            ],
+
+            // ╔═══ SWASTA DALAM NEGERI ═══╗
             [
                 'nama_universitas' => 'Universitas Bina Nusantara',
                 'kota' => 'Jakarta',
                 'provinsi' => 'DKI Jakarta',
                 'website' => 'https://www.binus.ac.id',
-                'nomor_telepon' => '(021) 5350660',
+                'nomor_telepon' => '(021) 5345830',
                 'jenis' => 'swasta',
                 'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Universitas Gunadarma',
-                'kota' => 'Depok',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.gunadarma.ac.id',
-                'nomor_telepon' => '(021) 78881112',
+                'nama_universitas' => 'Universitas Pelita Harapan',
+                'kota' => 'Tangerang',
+                'provinsi' => 'Banten',
+                'website' => 'https://www.uph.edu',
+                'nomor_telepon' => '(021) 5460901',
                 'jenis' => 'swasta',
-                'akreditasi' => 'B',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Universitas Pasundan',
+                'nama_universitas' => 'Universitas Padjajaran',
                 'kota' => 'Bandung',
                 'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.unpas.ac.id',
-                'nomor_telepon' => '(022) 2019474',
+                'website' => 'https://www.unpad.ac.id',
+                'nomor_telepon' => '(022) 7796363',
                 'jenis' => 'swasta',
-                'akreditasi' => 'B',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'dalam_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'Universitas Negeri Bandung (UNB)',
-                'kota' => 'Bandung',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.unb.ac.id',
-                'nomor_telepon' => '(022) 2006200',
+                'nama_universitas' => 'Universitas Tarumanagara',
+                'kota' => 'Jakarta',
+                'provinsi' => 'DKI Jakarta',
+                'website' => 'https://www.untar.ac.id',
+                'nomor_telepon' => '(021) 5696969',
+                'jenis' => 'swasta',
+                'akreditasi' => 'B',
+                'lokasi_kuliah' => 'dalam_negeri',
+
+                'status' => 'aktif',
+            ],
+
+            // ╔═══ LUAR NEGERI ═══╗
+        [
+                'nama_universitas' => 'National University of Singapore',
+                'kota' => 'Singapore',
+                'provinsi' => 'Singapore',
+                'website' => 'https://www.nus.edu.sg',
+                'nomor_telepon' => '+65 6516 1111',
                 'jenis' => 'negeri',
-                'akreditasi' => 'B',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'luar_negeri',
+
                 'status' => 'aktif',
             ],
             [
-                'nama_universitas' => 'STMIK Bandung',
-                'kota' => 'Bandung',
-                'provinsi' => 'Jawa Barat',
-                'website' => 'https://www.stmik-bandung.ac.id',
-                'nomor_telepon' => '(022) 2045040',
-                'jenis' => 'swasta',
-                'akreditasi' => 'B',
+                'nama_universitas' => 'University of Melbourne',
+                'kota' => 'Melbourne',
+                'provinsi' => 'Victoria',
+                'website' => 'https://www.unimelb.edu.au',
+                'nomor_telepon' => '+61 3 9035 5511',
+                'jenis' => 'negeri',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'luar_negeri',
+
+                'status' => 'aktif',
+            ],
+            [
+                'nama_universitas' => 'University of Tokyo',
+                'kota' => 'Tokyo',
+                'provinsi' => 'Tokyo',
+                'website' => 'https://www.u-tokyo.ac.jp',
+                'nomor_telepon' => '+81 3 3812 2111',
+                'jenis' => 'negeri',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'luar_negeri',
+                'status' => 'aktif',
+            ],
+            [
+                'nama_universitas' => 'Chulalongkorn University',
+                'kota' => 'Bangkok',
+                'provinsi' => 'Bangkok',
+                'website' => 'https://www.chula.ac.th',
+                'nomor_telepon' => '+66 2 218 0000',
+                'jenis' => 'negeri',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'luar_negeri',
+                'status' => 'aktif',
+            ],
+            [
+                'nama_universitas' => 'Universitas Malaya',
+                'kota' => 'Kuala Lumpur',
+                'provinsi' => 'Kuala Lumpur',
+                'website' => 'https://www.um.edu.my',
+                'nomor_telepon' => '+60 3 7967 7022',
+                'jenis' => 'negeri',
+                'akreditasi' => 'A',
+                'lokasi_kuliah' => 'luar_negeri',
+
                 'status' => 'aktif',
             ],
         ];
 
-        foreach ($data as $item) {
+        foreach ($universitas as $item) {
             Universitas::create($item);
         }
     }

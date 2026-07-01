@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('nomor_telepon')->nullable();
             $table->enum('jenis', ['negeri', 'swasta'])->default('swasta');
             $table->string('akreditasi')->nullable();
+            $table->enum('lokasi_kuliah', ['dalam_negeri', 'luar_negeri'])->default('dalam_negeri');
+            // ❌ cara_masuk dihapus - dipindahkan ke alumni_kuliah
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });

@@ -3,6 +3,24 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Data Alumni Kuliah" />
 
+    <style>
+            .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        html {
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs">
         <!-- Table Header Actions -->
         <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800">
@@ -66,14 +84,16 @@
         </div>
 
         <!-- Table Content -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto hide-scrollbar">
             <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400">
                 <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                     <tr>
                         <th class="px-6 py-4">Nama Alumni</th>
                         <th class="px-6 py-4">NIS</th>
                         <th class="px-6 py-4">Universitas</th>
+                        <th class="px-6 py-4">Lokasi</th>
                         <th class="px-6 py-4">Program Studi</th>
+                        <th class="px-6 py-4">Cara Masuk</th>
                         <th class="px-6 py-4">Tahun Lulus</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
@@ -91,8 +111,44 @@
                             <td class="px-6 py-4 whitespace-nowrap font-medium">
                                 {{ $row->universitas->nama_universitas ?? '-' }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($row->universitas)
+                                    @if($row->universitas->lokasi_kuliah === 'dalam_negeri')
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400">
+                                            🇮🇩 Dalam Negeri
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">
+                                            Luar Negeri
+                                        </span>
+                                    @endif
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap font-medium">
                                 {{ $row->program_studi }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-xs">
+                                @if($row->cara_masuk)
+                                    <span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 font-semibold text-purple-700 ring-1 ring-inset ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400">
+                                        @if($row->cara_masuk === 'snbp')
+                                            SNBP
+                                        @elseif($row->cara_masuk === 'utbk')
+                                            UTBK
+                                        @elseif($row->cara_masuk === 'ujian_masuk')
+                                            Ujian Masuk
+                                        @elseif($row->cara_masuk === 'beasiswa')
+                                            Beasiswa
+                                        @elseif($row->cara_masuk === 'transfer')
+                                            Transfer
+                                        @else
+                                            Lainnya
+                                        @endif
+                                    </span>
+                                @else
+                                    -
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800 dark:text-white/90">
                                 {{ $row->tahun_lulus }}
@@ -139,14 +195,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="9" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
                                 Tidak ada data alumni kuliah ditemukan.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
-            <!-- Tambahkan ini di halaman alumni-kuliah index, sebelum </div> terakhir -->
+        </div>
 
     <!-- Import Excel Section -->
     <div class="mt-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs">
@@ -201,7 +257,7 @@
             <!-- Info -->
             <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-700 rounded-lg">
                 <p class="text-sm text-blue-800 dark:text-blue-300">
-                    <strong>Informasi:</strong> File harus berformat .xlsx atau .xls, ukuran maksimal 5MB. Pastikan nama universitas dan status sudah sesuai dengan yang tersedia di sistem.
+                    <strong>Informasi:</strong> File harus berformat .xlsx atau .xls, ukuran maksimal 5MB. Kolom cara masuk: SNBP, UTBK, Ujian Masuk, Beasiswa, Transfer, Lainnya.
                 </p>
             </div>
         </div>
@@ -235,7 +291,6 @@
             btn.textContent = 'Sedang memproses...';
         });
     </script>
-        </div>
 
         <!-- Pagination Links -->
         @if ($alumni->hasPages())

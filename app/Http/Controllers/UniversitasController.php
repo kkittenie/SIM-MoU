@@ -29,6 +29,13 @@ class UniversitasController extends Controller
             $query->where('jenis', $request->input('jenis'));
         }
 
+        // Filter Lokasi Kuliah
+        if ($request->filled('lokasi_kuliah')) {
+            $query->where('lokasi_kuliah', $request->input('lokasi_kuliah'));
+        }
+
+        // ❌ Filter Cara Masuk dihapus - dipindahkan ke alumni_kuliah
+
         // Filter Status
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
@@ -60,6 +67,8 @@ class UniversitasController extends Controller
             'akreditasi' => 'nullable|string|max:5',
             'website' => 'nullable|url|max:255',
             'nomor_telepon' => 'nullable|string|max:20',
+            'lokasi_kuliah' => 'required|in:dalam_negeri,luar_negeri',
+            // ❌ cara_masuk validation dihapus
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
@@ -102,6 +111,8 @@ class UniversitasController extends Controller
             'akreditasi' => 'nullable|string|max:5',
             'website' => 'nullable|url|max:255',
             'nomor_telepon' => 'nullable|string|max:20',
+            'lokasi_kuliah' => 'required|in:dalam_negeri,luar_negeri',
+            // ❌ cara_masuk validation dihapus
             'status' => 'required|in:aktif,nonaktif',
         ]);
 

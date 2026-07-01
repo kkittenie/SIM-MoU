@@ -16,8 +16,38 @@ class Universitas extends Model
         'nomor_telepon',
         'jenis',
         'akreditasi',
+        'lokasi_kuliah',      
+        'cara_masuk',
         'status',
     ];
+
+    /**
+     * Get label untuk lokasi_kuliah
+     */
+    public function getLokasiKuliahLabel()
+    {
+        return match($this->lokasi_kuliah) {
+            'dalam_negeri' => 'Dalam Negeri',
+            'luar_negeri' => 'Luar Negeri',
+            default => 'Unknown'
+        };
+    }
+
+    /**
+     * Get label untuk cara_masuk
+     */
+    public function getCaraMasukLabel()
+    {
+        return match($this->cara_masuk) {
+            'snbp' => 'SNBP',
+            'utbk' => 'UTBK',
+            'ujian_masuk' => 'Ujian Masuk',
+            'beasiswa' => 'Beasiswa',
+            'transfer' => 'Transfer',
+            'lainnya' => 'Lainnya',
+            default => 'Unknown'
+        };
+    }
 
     public function alumniKuliah()
     {

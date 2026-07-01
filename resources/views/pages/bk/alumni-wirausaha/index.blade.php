@@ -3,6 +3,16 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Data Alumni Wirausaha" />
 
+    <style>
+    html {
+        scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
+    </style>
+
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs">
         <!-- Table Header Actions -->
         <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800">

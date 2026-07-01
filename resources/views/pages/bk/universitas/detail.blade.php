@@ -63,6 +63,21 @@
                         </div>
                     </div>
 
+                    {{-- Lokasi Kuliah --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kuliah</label>
+                        <p class="mt-1">
+                            <span class="inline-flex rounded-full px-3 py-1 text-xs font-medium
+                                @if($universitas->lokasi_kuliah === 'dalam_negeri')
+                                    bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-400
+                                @else
+                                    bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400
+                                @endif">
+                                {{ $universitas->getLokasiKuliahLabel() }}
+                            </span>
+                        </p>
+                    </div>
+
                     {{-- Akreditasi & Status --}}
                     <div class="grid gap-2 md:grid-cols-2">
                         <div>
@@ -141,11 +156,20 @@
                     </div>
                     <div class="flex items-start justify-between">
                         <span class="text-gray-600 dark:text-gray-400">Diperbarui:</span>
-                        <span class="font-medium text-gray-800 dark:text-white">{{ $universitas->updated_at?->format('d M Y H:i') ?? '-' }}
-                        </span>
+                        <span class="font-medium text-gray-800 dark:text-white">{{ $universitas->updated_at?->format('d M Y H:i') ?? '-' }}</span>
                     </div>
                 </div>
             </div>
+
+            {{-- Edit Button (Admin only) --}}
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('universitas.edit', $universitas) }}" class="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20 transition-colors">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit Universitas
+                </a>
+            @endif
 
             {{-- Back Button --}}
             <a href="{{ route('universitas.index') }}" class="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 font-medium text-gray-800 hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white dark:hover:bg-white/5">

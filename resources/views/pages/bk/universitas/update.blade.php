@@ -84,6 +84,23 @@
                 </div>
             </div>
 
+            {{-- Lokasi Kuliah --}}
+            <div>
+                <label for="lokasi_kuliah" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Lokasi Kuliah <span class="text-red-500">*</span>
+                </label>
+                <select id="lokasi_kuliah" name="lokasi_kuliah"
+                    class="mt-2 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-600 dark:bg-white/5 dark:text-white
+                    @error('lokasi_kuliah') border-red-500 dark:border-red-500 @enderror">
+                    <option value="">-- Pilih Lokasi --</option>
+                    <option value="dalam_negeri" {{ old('lokasi_kuliah', $universitas->lokasi_kuliah) === 'dalam_negeri' ? 'selected' : '' }}>Dalam Negeri</option>
+                    <option value="luar_negeri" {{ old('lokasi_kuliah', $universitas->lokasi_kuliah) === 'luar_negeri' ? 'selected' : '' }}>Luar Negeri</option>
+                </select>
+                @error('lokasi_kuliah')
+                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
             {{-- Akreditasi & Status --}}
             <div class="grid gap-6 md:grid-cols-2">
                 <div>
