@@ -104,12 +104,12 @@ class BkkDataSeeder extends Seeder
 
         // 2. Seed Alumni Bekerja
         $alumniData = [
-            ['nama' => 'Aditya Pratama', 'tahun_lulus' => 2023, 'jabatan' => 'Junior Web Developer', 'mitra_index' => 0, 'gaji' => 5500000, 'status' => 'Tetap', 'tgl' => '2023-08-15'],
+            ['nama' => 'Aditya Pratama', 'tahun_lulus' => 2023, 'jabatan' => 'Junior Web Developer', 'mitra_index' => 0, 'gaji' => 5500000, 'status' => 'Freelance', 'tgl' => '2023-08-15'],
             ['nama' => 'Bambang Pamungkas', 'tahun_lulus' => 2022, 'jabatan' => 'Operator Produksi', 'mitra_index' => 1, 'gaji' => 4800000, 'status' => 'Tetap', 'tgl' => '2022-09-01'],
-            ['nama' => 'Citra Kirana', 'tahun_lulus' => 2024, 'jabatan' => 'Customer Relations Officer', 'mitra_index' => 2, 'gaji' => 6000000, 'status' => 'Kontrak', 'tgl' => '2024-03-10'],
+            ['nama' => 'Citra Kirana', 'tahun_lulus' => 2024, 'jabatan' => 'Customer Relations Officer', 'mitra_index' => 2, 'gaji' => 6000000, 'status' => 'Kontrak', 'tgl' => '2024-03-10', 'lokasi' => 'Luar Negeri'],
             ['nama' => 'Dian Sastrowardoyo', 'tahun_lulus' => 2023, 'jabatan' => 'Quality Control Staff', 'mitra_index' => 3, 'gaji' => 5000000, 'status' => 'Tetap', 'tgl' => '2023-11-20'],
             ['nama' => 'Eko Prasetyo', 'tahun_lulus' => 2023, 'jabatan' => 'Medical Representative', 'mitra_index' => 4, 'gaji' => 5800000, 'status' => 'Tetap', 'tgl' => '2024-01-05'],
-            ['nama' => 'Fajar Alfian', 'tahun_lulus' => 2024, 'jabatan' => 'Network Engineer', 'mitra_index' => 5, 'gaji' => 6500000, 'status' => 'Kontrak', 'tgl' => '2024-07-01'],
+            ['nama' => 'Fajar Alfian', 'tahun_lulus' => 2024, 'jabatan' => 'Network Engineer', 'mitra_index' => 5, 'gaji' => 6500000, 'status' => 'Kontrak', 'tgl' => '2024-07-01', 'lokasi' => 'Luar Negeri'],
             ['nama' => 'Gita Gutawa', 'tahun_lulus' => 2025, 'jabatan' => 'Graphic Designer', 'mitra_index' => 6, 'gaji' => 4500000, 'status' => 'Magang', 'tgl' => '2025-02-15'],
             
             // Manual entries (not in Mitra list)
@@ -130,7 +130,7 @@ class BkkDataSeeder extends Seeder
             ['nama' => 'Utami Dewi', 'tahun_lulus' => 2025, 'jabatan' => 'UI/UX Designer Apprentice', 'mitra_index' => 0, 'gaji' => 3500000, 'status' => 'Magang', 'tgl' => '2025-04-01'],
             ['nama' => 'Vicky Prasetyo', 'tahun_lulus' => 2024, 'jabatan' => 'Production Planner', 'mitra_index' => 1, 'gaji' => 5200000, 'status' => 'Kontrak', 'tgl' => '2024-09-10'],
             ['nama' => 'Wulan Guritno', 'tahun_lulus' => 2023, 'jabatan' => 'Staff Laboratorium', 'mitra_index' => 4, 'gaji' => 5700000, 'status' => 'Tetap', 'tgl' => '2023-10-15'],
-            ['nama' => 'Yuda Ramadhan', 'tahun_lulus' => 2024, 'jabatan' => 'Data Analyst', 'perusahaan_manual' => 'Gojek Indonesia', 'industri' => 'Teknologi', 'gaji' => 7800000, 'status' => 'Tetap', 'tgl' => '2024-10-01'],
+            ['nama' => 'Yuda Ramadhan', 'tahun_lulus' => 2024, 'jabatan' => 'Data Analyst', 'perusahaan_manual' => 'Gojek Indonesia', 'industri' => 'Teknologi', 'gaji' => 7800000, 'status' => 'Freelance', 'tgl' => '2024-10-01', 'lokasi' => 'Luar Negeri'],
             ['nama' => 'Zahra Nabila', 'tahun_lulus' => 2023, 'jabatan' => 'Staff Administrasi', 'perusahaan_manual' => 'PT Kereta Api Indonesia', 'industri' => 'Jasa', 'gaji' => 5300000, 'status' => 'Tetap', 'tgl' => '2023-08-01'],
         ];
 
@@ -142,6 +142,7 @@ class BkkDataSeeder extends Seeder
                 'tanggal_masuk' => $alumni['tgl'],
                 'gaji' => $alumni['gaji'],
                 'status_pekerjaan' => $alumni['status'],
+                'lokasi_kerja' => $alumni['lokasi'] ?? 'Dalam Negeri',
             ];
 
             if (isset($alumni['mitra_index'])) {

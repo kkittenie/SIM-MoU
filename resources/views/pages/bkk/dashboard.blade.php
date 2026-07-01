@@ -182,7 +182,7 @@
     @endif
 
     {{-- CHARTS --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
         <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #5BB6FF"></span>
@@ -192,17 +192,27 @@
         </div>
         <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
-                <span class="dash-panel-dot" style="background: #22C55E"></span>
-                Top mitra perekrut alumni
+                <span class="dash-panel-dot" style="background: #A855F7"></span>
+                Lokasi kerja alumni
             </div>
-            <div id="perusahaanChart" class="w-full"></div>
+            <div class="flex justify-center"><div id="lokasiChart" class="w-full max-w-[320px]"></div></div>
         </div>
-        <div class="dash-panel anim-up d-7">
+        <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #F59E0B"></span>
                 Penyebaran berdasarkan sektor industri
             </div>
             <div class="flex justify-center"><div id="industriChart" class="w-full max-w-[320px]"></div></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+        <div class="dash-panel anim-up d-7">
+            <div class="dash-panel-title">
+                <span class="dash-panel-dot" style="background: #22C55E"></span>
+                Top mitra perekrut alumni
+            </div>
+            <div id="perusahaanChart" class="w-full"></div>
         </div>
         <div class="dash-panel anim-up d-7">
             <div class="dash-panel-title">
@@ -226,7 +236,18 @@ document.addEventListener('DOMContentLoaded', function () {
         chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
         series: @json($statusChartData['series']),
         labels: @json($statusChartData['labels']),
-        colors: ['#5BB6FF', '#EF4444'],
+        colors: ['#22C55E', '#F59E0B', '#3B82F6', '#8B5CF6'],
+        legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
+        stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
+        plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', formatter: v => v }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500, formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0) } } } } },
+        dataLabels: { enabled: false }
+    }).render();
+
+    new ApexCharts(document.querySelector("#lokasiChart"), {
+        chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+        series: @json($lokasiChartData['series']),
+        labels: @json($lokasiChartData['labels']),
+        colors: ['#3B82F6', '#EC4899'],
         legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
         stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
         plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', formatter: v => v }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500, formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0) } } } } },

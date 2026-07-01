@@ -22,6 +22,7 @@ class AlumniBekerja extends Model
         'bidang_industri',
         'gaji',
         'status_pekerjaan',
+        'lokasi_kerja',
     ];
 
     protected $casts = [

@@ -240,12 +240,24 @@ class DashboardController extends Controller
         $statusStats = [
             'Tetap' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Tetap')->count(),
             'Kontrak' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Kontrak')->count(),
+            'Magang' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Magang')->count(),
             'Freelance' => AlumniBekerja::tahunAjaranAktif()->where('status_pekerjaan', 'Freelance')->count(),
         ];
 
         $statusChartData = [
             'labels' => array_keys($statusStats),
             'series' => array_values($statusStats),
+        ];
+
+        // 1b. Grafik Lokasi Kerja Alumni
+        $lokasiStats = [
+            'Dalam Negeri' => AlumniBekerja::tahunAjaranAktif()->where('lokasi_kerja', 'Dalam Negeri')->count(),
+            'Luar Negeri' => AlumniBekerja::tahunAjaranAktif()->where('lokasi_kerja', 'Luar Negeri')->count(),
+        ];
+
+        $lokasiChartData = [
+            'labels' => array_keys($lokasiStats),
+            'series' => array_values($lokasiStats),
         ];
 
         // 2. Grafik Perusahaan yang Paling Banyak Merekrut (Top 5)
@@ -325,6 +337,7 @@ class DashboardController extends Controller
             'totalPerusahaanMitra',
             'totalLowonganKerja',
             'statusChartData',
+            'lokasiChartData',
             'perusahaanChartData',
             'industriChartData',
             'penyerapanChartData',

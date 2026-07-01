@@ -16,6 +16,7 @@ class AlumniBekerjaController extends Controller
         $search = $request->input('search');
         $tahunLulus = $request->has('tahun_lulus') ? $request->input('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
         $statusPekerjaan = $request->input('status_pekerjaan');
+        $lokasiKerja = $request->input('lokasi_kerja');
 
         $alumni = AlumniBekerja::query()
             ->tahunAjaranAktif()
@@ -30,13 +31,16 @@ class AlumniBekerjaController extends Controller
             ->when($statusPekerjaan, function ($query, $statusPekerjaan) {
                 $query->where('status_pekerjaan', $statusPekerjaan);
             })
+            ->when($lokasiKerja, function ($query, $lokasiKerja) {
+                $query->where('lokasi_kerja', $lokasiKerja);
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
         $tahunLulusList = AlumniBekerja::distinct()->pluck('tahun_lulus')->sort()->toArray();
 
-        return view('pages.bkk.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'tahunLulusList'));
+        return view('pages.bkk.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'lokasiKerja', 'tahunLulusList'));
     }
 
     /**
@@ -62,7 +66,8 @@ class AlumniBekerjaController extends Controller
             'tahun_lulus' => 'required|integer|min:2000|max:' . (date('Y') + 5),
             'bidang_industri' => 'required_without:perusahaan_mitra_id|nullable|string|max:255',
             'gaji' => 'nullable|numeric|min:0',
-            'status_pekerjaan' => 'required|string|max:255',
+            'status_pekerjaan' => 'required|string|in:Tetap,Kontrak,Magang,Freelance',
+            'lokasi_kerja' => 'required|string|in:Dalam Negeri,Luar Negeri',
         ];
 
         $messages = [
@@ -74,7 +79,10 @@ class AlumniBekerjaController extends Controller
             'tahun_lulus.required' => 'Tahun lulus wajib diisi.',
             'bidang_industri.required_without' => 'Bidang industri wajib diisi jika tidak memilih dari perusahaan mitra.',
             'gaji.numeric' => 'Nominal gaji harus berupa angka.',
-            'status_pekerjaan.required' => 'Status pekerjaan (e.g. Tetap/Kontrak/Magang) wajib diisi.',
+            'status_pekerjaan.required' => 'Status pekerjaan (e.g. Tetap/Kontrak/Magang/Freelance) wajib diisi.',
+            'status_pekerjaan.in' => 'Status pekerjaan tidak valid.',
+            'lokasi_kerja.required' => 'Lokasi kerja wajib diisi.',
+            'lokasi_kerja.in' => 'Lokasi kerja tidak valid.',
         ];
 
         $validated = $request->validate($rules, $messages);
@@ -127,7 +135,8 @@ class AlumniBekerjaController extends Controller
             'tahun_lulus' => 'required|integer|min:2000|max:' . (date('Y') + 5),
             'bidang_industri' => 'required_without:perusahaan_mitra_id|nullable|string|max:255',
             'gaji' => 'nullable|numeric|min:0',
-            'status_pekerjaan' => 'required|string|max:255',
+            'status_pekerjaan' => 'required|string|in:Tetap,Kontrak,Magang,Freelance',
+            'lokasi_kerja' => 'required|string|in:Dalam Negeri,Luar Negeri',
         ];
 
         $messages = [
@@ -139,7 +148,10 @@ class AlumniBekerjaController extends Controller
             'tahun_lulus.required' => 'Tahun lulus wajib diisi.',
             'bidang_industri.required_without' => 'Bidang industri wajib diisi jika tidak memilih dari perusahaan mitra.',
             'gaji.numeric' => 'Nominal gaji harus berupa angka.',
-            'status_pekerjaan.required' => 'Status pekerjaan (e.g. Tetap/Kontrak/Magang) wajib diisi.',
+            'status_pekerjaan.required' => 'Status pekerjaan (e.g. Tetap/Kontrak/Magang/Freelance) wajib diisi.',
+            'status_pekerjaan.in' => 'Status pekerjaan tidak valid.',
+            'lokasi_kerja.required' => 'Lokasi kerja wajib diisi.',
+            'lokasi_kerja.in' => 'Lokasi kerja tidak valid.',
         ];
 
         $validated = $request->validate($rules, $messages);

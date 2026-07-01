@@ -127,17 +127,33 @@
                     </div>
                 </div>
 
-                <!-- Status Pekerjaan -->
-                <div>
-                    <label for="status_pekerjaan" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Status Pekerjaan <span class="text-error-500">*</span>
-                    </label>
-                    <select id="status_pekerjaan" name="status_pekerjaan" required
-                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="Tetap" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Tetap' ? 'selected' : '' }}>Tetap</option>
-                        <option value="Kontrak" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
-                        <option value="Magang" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Magang' ? 'selected' : '' }}>Magang / Apprentice</option>
-                    </select>
+                <!-- Grid Status Pekerjaan dan Lokasi Kerja -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Status Pekerjaan -->
+                    <div>
+                        <label for="status_pekerjaan" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Status Pekerjaan <span class="text-error-500">*</span>
+                        </label>
+                        <select id="status_pekerjaan" name="status_pekerjaan" required
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <option value="Tetap" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Tetap' ? 'selected' : '' }}>Tetap</option>
+                            <option value="Kontrak" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
+                            <option value="Magang" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Magang' ? 'selected' : '' }}>Magang / Apprentice</option>
+                            <option value="Freelance" {{ old('status_pekerjaan', $alumni->status_pekerjaan) === 'Freelance' ? 'selected' : '' }}>Freelance</option>
+                        </select>
+                    </div>
+
+                    <!-- Lokasi Kerja -->
+                    <div>
+                        <label for="lokasi_kerja" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Lokasi Kerja <span class="text-error-500">*</span>
+                        </label>
+                        <select id="lokasi_kerja" name="lokasi_kerja" required
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <option value="Dalam Negeri" {{ old('lokasi_kerja', $alumni->lokasi_kerja) === 'Dalam Negeri' ? 'selected' : '' }}>Dalam Negeri</option>
+                            <option value="Luar Negeri" {{ old('lokasi_kerja', $alumni->lokasi_kerja) === 'Luar Negeri' ? 'selected' : '' }}>Luar Negeri</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Actions -->

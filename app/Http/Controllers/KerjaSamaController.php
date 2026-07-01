@@ -82,7 +82,7 @@ class KerjaSamaController extends Controller
      */
     public function create()
     {
-        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan() && !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses untuk menambah kerja sama.');
         }
 
@@ -93,7 +93,7 @@ class KerjaSamaController extends Controller
 
     public function store(Request $request)
     {
-        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan() && !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses untuk menambah kerja sama.');
         }
 
@@ -234,7 +234,7 @@ class KerjaSamaController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan() && !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus kerja sama.');
         }
 
@@ -273,7 +273,7 @@ class KerjaSamaController extends Controller
      */
     public function kirimWhatsapp($id)
     {
-        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan()) {
+        if (!auth()->user()->isBKK() && !auth()->user()->isAdminJurusan() && !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses untuk mengirim notifikasi WhatsApp.');
         }
 

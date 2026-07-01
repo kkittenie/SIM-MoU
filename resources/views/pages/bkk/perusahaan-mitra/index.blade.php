@@ -50,7 +50,7 @@
                         <th class="px-6 py-4">Bidang Industri</th>
                         <th class="px-6 py-4">Kontak / Email</th>
                         <th class="px-6 py-4">PIC</th>
-                        <th class="px-6 py-4">Status Kerja Sama</th>
+                        <!-- <th class="px-6 py-4">Status Kerja Sama</th> -->
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -72,7 +72,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $mitra->pic }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <!-- <td class="px-6 py-4 whitespace-nowrap">
                                 @if ($mitra->status_aktif === 'Aktif')
                                     <span class="inline-flex items-center rounded-md bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
                                         Aktif
@@ -82,7 +82,7 @@
                                         Tidak Aktif
                                     </span>
                                 @endif
-                            </td>
+                            </td> -->
                             <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('bkk.perusahaan-mitra.show', $mitra->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">

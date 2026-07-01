@@ -7,7 +7,7 @@
         <!-- Table Header Actions -->
         <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800">
             <!-- Search & Filters -->
-            <form action="{{ route('bkk.alumni-bekerja.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:max-w-2xl">
+            <form action="{{ route('bkk.alumni-bekerja.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:max-w-3xl">
                 <!-- Search input -->
                 <div class="relative flex-1">
                     <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
@@ -38,6 +38,17 @@
                         <option value="Tetap" {{ $statusPekerjaan === 'Tetap' ? 'selected' : '' }}>Tetap</option>
                         <option value="Kontrak" {{ $statusPekerjaan === 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
                         <option value="Magang" {{ $statusPekerjaan === 'Magang' ? 'selected' : '' }}>Magang</option>
+                        <option value="Freelance" {{ $statusPekerjaan === 'Freelance' ? 'selected' : '' }}>Freelance</option>
+                    </select>
+                </div>
+
+                <!-- Filter Lokasi Kerja -->
+                <div class="w-full sm:w-36">
+                    <select name="lokasi_kerja" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
+                        <option value="">Lokasi Kerja</option>
+                        <option value="Dalam Negeri" {{ $lokasiKerja === 'Dalam Negeri' ? 'selected' : '' }}>Dalam Negeri</option>
+                        <option value="Luar Negeri" {{ $lokasiKerja === 'Luar Negeri' ? 'selected' : '' }}>Luar Negeri</option>
                     </select>
                 </div>
             </form>
@@ -62,6 +73,7 @@
                         <th class="px-6 py-4">Jabatan</th>
                         <th class="px-6 py-4">Tanggal Masuk</th>
                         <th class="px-6 py-4">Tahun Lulus</th>
+                        <th class="px-6 py-4">Lokasi</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
@@ -84,6 +96,17 @@
                             <td class="px-6 py-4 whitespace-nowrap font-medium">{{ $row->jabatan }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $row->tanggal_masuk->format('d M Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800 dark:text-white/90">{{ $row->tahun_lulus }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($row->lokasi_kerja === 'Luar Negeri')
+                                    <span class="inline-flex items-center rounded-md bg-pink-50 px-2 py-0.5 font-semibold text-pink-700 ring-1 ring-inset ring-pink-600/20 dark:bg-pink-500/10 dark:text-pink-400">
+                                        Luar Negeri
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-600/20 dark:bg-indigo-500/10 dark:text-indigo-400">
+                                        Dalam Negeri
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-xs">
                                 @if($row->status_pekerjaan === 'Tetap')
                                     <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400">
@@ -93,9 +116,17 @@
                                     <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">
                                         Kontrak
                                     </span>
+                                @elseif($row->status_pekerjaan === 'Magang')
+                                    <span class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 font-semibold text-yellow-700 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-400">
+                                        Magang
+                                    </span>
+                                @elseif($row->status_pekerjaan === 'Freelance')
+                                    <span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 font-semibold text-purple-700 ring-1 ring-inset ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400">
+                                        Freelance
+                                    </span>
                                 @else
                                     <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-0.5 font-semibold text-gray-700 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-500/10 dark:text-gray-400">
-                                        Magang
+                                        {{ $row->status_pekerjaan }}
                                     </span>
                                 @endif
                             </td>
@@ -122,7 +153,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="8" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
                                 Tidak ada data alumni bekerja ditemukan.
                             </td>
                         </tr>

@@ -69,7 +69,7 @@ class MenuHelper
             ];
             $items[] = [
                 'icon' => 'perusahaan-mitra',
-                'name' => 'Perusahaan',
+                'name' => 'Data Perusahaan',
                 'path' => '/bkk/perusahaan-mitra',
             ];
             $items[] = [

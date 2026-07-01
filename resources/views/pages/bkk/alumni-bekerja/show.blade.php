@@ -67,9 +67,17 @@
                             <span class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">
                                 Kontrak
                             </span>
+                        @elseif($alumni->status_pekerjaan === 'Magang')
+                            <span class="inline-flex items-center rounded-md bg-yellow-50 px-2.5 py-0.5 text-xs font-semibold text-yellow-700 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-400">
+                                Magang / Apprentice
+                            </span>
+                        @elseif($alumni->status_pekerjaan === 'Freelance')
+                            <span class="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-700 ring-1 ring-inset ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400">
+                                Freelance
+                            </span>
                         @else
                             <span class="inline-flex items-center rounded-md bg-gray-50 px-2.5 py-0.5 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-500/10 dark:text-gray-400">
-                                Magang / Apprentice
+                                {{ $alumni->status_pekerjaan }}
                             </span>
                         @endif
                     </span>
@@ -95,6 +103,24 @@
                             Rp {{ number_format($alumni->gaji, 0, ',', '.') }}
                         @else
                             -
+                        @endif
+                    </span>
+                </div>
+            </div>
+
+            <!-- Grid 4: Lokasi Kerja -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Lokasi Kerja</span>
+                    <span class="block mt-1">
+                        @if($alumni->lokasi_kerja === 'Luar Negeri')
+                            <span class="inline-flex items-center rounded-md bg-pink-50 px-2.5 py-0.5 text-xs font-semibold text-pink-700 ring-1 ring-inset ring-pink-600/20 dark:bg-pink-500/10 dark:text-pink-400">
+                                Luar Negeri
+                            </span>
+                        @else
+                            <span class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">
+                                Dalam Negeri
+                            </span>
                         @endif
                     </span>
                 </div>
