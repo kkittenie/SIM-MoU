@@ -63,11 +63,6 @@ class MenuHelper
                 'path' => '/bkk/alumni-bekerja',
             ];
             $items[] = [
-                'icon' => 'lowongan-kerja',
-                'name' => 'Lowongan Kerja',
-                'path' => '/bkk/lowongan-kerja',
-            ];
-            $items[] = [
                 'icon' => 'perusahaan-mitra',
                 'name' => 'Data Perusahaan',
                 'path' => '/bkk/perusahaan-mitra',
