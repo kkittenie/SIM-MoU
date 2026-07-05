@@ -68,7 +68,65 @@ class AlumniWirausahaSeeder extends Seeder
                 'bidang_usaha' => 'Fashion & Konveksi',
                 'lama_usaha' => '1 Tahun',
                 'tahun_lulus' => 2024,
-            ]
+            ],
+
+            // ══ Tahun 2026 (Tahun Ajaran Aktif) ══
+            [
+                'nama_alumni' => 'Arya Nugraha',
+                'nama_usaha' => 'Arya Tech Solutions',
+                'bidang_usaha' => 'Teknologi & Servis Komputer',
+                'lama_usaha' => '6 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Dewi Anggraini',
+                'nama_usaha' => 'Dewi Catering Nusantara',
+                'bidang_usaha' => 'Kuliner (Katering)',
+                'lama_usaha' => '3 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Ega Firmansyah',
+                'nama_usaha' => 'EF Digital Marketing',
+                'bidang_usaha' => 'Multimedia & Agensi',
+                'lama_usaha' => '4 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Fitri Handayani',
+                'nama_usaha' => 'Fitri Organic Farm',
+                'bidang_usaha' => 'Peternakan & Pertanian',
+                'lama_usaha' => '5 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Gilang Prasetyo',
+                'nama_usaha' => 'Gilang Auto Care',
+                'bidang_usaha' => 'Otomotif & Bengkel',
+                'lama_usaha' => '2 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Hesti Wulandari',
+                'nama_usaha' => 'Hesti Boutique Online',
+                'bidang_usaha' => 'Fashion & E-Commerce',
+                'lama_usaha' => '3 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Ivan Kurniawan',
+                'nama_usaha' => 'Ivan Print & Design',
+                'bidang_usaha' => 'Percetakan & Desain Grafis',
+                'lama_usaha' => '6 Bulan',
+                'tahun_lulus' => 2026,
+            ],
+            [
+                'nama_alumni' => 'Joni Setiawan',
+                'nama_usaha' => 'Joni Kopi Nusantara',
+                'bidang_usaha' => 'Kuliner (Roti & Kopi)',
+                'lama_usaha' => '4 Bulan',
+                'tahun_lulus' => 2026,
+            ],
         ];
 
         foreach ($data as $item) {

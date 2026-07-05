@@ -82,6 +82,11 @@ class MenuHelper
                 'path' => '/dashboard',
             ];
             $items[] = [
+                'icon' => 'universitas',
+                'name' => 'Universitas',
+                'path' => '/universitas',
+            ];
+            $items[] = [
                 'icon' => 'alumni-kuliah',
                 'name' => 'Data Alumni Kuliah',
                 'path' => '/bk/alumni-kuliah',
@@ -90,11 +95,6 @@ class MenuHelper
                 'icon' => 'tracer-study',
                 'name' => 'Data Alumni Wirausaha',
                 'path' => '/bk/alumni-wirausaha',
-            ];
-            $items[] = [
-                'icon' => 'universitas',
-                'name' => 'Universitas',
-                'path' => '/universitas',
             ];
             $items[] = [
                 'icon' => 'laporan',

@@ -115,7 +115,7 @@
                                 @if($row->universitas)
                                     @if($row->universitas->lokasi_kuliah === 'dalam_negeri')
                                         <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400">
-                                            🇮🇩 Dalam Negeri
+                                            Dalam Negeri
                                         </span>
                                     @else
                                         <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400">

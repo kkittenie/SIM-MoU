@@ -185,7 +185,7 @@
         </div>
     @endif
 
-    {{-- CHARTS --}}
+    {{-- CHARTS ROW 1 (Donuts) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
         <div class="dash-panel anim-up d-5">
             <div class="dash-panel-title">
@@ -195,6 +195,17 @@
             <div class="flex justify-center"><div id="distribChart" class="w-full max-w-[320px]"></div></div>
         </div>
         <div class="dash-panel anim-up d-5">
+            <div class="dash-panel-title">
+                <span class="dash-panel-dot" style="background: #A855F7"></span>
+                Lokasi Kuliah Alumni (Dalam vs Luar Negeri)
+            </div>
+            <div class="flex justify-center"><div id="lokasiChart" class="w-full max-w-[320px]"></div></div>
+        </div>
+    </div>
+
+    {{-- CHARTS ROW 2 (Bars) --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+        <div class="dash-panel anim-up d-6">
             <div class="dash-panel-title">
                 <span class="dash-panel-dot" style="background: #5BB6FF"></span>
                 Kampus Tujuan Terbanyak
@@ -208,13 +219,15 @@
             </div>
             <div id="wirausahaChart" class="w-full"></div>
         </div>
-        <div class="dash-panel anim-up d-6">
-            <div class="dash-panel-title">
-                <span class="dash-panel-dot" style="background: #399EF2"></span>
-                Tren Alumni Kuliah per Tahun Lulus
-            </div>
-            <div id="trendChart" class="w-full"></div>
+    </div>
+
+    {{-- CHARTS ROW 3 (Area Trend) --}}
+    <div class="dash-panel anim-up d-7 mb-6">
+        <div class="dash-panel-title">
+            <span class="dash-panel-dot" style="background: #399EF2"></span>
+            Tren Alumni Kuliah per Tahun Lulus
         </div>
+        <div id="trendChart" class="w-full"></div>
     </div>
 @endsection
 
@@ -236,6 +249,18 @@ document.addEventListener('DOMContentLoaded', function () {
         legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
         stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
         plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b' }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500 } } } } },
+        dataLabels: { enabled: false }
+    }).render();
+
+    // 1.5. Donut Lokasi Kuliah
+    new ApexCharts(document.querySelector("#lokasiChart"), {
+        chart: { type: 'donut', height: 300, fontFamily, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+        series: @json($lokasiChartData['series']),
+        labels: @json($lokasiChartData['labels']),
+        colors: ['#3B82F6', '#EC4899'],
+        legend: { position: 'bottom', fontSize: '12px', fontWeight: 500, labels: { colors: labelColor }, markers: { size: 6, offsetX: -3 } },
+        stroke: { show: true, width: 3, colors: [isDark ? '#111827' : '#ffffff'] },
+        plotOptions: { pie: { donut: { size: '72%', labels: { show: true, name: { fontSize: '13px', fontWeight: 600, color: labelColor }, value: { fontSize: '22px', fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', formatter: v => v }, total: { show: true, label: 'Total Alumni', color: labelColor, fontSize: '12px', fontWeight: 500, formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0) } } } } },
         dataLabels: { enabled: false }
     }).render();
 

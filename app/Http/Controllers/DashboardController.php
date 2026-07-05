@@ -413,9 +413,25 @@ class DashboardController extends Controller
             $trendChartData['series'] = [0];
         }
 
+        // 4.5. Grafik Lokasi Kuliah Alumni (Dalam vs Luar Negeri) - Donut
+        $alumniLokasiStats = AlumniKuliah::tahunAjaranAktif()
+            ->join('universitas', 'alumni_kuliah.universitas_id', '=', 'universitas.id')
+            ->selectRaw('universitas.lokasi_kuliah, count(*) as total')
+            ->groupBy('universitas.lokasi_kuliah')
+            ->pluck('total', 'lokasi_kuliah');
+
+        $lokasiChartData = [
+            'series' => [
+                (int) $alumniLokasiStats->get('dalam_negeri', 0),
+                (int) $alumniLokasiStats->get('luar_negeri', 0)
+            ],
+            'labels' => ['Dalam Negeri', 'Luar Negeri']
+        ];
+
         // 5. Dynamic Insights
         $insights = [];
         $insights[] = "Terdapat <strong>{$totalAlumniKuliah} alumni</strong> melanjutkan kuliah dan <strong>{$totalAlumniWirausaha} alumni</strong> yang berwirausaha.";
+        $insights[] = "Alumni kuliah terdiri dari <strong>{$lokasiChartData['series'][0]} alumni</strong> di Dalam Negeri dan <strong>{$lokasiChartData['series'][1]} alumni</strong> di Luar Negeri.";
 
         if ($totalAlumniKuliah > 0) {
             $topUniv = $alumniPerUniversitas->first();
@@ -437,6 +453,7 @@ class DashboardController extends Controller
             'totalAlumniWirausaha',
             'totalUniversitas',
             'distribChartData',
+            'lokasiChartData',
             'universChartData',
             'wirausahaChartData',
             'trendChartData',

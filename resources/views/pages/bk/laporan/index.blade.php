@@ -287,7 +287,7 @@
                                 @endif">
 
                                 @if($row->universitas->lokasi_kuliah === 'dalam_negeri')
-                                    🇮🇩 Dalam Negeri
+                                    Dalam Negeri
                                 @else
                                     Luar Negeri
                                 @endif

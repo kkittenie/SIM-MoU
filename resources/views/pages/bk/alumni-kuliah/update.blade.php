@@ -123,7 +123,7 @@
             const lokasiText = document.getElementById('lokasiText');
 
             if (lokasi) {
-                const lokasiLabel = lokasi === 'dalam_negeri' ? '🇮🇩 Dalam Negeri' : 'Luar Negeri';
+                const lokasiLabel = lokasi === 'dalam_negeri' ? 'Dalam Negeri' : 'Luar Negeri';
                 lokasiText.textContent = lokasiLabel;
                 infoBox.classList.remove('hidden');
             } else {
