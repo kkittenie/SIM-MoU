@@ -36,6 +36,14 @@ class LowonganKerja extends Model
     }
 
     /**
+     * Relasi ke Pelamar
+     */
+    public function pelamars()
+    {
+        return $this->hasMany(Pelamar::class, 'lowongan_kerja_id');
+    }
+
+    /**
      * Dapatkan nama perusahaan secara dinamis.
      */
     public function getNamaPerusahaanAttribute(): string

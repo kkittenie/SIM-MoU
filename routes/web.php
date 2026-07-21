@@ -24,6 +24,7 @@ use App\Http\Controllers\LandingController;
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/lowongan', [LandingController::class, 'lowonganIndex'])->name('landing.lowongan.index');
 Route::get('/lowongan/{id}', [LandingController::class, 'lowonganDetail'])->name('landing.lowongan.detail');
+Route::post('/lowongan/{id}/lamar', [LandingController::class, 'submitLamaran'])->name('landing.lowongan.lamar');
 Route::get('/tracer-study', [LandingController::class, 'tracerStudyForm'])->name('landing.tracer-study');
 
 // ════════════════════════════════════════════════
@@ -131,6 +132,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/lowongan-kerja/{id}/ubah', [LowonganKerjaController::class, 'edit'])->name('lowongan-kerja.edit');
             Route::put('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'update'])->name('lowongan-kerja.update');
             Route::delete('/lowongan-kerja/{id}', [LowonganKerjaController::class, 'destroy'])->name('lowongan-kerja.destroy');
+
+            // Data Pelamar
+            Route::get('/pelamar', [\App\Http\Controllers\PelamarController::class, 'index'])->name('pelamar.index');
+            Route::patch('/pelamar/{id}/status', [\App\Http\Controllers\PelamarController::class, 'updateStatus'])->name('pelamar.status');
+            Route::get('/pelamar/{id}/view-cv', [\App\Http\Controllers\PelamarController::class, 'viewCv'])->name('pelamar.view-cv');
+            Route::get('/pelamar/{id}/download-cv', [\App\Http\Controllers\PelamarController::class, 'downloadCv'])->name('pelamar.download-cv');
+            Route::delete('/pelamar/{id}', [\App\Http\Controllers\PelamarController::class, 'destroy'])->name('pelamar.destroy');
         });
     });
 

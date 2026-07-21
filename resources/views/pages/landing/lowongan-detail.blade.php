@@ -272,13 +272,41 @@
 
                         <!-- Form Body -->
                         <div class="form-card-body">
-                            <form class="space-y-4" x-data="{ submitting: false }">
+                            @if(session('success'))
+                                <div class="mb-4 p-4 rounded-xl bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-sm text-green-700 dark:text-green-300">
+                                    <div class="flex items-center gap-2 font-semibold">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Berhasil!
+                                    </div>
+                                    <p class="mt-1">{{ session('success') }}</p>
+                                </div>
+                            @endif
+
+                            @if(session('error'))
+                                <div class="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
+                                    <p class="font-semibold">{{ session('error') }}</p>
+                                </div>
+                            @endif
+
+                            @if($errors->any())
+                                <div class="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300 space-y-1">
+                                    <p class="font-semibold">Terjadi kesalahan:</p>
+                                    <ul class="list-disc list-inside text-xs">
+                                        @foreach($errors->all() as $err)
+                                            <li>{{ $err }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            @if($lowongan->status === 'Aktif')
+                            <form action="{{ route('landing.lowongan.lamar', $lowongan->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="{ submitting: false }" @submit="submitting = true">
                                 @csrf
 
                                 <!-- Nama Lengkap -->
                                 <div>
                                     <label for="nama_lengkap" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">Nama Lengkap <span class="text-red-500">*</span></label>
-                                    <input type="text" id="nama_lengkap" name="nama_lengkap" required
+                                    <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}" required
                                         class="landing-input"
                                         placeholder="Masukkan nama lengkap Anda">
                                 </div>
@@ -286,7 +314,7 @@
                                 <!-- Email -->
                                 <div>
                                     <label for="email" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">Alamat Email <span class="text-red-500">*</span></label>
-                                    <input type="email" id="email" name="email" required
+                                    <input type="email" id="email" name="email" value="{{ old('email') }}" required
                                         class="landing-input"
                                         placeholder="contoh@email.com">
                                 </div>
@@ -294,7 +322,7 @@
                                 <!-- No. Telepon -->
                                 <div>
                                     <label for="nomor_telepon" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">No. Telepon / WhatsApp <span class="text-red-500">*</span></label>
-                                    <input type="tel" id="nomor_telepon" name="nomor_telepon" required
+                                    <input type="tel" id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}" required
                                         class="landing-input"
                                         placeholder="08xxxxxxxxxx">
                                 </div>
@@ -303,19 +331,15 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label for="tahun_lulus" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">Tahun Lulus <span class="text-red-500">*</span></label>
-                                        <input type="number" id="tahun_lulus" name="tahun_lulus" min="2000" max="{{ date('Y') }}" required
+                                        <input type="number" id="tahun_lulus" name="tahun_lulus" value="{{ old('tahun_lulus', date('Y')) }}" min="2000" max="{{ date('Y') }}" required
                                             class="landing-input"
                                             placeholder="{{ date('Y') }}">
                                     </div>
                                     <div>
                                         <label for="program_keahlian" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">Jurusan <span class="text-red-500">*</span></label>
-                                        <select id="program_keahlian" name="program_keahlian" required
-                                            class="landing-input landing-select">
-                                            <option value="" disabled selected>Pilih Jurusan</option>
-                                            @foreach($programKeahlians as $pk)
-                                                <option value="{{ $pk->nama }}">{{ $pk->nama }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" id="program_keahlian" name="program_keahlian" value="{{ old('program_keahlian') }}" required
+                                            class="landing-input"
+                                            placeholder="Contoh: Rekayasa Perangkat Lunak">
                                     </div>
                                 </div>
 
@@ -324,7 +348,7 @@
                                     <label for="surat_lamaran" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">Pesan / Surat Lamaran <span class="text-red-500">*</span></label>
                                     <textarea id="surat_lamaran" name="surat_lamaran" rows="4" required
                                         class="landing-input landing-textarea"
-                                        placeholder="Ceritakan mengapa Anda tertarik dengan posisi ini..."></textarea>
+                                        placeholder="Ceritakan mengapa Anda tertarik dengan posisi ini...">{{ old('surat_lamaran') }}</textarea>
                                 </div>
 
                                 <!-- Upload CV -->
@@ -339,11 +363,24 @@
                                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
 
                                 <!-- Submit Button -->
-                                <button type="submit"
-                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2">
-                                    <span>Kirim Lamaran</span>
+                                <button type="submit" :disabled="submitting"
+                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50">
+                                    <span x-show="!submitting">Kirim Lamaran</span>
+                                    <span x-show="submitting" class="flex items-center gap-2">
+                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Mengirim...
+                                    </span>
                                 </button>
                             </form>
+                            @else
+                            <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                                <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <p class="font-medium text-sm">Pendaftaran untuk lowongan ini sudah ditutup.</p>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

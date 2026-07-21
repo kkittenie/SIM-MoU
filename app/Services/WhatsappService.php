@@ -117,4 +117,82 @@ class WhatsappService
         $months = intval($type); // extracts the number from "3 bulan" etc.
         return "🔔 *PENGINGAT KERJA SAMA ({$months} BULAN)* 🔔\n\nYth. Bapak/Ibu *{$picName}*,\n\nKami menginformasikan bahwa dokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) akan berakhir dalam *{$months} bulan* pada tanggal *{$tanggalBerakhir}*.\n\nApakah ada rencana untuk melanjutkan/memperpanjang kerja sama ini? Kami sangat senang jika bisa terus bersinergi.\n\nTerima kasih atas kerja samanya.\n\nSistem Informasi OneLink.";
     }
+
+    /**
+     * Kirim notifikasi WhatsApp ke Pelamar yang Diterima
+     */
+    public function sendPelamarDiterima($pelamar)
+    {
+        $settings = Setting::getSettings();
+        if (!$settings->whatsapp_active || !$settings->fonnte_token || !$pelamar->nomor_telepon) {
+            return false;
+        }
+
+        $recipient = $this->formatPhoneNumber($pelamar->nomor_telepon);
+        $judulLoker = $pelamar->lowonganKerja ? $pelamar->lowonganKerja->judul : 'Lowongan Kerja';
+        $namaPerusahaan = $pelamar->lowonganKerja ? $pelamar->lowonganKerja->nama_perusahaan : 'Perusahaan Mitra';
+
+        $message = "🎉 *SELAMAT! LAMARAN ANDA DITERIMA* 🎉\n\nYth. Sdr/i *{$pelamar->nama_lengkap}*,\n\nSelamat! Berdasarkan hasil seleksi BKK, Anda dinyatakan *DITERIMA* untuk posisi *{$judulLoker}* di *{$namaPerusahaan}*.\n\nTim BKK / Perusahaan akan segera menghubungi Anda untuk tahap selanjutnya.\n\nSalam,\nBursa Kerja Khusus (BKK)";
+
+        return $this->sendDirectMessage($recipient, $message, 'pelamar_diterima');
+    }
+
+    /**
+     * Kirim notifikasi WhatsApp ke Pelamar yang Ditolak
+     */
+    public function sendPelamarDitolak($pelamar)
+    {
+        $settings = Setting::getSettings();
+        if (!$settings->whatsapp_active || !$settings->fonnte_token || !$pelamar->nomor_telepon) {
+            return false;
+        }
+
+        $recipient = $this->formatPhoneNumber($pelamar->nomor_telepon);
+        $judulLoker = $pelamar->lowonganKerja ? $pelamar->lowonganKerja->judul : 'Lowongan Kerja';
+        $namaPerusahaan = $pelamar->lowonganKerja ? $pelamar->lowonganKerja->nama_perusahaan : 'Perusahaan Mitra';
+
+        $message = "Halo Sdr/i *{$pelamar->nama_lengkap}*,\n\nTerima kasih telah melamar untuk posisi *{$judulLoker}* di *{$namaPerusahaan}* melalui BKK.\n\nMohon maaf, saat ini Anda belum dapat diproses ke tahap selanjutnya karena kuota/posisi telah terpenuhi. Tetap semangat dan jangan ragu melamar di lowongan BKK berikutnya!\n\nSalam,\nBursa Kerja Khusus (BKK)";
+
+        return $this->sendDirectMessage($recipient, $message, 'pelamar_ditolak');
+    }
+
+    /**
+     * General direct message sender via Fonnte
+     */
+    protected function sendDirectMessage($recipient, $message, $type)
+    {
+        $settings = Setting::getSettings();
+        $status = 'failed';
+        $responseBody = null;
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $settings->fonnte_token
+            ])->timeout(10)->post('https://api.fonnte.com/send', [
+                'target' => $recipient,
+                'message' => $message,
+            ]);
+
+            $responseBody = $response->body();
+            if ($response->successful()) {
+                $resData = json_decode($responseBody, true);
+                if (isset($resData['status']) && $resData['status'] == true) {
+                    $status = 'success';
+                }
+            }
+        } catch (\Exception $e) {
+            $responseBody = 'Error: ' . $e->getMessage();
+            Log::error("Fonnte API Exception ({$type}): " . $e->getMessage());
+        }
+
+        WhatsappLog::create([
+            'type' => $type,
+            'recipient' => $recipient,
+            'message' => $message,
+            'status' => $status,
+            'response' => $responseBody,
+        ]);
+
+        return $status === 'success';
+    }
 }

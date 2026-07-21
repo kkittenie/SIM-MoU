@@ -73,6 +73,11 @@ class MenuHelper
                 'path' => '/bkk/lowongan-kerja',
             ];
             $items[] = [
+                'icon' => 'user-profile',
+                'name' => 'Data Pelamar',
+                'path' => '/bkk/pelamar',
+            ];
+            $items[] = [
                 'icon' => 'laporan',
                 'name' => 'Laporan BKK',
                 'path' => '/bkk/laporan',
