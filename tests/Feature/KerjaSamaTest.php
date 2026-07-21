@@ -188,3 +188,27 @@ test('bkk and bk cannot access settings or notifications', function () {
     $this->actingAs($bk)->get(route('notifikasi.index'))->assertStatus(403);
 });
 
+test('authorized users can export MoU to Excel', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+    $cat = KategoriMitra::create(['nama' => 'Kategori A']);
+    
+    KerjaSama::create([
+        'kategori_mitra_id' => $cat->id,
+        'nama_mitra' => 'Mitra A',
+        'jenis_mitra' => 'Kategori A',
+        'alamat' => 'Jl. A',
+        'email' => 'a@mitra.com',
+        'nomor_telepon' => '0811',
+        'pic' => 'PIC A',
+        'nomor_mou' => 'MOU-A',
+        'tanggal_mulai' => '2024-01-01',
+        'tanggal_berakhir' => '2025-01-01',
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('laporan-kerja-sama.export-excel'));
+    $response->assertStatus(200);
+    $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $this->assertStringContainsString('attachment; filename="laporan-kerja-sama-', $response->headers->get('Content-Disposition'));
+});
+
+

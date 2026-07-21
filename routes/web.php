@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,bkk,admin_jurusan')->group(function () {
         // Kerja Sama - Laporan
         Route::get('/laporan-kerja-sama', [LaporanKerjaSamaController::class, 'index'])->name('laporan-kerja-sama.index');
+        Route::get('/laporan-kerja-sama/export/excel', [LaporanKerjaSamaController::class, 'exportExcel'])->name('laporan-kerja-sama.export-excel');
     });
 
     // BKK Only (CRUD)

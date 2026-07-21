@@ -55,16 +55,14 @@
         </div>
         
         <div class="flex items-center gap-3">
-            <!-- Filter Tahun Mulai -->
-            <form action="{{ route('laporan-kerja-sama.index') }}" method="GET" class="flex gap-2 items-center">
-                <select name="year" onchange="this.form.submit()"
-                    class="dark:bg-dark-900 h-10 rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
-                    <option value="">Semua Tahun Mulai</option>
-                    @foreach($tahunList as $t)
-                        <option value="{{ $t }}" {{ $year == $t ? 'selected' : '' }}>Tahun Mulai {{ $t }}</option>
-                    @endforeach
-                </select>
-            </form>
+            <!-- Ekspor Excel Button -->
+            <a href="{{ route('laporan-kerja-sama.export-excel', request()->all()) }}" 
+                class="bg-green-600 hover:bg-green-700 shadow-theme-xs inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition whitespace-nowrap">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Ekspor Excel
+            </a>
 
             <!-- Cetak Button -->
             <button onclick="window.print()" 
@@ -74,6 +72,83 @@
                 </svg>
                 Cetak Laporan
             </button>
+        </div>
+    </div>
+
+    <!-- Filters Form -->
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-xs mb-6 no-print">
+        <div class="p-5">
+            <form action="{{ route('laporan-kerja-sama.index') }}" method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <!-- Search Input -->
+                <div class="relative">
+                    <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
+                        <svg class="fill-gray-400 dark:fill-gray-500" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
+                        </svg>
+                    </span>
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Cari mitra, PIC, MoU..."
+                        class="dark:bg-dark-900 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 pl-10 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                </div>
+
+                <!-- Jenis/Kategori Mitra -->
+                <div>
+                    <select name="jenis_mitra" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Kategori Mitra</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->nama }}" {{ $jenisMitra === $cat->nama ? 'selected' : '' }}>
+                                {{ $cat->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Tahun MoU -->
+                <div>
+                    <select name="year" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Tahun Mulai</option>
+                        @foreach ($tahunList as $y)
+                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>
+                                Tahun Mulai {{ $y }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Program Keahlian / Jurusan -->
+                <div>
+                    <select name="program_keahlian_id" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Jurusan</option>
+                        @foreach ($programKeahlians as $pk)
+                            <option value="{{ $pk->id }}" {{ $programKeahlianId == $pk->id ? 'selected' : '' }}>
+                                {{ $pk->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <select name="status" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Status MoU</option>
+                        <option value="Aktif" {{ $status === 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="Akan Berakhir" {{ $status === 'Akan Berakhir' ? 'selected' : '' }}>Akan Berakhir (<= 6 bulan)</option>
+                        <option value="Berakhir" {{ $status === 'Berakhir' ? 'selected' : '' }}>Berakhir</option>
+                    </select>
+                </div>
+            </form>
+            
+            @if ($search || $jenisMitra || $status || $year || $programKeahlianId)
+                <div class="mt-4 flex justify-start">
+                    <a href="{{ route('laporan-kerja-sama.index') }}"
+                        class="bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 h-10 text-gray-700 dark:text-white/95 rounded-lg px-4 py-2 text-sm font-medium transition inline-flex items-center justify-center whitespace-nowrap">
+                        Reset Filter
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 
