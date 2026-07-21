@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Beranda' }} | SIM-MoU</title>
-    <meta name="description" content="Sistem Informasi Manajemen Kerja Sama & MoU — Platform pengelolaan dokumen kemitraan institusi pendidikan.">
+    <title>{{ $title ?? 'Beranda' }} | OneLink</title>
+    <meta name="description" content="OneLink — Sistem Informasi Bursa Kerja Khusus (BKK) & Tracer Study Alumni SMK Negeri 1 Cirebon.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

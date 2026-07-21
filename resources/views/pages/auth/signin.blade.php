@@ -248,6 +248,47 @@
         color: #e2e8f0;
         box-shadow: 0 4px 16px rgba(91, 182, 255, 0.15);
     }
+
+    /* ── Floating Back to Home Button ── */
+    .login-back-btn {
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1.5px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        text-decoration: none;
+    }
+    .login-back-btn:hover {
+        border-color: #5BB6FF;
+        color: #2278D8;
+        box-shadow: 0 4px 16px rgba(91, 182, 255, 0.15);
+        transform: translateY(-1px);
+    }
+    .dark .login-back-btn {
+        background: rgba(17, 24, 39, 0.85);
+        border-color: #1e293b;
+        color: #94a3b8;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .dark .login-back-btn:hover {
+        border-color: #5BB6FF;
+        color: #5BB6FF;
+        box-shadow: 0 4px 16px rgba(91, 182, 255, 0.15);
+    }
     .login-theme-toggle .toggle-track {
         width: 40px;
         height: 22px;
@@ -349,6 +390,7 @@
 
 @section('content')
     <div class="login-page">
+
         {{-- ═══════════════════════════════════════════════ --}}
         {{--  FLOATING DARK MODE TOGGLE                      --}}
         {{-- ═══════════════════════════════════════════════ --}}
@@ -386,17 +428,18 @@
                     <div class="mb-10">
                         <div class="inline-flex items-center gap-3 mb-6">
                             <div class="login-brand-logo flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm border border-white/10">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                <svg class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                                 </svg>
                             </div>
-                            <span class="text-2xl font-bold text-white tracking-tight">SIM-MoU</span>
+                            <span class="text-2xl font-bold text-white tracking-tight">OneLink</span>
                         </div>
                         <h1 class="text-3xl font-bold text-white leading-tight tracking-tight mb-4">
-                            Sistem Informasi<br>Kerja Sama & MoU
+                            Portal Bursa Kerja &<br>Tracer Study Alumni
                         </h1>
                         <p class="text-[15px] text-white/70 leading-relaxed max-w-sm">
-                            Platform terpadu untuk mengelola dokumen kemitraan, monitoring masa berlaku, dan administrasi kerja sama institusi pendidikan.
+                            Platform terpadu Bursa Kerja Khusus (BKK) dan penelusuran rekam jejak karir alumni SMK Negeri 1 Cirebon.
                         </p>
                     </div>
 
@@ -405,23 +448,24 @@
                         <div class="flex items-start gap-3">
                             <div class="login-feature-icon flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
                                 <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-sm font-semibold text-white/90">Kelola dokumen MoU</p>
-                                <p class="text-xs text-white/50 mt-0.5">Pantau dan kelola seluruh dokumen kemitraan secara digital</p>
+                                <p class="text-sm font-semibold text-white/90">Bursa Kerja Khusus (BKK)</p>
+                                <p class="text-xs text-white/50 mt-0.5">Penyaluran dan informasi lowongan kerja aktif terverifikasi dari mitra</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
                             <div class="login-feature-icon flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm flex-shrink-0 mt-0.5">
                                 <svg class="h-4 w-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-sm font-semibold text-white/90">Monitoring otomatis</p>
-                                <p class="text-xs text-white/50 mt-0.5">Notifikasi masa berlaku dan peringatan kontrak berakhir</p>
+                                <p class="text-sm font-semibold text-white/90">Tracer Study Alumni (BK)</p>
+                                <p class="text-xs text-white/50 mt-0.5">Penelusuran status kelulusan untuk evaluasi relevansi kurikulum sekolah</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
@@ -431,8 +475,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-sm font-semibold text-white/90">Laporan & analitik</p>
-                                <p class="text-xs text-white/50 mt-0.5">Dashboard visual untuk evaluasi dan pengambilan keputusan</p>
+                                <p class="text-sm font-semibold text-white/90">Laporan Statistik Karir</p>
+                                <p class="text-xs text-white/50 mt-0.5">Statistik dan data serapan kerja alumni yang dapat diakses langsung oleh tim BK</p>
                             </div>
                         </div>
                     </div>
@@ -446,11 +490,12 @@
                 {{-- Mobile Logo --}}
                 <div class="mb-8 flex items-center gap-2 lg:hidden anim-fade">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                         </svg>
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-gray-800 dark:text-white">SIM-MoU</span>
+                    <span class="text-xl font-bold tracking-tight text-gray-800 dark:text-white">OneLink</span>
                 </div>
 
                 <div class="login-card w-full max-w-[420px] p-8 sm:p-10 anim-slide-up anim-d1">
@@ -572,13 +617,23 @@
                                     Masuk
                                 </button>
                             </div>
+
+                            {{-- Back to Home Link --}}
+                            <div class="text-center pt-2 anim-slide-up anim-d5">
+                                <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400 transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                    </svg>
+                                    <span>Kembali ke Beranda Utama</span>
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
 
                 {{-- Footer --}}
                 <p class="mt-8 text-xs text-gray-400 dark:text-gray-500 text-center anim-fade anim-d5">
-                    &copy; {{ date('Y') }} SIM-MoU &mdash; Sistem Informasi Kerja Sama
+                    &copy; {{ date('Y') }} OneLink &mdash; Powered by SMK Negeri 1 Cirebon
                 </p>
             </div>
 

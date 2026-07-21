@@ -51,7 +51,7 @@
             <!-- Logo (mobile only) -->
             <a href="/" class="xl:hidden flex items-center gap-2">
                 <span class="text-xl font-extrabold tracking-tight text-brand-600 dark:text-brand-400">
-                    SIM-MoU
+                    OneLink
                 </span>
             </a>
 

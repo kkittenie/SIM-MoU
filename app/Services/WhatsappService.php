@@ -105,16 +105,16 @@ class WhatsappService
         $picName = $kerjaSama->pic ?: 'Bapak/Ibu';
 
         if ($type === 'berakhir') {
-            return "🚨 *PEMBERITAHUAN MASA BERLAKU BERAKHIR* 🚨\n\nYth. Bapak/Ibu *{$picName}*,\n\nKami menginformasikan bahwa dokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) telah *BERAKHIR* pada tanggal *{$tanggalBerakhir}*.\n\nJika ingin mengajukan kerja sama baru atau perpanjangan kembali, silakan hubungi tim kami.\n\nTerima kasih atas kerja sama yang telah terjalin baik selama ini.\n\nSistem Informasi SIM-MoU.";
+            return "🚨 *PEMBERITAHUAN MASA BERLAKU BERAKHIR* 🚨\n\nYth. Bapak/Ibu *{$picName}*,\n\nKami menginformasikan bahwa dokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) telah *BERAKHIR* pada tanggal *{$tanggalBerakhir}*.\n\nJika ingin mengajukan kerja sama baru atau perpanjangan kembali, silakan hubungi tim kami.\n\nTerima kasih atas kerja sama yang telah terjalin baik selama ini.\n\nSistem Informasi OneLink.";
         }
 
         if (str_contains($type, 'hari')) {
             $days = intval($type);
-            return "⚠️ *PERINGATAN PENTING KERJA SAMA ({$days} HARI)* ⚠️\n\nYth. Bapak/Ibu *{$picName}*,\n\nDokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) akan segera berakhir dalam *{$days} hari* pada tanggal *{$tanggalBerakhir}*.\n\nMohon segera konfirmasikan perihal status perpanjangan kerja sama ini agar kami dapat memproses administrasi yang diperlukan.\n\nTerima kasih atas kerja samanya.\n\nSistem Informasi SIM-MoU.";
+            return "⚠️ *PERINGATAN PENTING KERJA SAMA ({$days} HARI)* ⚠️\n\nYth. Bapak/Ibu *{$picName}*,\n\nDokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) akan segera berakhir dalam *{$days} hari* pada tanggal *{$tanggalBerakhir}*.\n\nMohon segera konfirmasikan perihal status perpanjangan kerja sama ini agar kami dapat memproses administrasi yang diperlukan.\n\nTerima kasih atas kerja samanya.\n\nSistem Informasi OneLink.";
         }
 
         // Monthly warning (e.g. "6 bulan", "3 bulan", "1 bulan")
         $months = intval($type); // extracts the number from "3 bulan" etc.
-        return "🔔 *PENGINGAT KERJA SAMA ({$months} BULAN)* 🔔\n\nYth. Bapak/Ibu *{$picName}*,\n\nKami menginformasikan bahwa dokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) akan berakhir dalam *{$months} bulan* pada tanggal *{$tanggalBerakhir}*.\n\nApakah ada rencana untuk melanjutkan/memperpanjang kerja sama ini? Kami sangat senang jika bisa terus bersinergi.\n\nTerima kasih atas kerja samanya.\n\nSistem Informasi SIM-MoU.";
+        return "🔔 *PENGINGAT KERJA SAMA ({$months} BULAN)* 🔔\n\nYth. Bapak/Ibu *{$picName}*,\n\nKami menginformasikan bahwa dokumen kerja sama (MoU/MoA) antara sekolah kami dengan *{$namaMitra}* (No. MoU: {$nomorMou}) akan berakhir dalam *{$months} bulan* pada tanggal *{$tanggalBerakhir}*.\n\nApakah ada rencana untuk melanjutkan/memperpanjang kerja sama ini? Kami sangat senang jika bisa terus bersinergi.\n\nTerima kasih atas kerja samanya.\n\nSistem Informasi OneLink.";
     }
 }

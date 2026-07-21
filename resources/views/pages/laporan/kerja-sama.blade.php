@@ -155,7 +155,7 @@
     <!-- Print-only Title Header -->
     <div class="hidden print:block text-center mb-6">
         <h1 class="text-2xl font-extrabold uppercase">Laporan Kerja Sama dan MoU</h1>
-        <h2 class="text-lg font-bold mt-1">SMK Negeri Sim-MoU</h2>
+        <h2 class="text-lg font-bold mt-1">SMK Negeri 1 Cirebon</h2>
         @if($year)
             <p class="text-sm text-gray-600 mt-1">Tahun Mulai Kerja Sama: {{ $year }}</p>
         @else

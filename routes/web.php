@@ -16,6 +16,15 @@ use App\Http\Controllers\LaporanBkkController;
 use App\Http\Controllers\LaporanKerjaSamaController;
 use App\Http\Controllers\UniversitasController;
 use App\Http\Controllers\AlumniWirausahaController;
+use App\Http\Controllers\LandingController;
+
+// ════════════════════════════════════════════════
+// PUBLIC ROUTES
+// ════════════════════════════════════════════════
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/lowongan', [LandingController::class, 'lowonganIndex'])->name('landing.lowongan.index');
+Route::get('/lowongan/{id}', [LandingController::class, 'lowonganDetail'])->name('landing.lowongan.detail');
+Route::get('/tracer-study', [LandingController::class, 'tracerStudyForm'])->name('landing.tracer-study');
 
 // ════════════════════════════════════════════════
 // GUEST ROUTES
@@ -42,8 +51,7 @@ Route::middleware('auth')->group(function () {
     })->name('set-tahun-ajaran');
 
     // Dashboard (auto-detect role)
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin Only
     Route::middleware('role:admin')->group(function () {
