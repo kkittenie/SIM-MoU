@@ -66,6 +66,7 @@ class WhatsappService
 
         // Save log
         WhatsappLog::create([
+            'user_id' => auth()->id(),
             'kerja_sama_id' => $kerjaSama->id,
             'type' => $type,
             'recipient' => $recipient,
@@ -186,6 +187,7 @@ class WhatsappService
         }
 
         WhatsappLog::create([
+            'user_id' => auth()->id(),
             'type' => $type,
             'recipient' => $recipient,
             'message' => $message,

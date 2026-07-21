@@ -170,12 +170,12 @@ test('authorized users (admin, bkk) can access Laporan Kerja Sama and filter by 
     $response->assertDontSee('Mitra 2025');
 });
 
-test('bkk and bk cannot access settings or notifications', function () {
+test('bkk can access settings for whatsapp but bk cannot', function () {
     $bkk = User::factory()->create(['role' => 'bkk', 'status' => 'aktif']);
     $bk = User::factory()->create(['role' => 'bk', 'status' => 'aktif']);
 
-    // Check BKK cannot access settings
-    $this->actingAs($bkk)->get(route('setting.index'))->assertStatus(403);
+    // Check BKK can access settings but cannot store category
+    $this->actingAs($bkk)->get(route('setting.index'))->assertStatus(200);
     $this->actingAs($bkk)->post(route('setting.kategori.store'), ['nama' => 'Forbidden'])->assertStatus(403);
 
     // Check BKK cannot access notifications

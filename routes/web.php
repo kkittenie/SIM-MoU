@@ -71,8 +71,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pengaturan/program-keahlian/{id}', [SettingController::class, 'destroyProgramKeahlian'])->name('setting.program-keahlian.destroy');
     });
 
-    // Admin & Admin Jurusan (Pengaturan)
-    Route::middleware('role:admin,admin_jurusan')->group(function () {
+    // Admin, Admin Jurusan & BKK (Pengaturan)
+    Route::middleware('role:admin,admin_jurusan,bkk')->group(function () {
         Route::get('/pengaturan', [SettingController::class, 'index'])->name('setting.index');
         Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
     });

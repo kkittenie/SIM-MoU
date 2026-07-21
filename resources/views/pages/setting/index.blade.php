@@ -99,6 +99,8 @@
                                             <a href="{{ route('kerja-sama.show', $log->kerja_sama_id) }}" class="text-brand-600 hover:underline dark:text-brand-400">
                                                 {{ $log->kerjaSama->nama_mitra }}
                                             </a>
+                                        @elseif($log->type === 'pelamar_diterima' || $log->type === 'pelamar_ditolak')
+                                            <span class="text-gray-700 dark:text-gray-300">Notifikasi Pelamar</span>
                                         @else
                                             <span class="text-gray-400 italic">Data Dihapus</span>
                                         @endif
@@ -106,8 +108,12 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-xs font-semibold">
                                         @if($log->type === 'expired' || $log->type === 'berakhir')
                                             <span class="text-red-500">Berakhir</span>
+                                        @elseif($log->type === 'pelamar_diterima')
+                                            <span class="text-green-600 dark:text-green-400">Pelamar Diterima</span>
+                                        @elseif($log->type === 'pelamar_ditolak')
+                                            <span class="text-red-500">Pelamar Ditolak</span>
                                         @else
-                                            <span class="text-amber-500">{{ ucfirst($log->type) }}</span>
+                                            <span class="text-amber-500">{{ ucfirst(str_replace('_', ' ', $log->type)) }}</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs font-mono">

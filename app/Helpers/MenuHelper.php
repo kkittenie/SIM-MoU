@@ -141,8 +141,8 @@ class MenuHelper
             ];
         }
 
-        // ════ PENGATURAN (ADMIN & ADMIN JURUSAN) ════
-        if ($user && ($user->isAdmin() || $user->isAdminJurusan())) {
+        // ════ PENGATURAN (ADMIN, ADMIN JURUSAN & BKK) ════
+        if ($user && ($user->isAdmin() || $user->isAdminJurusan() || $user->isBKK())) {
             $items[] = [
                 'icon' => 'settings',
                 'name' => 'Pengaturan',

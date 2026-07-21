@@ -12,6 +12,7 @@ class WhatsappLog extends Model
     protected $table = 'whatsapp_logs';
 
     protected $fillable = [
+        'user_id',
         'kerja_sama_id',
         'type',
         'recipient',
@@ -19,6 +20,14 @@ class WhatsappLog extends Model
         'status',
         'response',
     ];
+
+    /**
+     * Get the User who sent this WhatsApp message.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     /**
      * Get the KerjaSama partnership associated with this WhatsApp log.

@@ -13,16 +13,26 @@ class SettingController extends Controller
      */
     public function index()
     {
-        // Settings are only accessible to Admin & Admin Jurusan
-        if (!auth()->user()->isAdmin() && !auth()->user()->isAdminJurusan()) {
+        // Settings are accessible to Admin, Admin Jurusan, and BKK
+        if (!auth()->user()->isAdmin() && !auth()->user()->isAdminJurusan() && !auth()->user()->isBKK()) {
             abort(403, 'Anda tidak memiliki akses ke pengaturan.');
         }
 
         $settings = Setting::getSettings();
         
-        $logs = WhatsappLog::with('kerjaSama')
-            ->latest()
-            ->paginate(10);
+        $logsQuery = WhatsappLog::with(['kerjaSama', 'user'])->latest();
+
+        if (auth()->user()->isBKK()) {
+            $logsQuery->where(function ($query) {
+                $query->whereHas('user', function ($u) {
+                    $u->where('role', 'bkk');
+                })
+                ->orWhere('user_id', auth()->id())
+                ->orWhereIn('type', ['pelamar_diterima', 'pelamar_ditolak']);
+            });
+        }
+
+        $logs = $logsQuery->paginate(10);
 
         $kategoriMitra = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
         $programKeahlian = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
@@ -35,7 +45,7 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-        if (!auth()->user()->isAdmin() && !auth()->user()->isAdminJurusan()) {
+        if (!auth()->user()->isAdmin() && !auth()->user()->isAdminJurusan() && !auth()->user()->isBKK()) {
             abort(403, 'Anda tidak memiliki akses ke pengaturan.');
         }
 
