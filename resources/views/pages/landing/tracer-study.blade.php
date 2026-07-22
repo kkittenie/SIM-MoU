@@ -28,6 +28,18 @@
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         outline: none;
     }
+    /* ── Fix date input (biarin native, jangan appearance:none) ── */
+    input[type="date"].landing-input {
+        box-sizing: border-box;
+        min-height: 2.75rem;
+        width: 100%;
+        -webkit-appearance: auto;
+        appearance: auto;
+        color-scheme: light;
+    }
+    .dark input[type="date"].landing-input {
+        color-scheme: dark;
+    }
     .dark .landing-input {
         color: #f3f4f6; background-color: #111827; border-color: #374151;
     }
@@ -105,6 +117,19 @@
 <!-- ════════════════════════════════════════════════ -->
 <section class="py-10 lg:py-14 bg-white dark:bg-gray-900">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- Alert error validasi --}}
+        @if ($errors->any())
+            <div class="reveal mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+                <p class="font-semibold mb-1">Periksa kembali data Anda:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="reveal">
             <div class="form-card-container">
 
@@ -123,15 +148,15 @@
 
                 <!-- Form Body -->
                 <div class="form-card-body">
-                    <form class="space-y-5" x-data="tracerForm()">
-                        @csrf
+                    <form class="space-y-5" x-data="tracerForm()" method="POST" action="{{ route('landing.tracer-study.submit') }}">
+                    @csrf
 
                         <!-- Nama Alumni -->
                         <div>
                             <label for="nama_alumni" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
                                 Nama Lengkap <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="nama_alumni" name="nama_alumni" required
+                            <input type="text" id="nama_alumni" name="nama_alumni" value="{{ old('nama_alumni') }}" required
                                 class="landing-input"
                                 placeholder="Masukkan nama lengkap Anda">
                         </div>
@@ -141,7 +166,7 @@
                             <label for="tahun_lulus" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
                                 Tahun Lulus <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" id="tahun_lulus" name="tahun_lulus" min="1990" max="{{ date('Y') }}" required
+                            <input type="number" id="tahun_lulus" name="tahun_lulus" value="{{ old('tahun_lulus') }}" min="1990" max="{{ date('Y') }}" required
                                 class="landing-input"
                                 placeholder="{{ date('Y') }}">
                             <p class="text-xs mt-1 text-gray-400 dark:text-gray-500">Tahun kelulusan dari SMKN 1 Cirebon</p>
@@ -156,7 +181,7 @@
                                 class="landing-input landing-select">
                                 <option value="" disabled selected>Pilih Jurusan</option>
                                 @foreach($programKeahlians as $pk)
-                                    <option value="{{ $pk->nama }}">{{ $pk->nama }}</option>
+                                    <option value="{{ $pk->nama }}" @selected(old('program_keahlian') == $pk->nama)>{{ $pk->nama }}</option>
                                 @endforeach
                             </select>
                             <p class="text-xs mt-1 text-gray-400 dark:text-gray-500">Program keahlian/jurusan Anda sewaktu bersekolah</p>
@@ -182,10 +207,136 @@
                             <label for="detail_status" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
                                 <span x-text="detailLabel"></span> <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="detail_status" name="detail_status"
+                            <input type="text" id="detail_status" name="detail_status" value="{{ old('detail_status') }}"
                                 class="landing-input"
                                 :placeholder="detailPlaceholder">
                             <p class="text-xs mt-1 text-gray-400 dark:text-gray-500" x-text="detailHelper"></p>
+                        </div>
+
+                        <!-- ══ Field khusus KULIAH ══ -->
+                        <div x-show="status === 'Kuliah'" x-transition.opacity.duration.300ms class="space-y-5">
+                            <div>
+                                <label for="nis" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    NIS (Nomor Induk Siswa) <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="nis" name="nis" value="{{ old('nis') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: 2021100123">
+                                <p class="text-xs mt-1 text-gray-400 dark:text-gray-500">NIS Anda semasa sekolah di SMKN 1 Cirebon</p>
+                            </div>
+
+                            <div>
+                                <label for="program_studi" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Program Studi <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="program_studi" name="program_studi" value="{{ old('program_studi') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: Teknik Informatika">
+                                <p class="text-xs mt-1 text-gray-400 dark:text-gray-500">Jurusan/program studi yang Anda tempuh di perguruan tinggi</p>
+                            </div>
+
+                            <div>
+                                <label for="cara_masuk" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Jalur Masuk <span class="text-red-500">*</span>
+                                </label>
+                                <select id="cara_masuk" name="cara_masuk"
+                                    class="landing-input landing-select">
+                                    <option value="" disabled selected>Pilih jalur masuk</option>
+                                    <option value="snbp" @selected(old('cara_masuk') == 'snbp')>SNBP</option>
+                                    <option value="utbk" @selected(old('cara_masuk') == 'utbk')>SNBT / UTBK</option>
+                                    <option value="ujian_masuk" @selected(old('cara_masuk') == 'ujian_masuk')>Ujian Mandiri</option>
+                                    <option value="beasiswa" @selected(old('cara_masuk') == 'beasiswa')>Beasiswa</option>
+                                    <option value="transfer" @selected(old('cara_masuk') == 'transfer')>Transfer</option>
+                                    <option value="lainnya" @selected(old('cara_masuk') == 'lainnya')>Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="status_kuliah" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Status Perkuliahan <span class="text-red-500">*</span>
+                                </label>
+                                <select id="status_kuliah" name="status_kuliah"
+                                    class="landing-input landing-select">
+                                    <option value="" disabled selected>Pilih status perkuliahan</option>
+                                    <option value="aktif" @selected(old('status_kuliah') == 'aktif')>Masih Aktif Kuliah</option>
+                                    <option value="lulus" @selected(old('status_kuliah') == 'lulus')>Sudah Lulus</option>
+                                    <option value="cuti" @selected(old('status_kuliah') == 'cuti')>Sedang Cuti</option>
+                                    <option value="belum_terdata" @selected(old('status_kuliah') == 'belum_terdata')>Belum Terdata</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- ══ Field khusus BEKERJA ══ -->
+                        <div x-show="status === 'Bekerja'" x-transition.opacity.duration.300ms class="space-y-5">
+                            <div>
+                                <label for="jabatan" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Jabatan <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="jabatan" name="jabatan" value="{{ old('jabatan') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: Staff IT">
+                            </div>
+
+                            <div>
+                                <label for="bidang_industri" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Bidang Industri <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="bidang_industri" name="bidang_industri" value="{{ old('bidang_industri') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: Teknologi Informasi">
+                            </div>
+
+                            <div>
+                                <label for="lokasi_kerja" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Lokasi Kerja <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="lokasi_kerja" name="lokasi_kerja" value="{{ old('lokasi_kerja') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: Jakarta Selatan, DKI Jakarta">
+                            </div>
+
+                            <div>
+                                <label for="status_pekerjaan" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Status Kepegawaian <span class="text-red-500">*</span>
+                                </label>
+                                <select id="status_pekerjaan" name="status_pekerjaan"
+                                    class="landing-input landing-select">
+                                    <option value="" disabled selected>Pilih status kepegawaian</option>
+                                    <option value="Tetap" @selected(old('status_pekerjaan') == 'Tetap')>Karyawan Tetap</option>
+                                    <option value="Kontrak" @selected(old('status_pekerjaan') == 'Kontrak')>Kontrak</option>
+                                    <option value="Magang" @selected(old('status_pekerjaan') == 'Magang')>Magang</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="tanggal_masuk" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Tanggal Mulai Bekerja <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" id="tanggal_masuk" name="tanggal_masuk" value="{{ old('tanggal_masuk') }}" max="{{ date('Y-m-d') }}"
+                                    class="landing-input">
+                            </div>
+                        </div>
+
+                        <!-- ══ Field khusus WIRAUSAHA ══ -->
+                        <div x-show="status === 'Wirausaha'" x-transition.opacity.duration.300ms class="space-y-5">
+                            <div>
+                                <label for="bidang_usaha" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Bidang Usaha <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="bidang_usaha" name="bidang_usaha" value="{{ old('bidang_usaha') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: Kuliner, Fashion, Jasa Desain">
+                            </div>
+
+                            <div>
+                                <label for="lama_usaha" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
+                                    Lama Usaha Berjalan <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="lama_usaha" name="lama_usaha" value="{{ old('lama_usaha') }}"
+                                    class="landing-input"
+                                    placeholder="contoh: 1 Tahun, 6 Bulan">
+                            </div>
                         </div>
 
                         <!-- Testimoni -->
@@ -195,7 +346,7 @@
                             </label>
                             <textarea id="testimoni" name="testimoni" rows="4"
                                 class="landing-input landing-textarea"
-                                placeholder="Bagikan pengalaman Anda setelah lulus dari SMKN 1 Cirebon..."></textarea>
+                                placeholder="Bagikan pengalaman Anda setelah lulus dari SMKN 1 Cirebon...">{{ old('testimoni') }}</textarea>
                             <p class="text-xs mt-1 text-gray-400 dark:text-gray-500">Opsional. Testimoni Anda dapat membantu calon lulusan mempersiapkan karir mereka.</p>
                         </div>
 
@@ -241,7 +392,7 @@
     // ── Alpine.js Tracer Form Logic ──
     function tracerForm() {
         return {
-            status: '',
+            status: '{{ old('status_alumni', '') }}',
             get detailLabel() {
                 const labels = {
                     'Bekerja': 'Nama Perusahaan / Instansi',

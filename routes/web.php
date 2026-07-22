@@ -26,6 +26,7 @@ Route::get('/lowongan', [LandingController::class, 'lowonganIndex'])->name('land
 Route::get('/lowongan/{id}', [LandingController::class, 'lowonganDetail'])->name('landing.lowongan.detail');
 Route::post('/lowongan/{id}/lamar', [LandingController::class, 'submitLamaran'])->name('landing.lowongan.lamar');
 Route::get('/tracer-study', [LandingController::class, 'tracerStudyForm'])->name('landing.tracer-study');
+Route::post('/tracer-study', [LandingController::class, 'submitTracerStudy'])->name('landing.tracer-study.submit');
 
 // ════════════════════════════════════════════════
 // GUEST ROUTES

@@ -20,6 +20,9 @@
     @yield('styles')
     @stack('styles')
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Entrance & Animation Styles -->
     <style>
         @keyframes heroFloat {
@@ -28,6 +31,10 @@
         }
         .animate-float {
             animation: heroFloat 5s ease-in-out infinite;
+        }
+
+        .swal2-container {
+            z-index: 9999999 !important;
         }
 
         /* ── Dynamic Mouse Glow overlay (Dark Mode Only) ── */
@@ -41,6 +48,40 @@
             }
         }
     </style>
+
+ @if (session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: @json(session('success')),
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+        });
+    });
+</script>
+@endif
+
+@if (session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: @json(session('error')),
+            timer: 4000,
+            timerProgressBar: true,
+            showConfirmButton: true,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#465FFF',
+        });
+    });
+</script>
+@endif
 
     <!-- Theme Store -->
     <script>
@@ -96,7 +137,7 @@
     <!-- ════════════════════════════════════════════════ -->
     <!-- HEADER NAVBAR (Sticky Glassmorphic) -->
     <!-- ════════════════════════════════════════════════ -->
-    <header x-data="{ mobileMenuOpen: false, scrolled: false }" 
+    <header x-data="{ mobileMenuOpen: false, scrolled: false }"
             @scroll.window="scrolled = (window.pageYOffset > 20)"
             :class="{ 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 dark:border-gray-800/50 py-3.5': scrolled, 'bg-transparent py-5': !scrolled }"
             class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
@@ -132,8 +173,8 @@
                 <!-- Actions: Theme Toggle & Login Button -->
                 <div class="hidden md:flex items-center gap-3">
                     <!-- Theme Switcher -->
-                    <button @click="$store.theme.toggle()" 
-                        type="button" 
+                    <button @click="$store.theme.toggle()"
+                        type="button"
                         class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                         <svg x-show="$store.theme.theme === 'light'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
@@ -144,7 +185,7 @@
                     </button>
 
                     @auth
-                        <a href="{{ url('/dashboard') }}" 
+                        <a href="{{ url('/dashboard') }}"
                             class="bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm px-5 py-2.5 rounded-xl shadow-md shadow-brand-500/20 hover:shadow-brand-500/30 transition-all flex items-center gap-2">
                             <span>Dashboard</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +193,7 @@
                             </svg>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" 
+                        <a href="{{ route('login') }}"
                             class="bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm px-5 py-2.5 rounded-xl shadow-md shadow-brand-500/20 hover:shadow-brand-500/30 transition-all flex items-center gap-2">
                             <span>Masuk / Login</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +223,7 @@
             </div>
 
             <!-- Mobile Menu Dropdown -->
-            <div x-show="mobileMenuOpen" 
+            <div x-show="mobileMenuOpen"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 -translate-y-2"
                 x-transition:enter-end="opacity-100 translate-y-0"
