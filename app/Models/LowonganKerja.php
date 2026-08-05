@@ -21,6 +21,7 @@ class LowonganKerja extends Model
         'gaji',
         'tanggal_tutup',
         'status',
+        'kuota',
     ];
 
     protected $casts = [

@@ -139,7 +139,12 @@ Route::middleware('auth')->group(function () {
             Route::patch('/pelamar/{id}/status', [\App\Http\Controllers\PelamarController::class, 'updateStatus'])->name('pelamar.status');
             Route::get('/pelamar/{id}/view-cv', [\App\Http\Controllers\PelamarController::class, 'viewCv'])->name('pelamar.view-cv');
             Route::get('/pelamar/{id}/download-cv', [\App\Http\Controllers\PelamarController::class, 'downloadCv'])->name('pelamar.download-cv');
+            Route::delete('/pelamar/{id}/hapus-cv', [\App\Http\Controllers\PelamarController::class, 'deleteCV'])->name('pelamar.delete-cv');
             Route::delete('/pelamar/{id}', [\App\Http\Controllers\PelamarController::class, 'destroy'])->name('pelamar.destroy');
+
+            // Kelola File CV
+            Route::get('/kelola-cv', [\App\Http\Controllers\PelamarController::class, 'kelolaCV'])->name('kelola-cv.index');
+            Route::delete('/kelola-cv/bulk-hapus', [\App\Http\Controllers\PelamarController::class, 'deleteCVBulk'])->name('kelola-cv.bulk-hapus');
         });
     });
 

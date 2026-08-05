@@ -56,6 +56,7 @@ class LowonganKerjaController extends Controller
             'gaji' => 'nullable|string|max:255',
             'tanggal_tutup' => 'nullable|date',
             'status' => 'required|in:Aktif,Tutup',
+            'kuota' => 'required|integer|min:1',
         ];
 
         $messages = [
@@ -65,6 +66,9 @@ class LowonganKerjaController extends Controller
             'persyaratan.required' => 'Persyaratan lowongan wajib diisi.',
             'tanggal_tutup.date' => 'Format tanggal penutupan tidak valid.',
             'status.required' => 'Status lowongan wajib dipilih.',
+            'kuota.required' => 'Kuota penerimaan wajib diisi.',
+            'kuota.integer' => 'Kuota penerimaan harus berupa angka.',
+            'kuota.min' => 'Kuota penerimaan minimal 1 orang.',
         ];
 
         $validated = $request->validate($rules, $messages);
@@ -116,6 +120,7 @@ class LowonganKerjaController extends Controller
             'gaji' => 'nullable|string|max:255',
             'tanggal_tutup' => 'nullable|date',
             'status' => 'required|in:Aktif,Tutup',
+            'kuota' => 'required|integer|min:1',
         ];
 
         $messages = [
@@ -125,6 +130,9 @@ class LowonganKerjaController extends Controller
             'persyaratan.required' => 'Persyaratan lowongan wajib diisi.',
             'tanggal_tutup.date' => 'Format tanggal penutupan tidak valid.',
             'status.required' => 'Status lowongan wajib dipilih.',
+            'kuota.required' => 'Kuota penerimaan wajib diisi.',
+            'kuota.integer' => 'Kuota penerimaan harus berupa angka.',
+            'kuota.min' => 'Kuota penerimaan minimal 1 orang.',
         ];
 
         $validated = $request->validate($rules, $messages);

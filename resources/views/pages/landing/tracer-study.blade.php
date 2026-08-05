@@ -190,7 +190,7 @@
                         <!-- Kelas -->
                         <div>
                             <label for="kelas" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
-                                Kelas <span class="text-xs font-normal text-gray-400 dark:text-gray-500">(Opsional)</span>
+                                Nama Kelas 
                             </label>
                             <input type="text" id="kelas" name="kelas" value="{{ old('kelas') }}"
                                 class="landing-input"
@@ -201,7 +201,7 @@
                         <!-- No WhatsApp -->
                         <div>
                             <label for="no_wa" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
-                                No. WhatsApp <span class="text-xs font-normal text-gray-400 dark:text-gray-500">(Opsional)</span>
+                                No. WhatsApp 
                             </label>
                             <div class="relative">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

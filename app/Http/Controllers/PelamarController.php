@@ -62,16 +62,13 @@ class PelamarController extends Controller
         $waService = new \App\Services\WhatsappService();
 
         if ($newStatus === 'Diterima' && $oldStatus !== 'Diterima') {
-            // 1. Update status pelamar ini ke Diterima sementara untuk kirim WA
+            // 1. Update status pelamar ini ke Diterima & kirim WA
             $pelamar->update(['status' => 'Diterima']);
             $waService->sendPelamarDiterima($pelamar);
 
-            // 2. Pindahkan data ke Alumni Bekerja jika belum disalin dan Tutup Lowongan Kerja
+            // 2. Pindahkan data ke Alumni Bekerja jika belum disalin
             $lowongan = $pelamar->lowonganKerja;
             if ($lowongan) {
-                // Tutup status lowongan secara otomatis
-                $lowongan->update(['status' => 'Tutup']);
-
                 $exists = \App\Models\AlumniBekerja::where('nama_alumni', $pelamar->nama_lengkap)
                     ->where('tahun_lulus', $pelamar->tahun_lulus)
                     ->exists();
@@ -89,33 +86,38 @@ class PelamarController extends Controller
                         'status_pekerjaan' => 'Kontrak',
                     ]);
                 }
-            }
 
-            // 3. Otomatis Tolak pelamar lain di lowongan yang sama yang masih Pending & Kirim WA Tolak
-            $otherPelamars = Pelamar::where('lowongan_kerja_id', $pelamar->lowongan_kerja_id)
-                ->where('id', '!=', $pelamar->id)
-                ->where('status', 'Pending')
-                ->get();
+                // Hitung jumlah pelamar yang sudah Diterima di lowongan ini
+                $diterimaCount = Pelamar::where('lowongan_kerja_id', $lowongan->id)
+                    ->where('status', 'Diterima')
+                    ->count();
 
-            foreach ($otherPelamars as $other) {
-                $other->update(['status' => 'Ditolak']);
-                $waService->sendPelamarDitolak($other);
+                // Jika jumlah yang diterima memenuhi atau melebihi kuota lowongan
+                if ($diterimaCount >= $lowongan->kuota) {
+                    // Tutup status lowongan secara otomatis
+                    $lowongan->update(['status' => 'Tutup']);
 
-                // Hapus pelamar yang ditolak agar tidak menumpuk
-                if ($other->file_cv && Storage::disk('public')->exists($other->file_cv)) {
-                    Storage::disk('public')->delete($other->file_cv);
+                    // Otomatis Tolak & hapus pelamar pending lainnya karena kuota sudah penuh
+                    $otherPelamars = Pelamar::where('lowongan_kerja_id', $pelamar->lowongan_kerja_id)
+                        ->where('id', '!=', $pelamar->id)
+                        ->where('status', 'Pending')
+                        ->get();
+
+                    foreach ($otherPelamars as $other) {
+                        $other->update(['status' => 'Ditolak']);
+                        $waService->sendPelamarDitolak($other);
+
+                        if ($other->file_cv && Storage::disk('public')->exists($other->file_cv)) {
+                            Storage::disk('public')->delete($other->file_cv);
+                        }
+                        $other->delete();
+                    }
+
+                    return back()->with('success', "Pelamar {$pelamar->nama_lengkap} DITERIMA! Kuota lowongan ({$lowongan->kuota} orang) telah terpenuhi. Lowongan otomatis ditutup, dan sisa pelamar lainnya otomatis ditolak & dibersihkan.");
                 }
-                $other->delete();
             }
 
-            // 4. Hapus pelamar yang diterima ini dari daftar pelamar (karena sudah pindah ke Alumni Bekerja)
-            $namaPelamar = $pelamar->nama_lengkap;
-            if ($pelamar->file_cv && Storage::disk('public')->exists($pelamar->file_cv)) {
-                Storage::disk('public')->delete($pelamar->file_cv);
-            }
-            $pelamar->delete();
-
-            return back()->with('success', "Pelamar {$namaPelamar} DITERIMA! Notifikasi WA telah dikirim, data resmi dipindahkan ke Data Alumni Bekerja, dan pelamar lainnya otomatis ditolak & dibersihkan dari daftar.");
+            return back()->with('success', "Pelamar {$pelamar->nama_lengkap} DITERIMA! Data resmi dipindahkan ke Data Alumni Bekerja. Lowongan tetap aktif karena kuota belum penuh.");
         }
 
         // Jika hanya diubah manual ke Ditolak
@@ -167,6 +169,79 @@ class PelamarController extends Controller
         }
 
         return Storage::disk('public')->download($pelamar->file_cv, "CV_{$pelamar->nama_lengkap}.pdf");
+    }
+
+    /**
+     * Tampilkan halaman kelola file CV (dengan checkbox untuk bulk delete).
+     */
+    public function kelolaCV(Request $request)
+    {
+        $search = $request->input('search');
+
+        $pelamars = Pelamar::where('status', 'Diterima')
+            ->whereNotNull('file_cv')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_lengkap', 'like', "%{$search}%")
+                      ->orWhere('program_keahlian', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        // Hitung total ukuran file CV yang berstatus Diterima
+        $totalFiles = Pelamar::where('status', 'Diterima')->whereNotNull('file_cv')->count();
+
+        return view('pages.bkk.pelamar.kelola-cv', compact('pelamars', 'search', 'totalFiles'));
+    }
+
+    /**
+     * Hapus file CV secara massal berdasarkan ID yang dipilih, atau semua CV.
+     */
+    public function deleteCVBulk(Request $request)
+    {
+        $hapusSemua = $request->input('hapus_semua') === '1';
+        $ids = $request->input('ids', []);
+
+        if ($hapusSemua) {
+            $pelamars = Pelamar::where('status', 'Diterima')->whereNotNull('file_cv')->get();
+        } elseif (!empty($ids)) {
+            $pelamars = Pelamar::whereIn('id', $ids)->where('status', 'Diterima')->whereNotNull('file_cv')->get();
+        } else {
+            return back()->with('error', 'Tidak ada file CV yang dipilih.');
+        }
+
+        $count = 0;
+        foreach ($pelamars as $pelamar) {
+            if (Storage::disk('public')->exists($pelamar->file_cv)) {
+                Storage::disk('public')->delete($pelamar->file_cv);
+            }
+            $pelamar->update(['file_cv' => null]);
+            $count++;
+        }
+
+        return back()->with('success', "{$count} file CV berhasil dihapus dari server.");
+    }
+
+    /**
+     * Hapus hanya file CV pelamar dari storage (hemat disk space).
+     */
+    public function deleteCV($id)
+    {
+        $pelamar = Pelamar::findOrFail($id);
+
+        if (!$pelamar->file_cv) {
+            return back()->with('error', 'Pelamar ini tidak memiliki file CV.');
+        }
+
+        if (Storage::disk('public')->exists($pelamar->file_cv)) {
+            Storage::disk('public')->delete($pelamar->file_cv);
+        }
+
+        $pelamar->update(['file_cv' => null]);
+
+        return back()->with('success', "File CV milik {$pelamar->nama_lengkap} berhasil dihapus dari server.");
     }
 
     /**

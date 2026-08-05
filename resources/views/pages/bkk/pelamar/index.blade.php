@@ -152,6 +152,14 @@
                                         <a href="{{ route('bkk.pelamar.download-cv', $row->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                             Download
                                         </a>
+                                        <span class="text-gray-300 dark:text-gray-700">|</span>
+                                        <form action="{{ route('bkk.pelamar.delete-cv', $row->id) }}" method="POST" class="inline-block form-hapus-cv" data-nama="{{ $row->nama_lengkap }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-orange-500 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300" title="Hapus file PDF CV dari server">
+                                                Hapus CV
+                                            </button>
+                                        </form>
                                     @endif
 
                                     <span class="text-gray-300 dark:text-gray-700">|</span>
@@ -180,9 +188,21 @@
                                     <div class="space-y-2">
                                         <div class="flex items-center justify-between font-bold text-gray-700 dark:text-gray-200">
                                             <span>Pratinjau CV:</span>
-                                            <a href="{{ route('bkk.pelamar.view-cv', $row->id) }}" target="_blank" class="text-xs text-brand-600 hover:underline font-normal">
-                                                Buka Tab Baru &nearr;
-                                            </a>
+                                            <div class="flex items-center gap-3">
+                                                <a href="{{ route('bkk.pelamar.view-cv', $row->id) }}" target="_blank" class="text-xs text-brand-600 hover:underline font-normal">
+                                                    Buka Tab Baru &nearr;
+                                                </a>
+                                                <form action="{{ route('bkk.pelamar.delete-cv', $row->id) }}" method="POST" class="inline-block form-hapus-cv" data-nama="{{ $row->nama_lengkap }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-orange-50 hover:bg-orange-100 text-orange-600 dark:bg-orange-950/40 dark:hover:bg-orange-900/60 dark:text-orange-400 border border-orange-200 dark:border-orange-800 transition"
+                                                        title="Hapus file PDF ini dari server untuk hemat disk space">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        Hapus File CV
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                         <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 h-64 bg-gray-100 dark:bg-gray-950">
                                             <iframe src="{{ route('bkk.pelamar.view-cv', $row->id) }}" class="w-full h-full border-0"></iframe>
@@ -249,6 +269,28 @@
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Ya, Tolak',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+    });
+
+    // Form Hapus CV saja (SweetAlert2)
+    document.querySelectorAll('.form-hapus-cv').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nama = this.getAttribute('data-nama');
+            Swal.fire({
+                title: 'Hapus File CV?',
+                text: `File PDF CV milik "${nama}" akan dihapus dari server. Data pelamar tetap ada, hanya file CV-nya yang dihapus untuk menghemat disk space.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ea580c',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus File CV!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {

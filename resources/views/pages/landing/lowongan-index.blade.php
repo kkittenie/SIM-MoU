@@ -147,6 +147,9 @@
                             <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-brand-5 text-brand-600 dark:bg-brand-950 dark:text-brand-400">
                                 {{ $job->posisi ?: 'Umum' }}
                             </span>
+                            <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400">
+                                Dibutuhkan: {{ $job->kuota }} Orang
+                            </span>
                             <span class="text-xs text-gray-400 font-medium">
                                 s.d. {{ $job->tanggal_tutup ? $job->tanggal_tutup->format('d M Y') : 'Selesai' }}
                             </span>

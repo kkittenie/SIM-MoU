@@ -155,6 +155,10 @@
 
                 <!-- Right: Meta Info -->
                 <div class="flex flex-wrap gap-3 shrink-0">
+                    <div class="info-pill">
+                        <span class="text-xs block text-gray-400 dark:text-gray-500">Kuota Dibutuhkan</span>
+                        <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $lowongan->kuota }} Orang</span>
+                    </div>
                     @if($lowongan->gaji)
                     <div class="info-pill">
                         <span class="text-xs block text-gray-400 dark:text-gray-500">Rentang Gaji</span>
