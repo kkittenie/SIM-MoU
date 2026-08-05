@@ -14,6 +14,8 @@ class AlumniBekerja extends Model
 
     protected $fillable = [
         'nama_alumni',
+        'kelas',
+        'no_wa',
         'perusahaan_mitra_id',
         'perusahaan_nama',
         'jabatan',

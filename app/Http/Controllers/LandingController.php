@@ -93,6 +93,8 @@ class LandingController extends Controller
     {
         $validated = $request->validate([
             'nama_alumni' => 'required|string|max:255',
+            'kelas'       => 'nullable|string|max:50',
+            'no_wa'       => 'nullable|string|max:20',
             'nis' => 'required_if:status_alumni,Kuliah|nullable|string|max:20',
             'tahun_lulus' => 'required|numeric|digits:4|min:1990|max:' . date('Y'),
             'program_keahlian' => 'required|string|max:255',
@@ -151,15 +153,17 @@ class LandingController extends Controller
         switch ($validated['status_alumni']) {
             case 'Bekerja':
                 AlumniBekerja::create([
-                    'nama_alumni' => $validated['nama_alumni'],
+                    'nama_alumni'     => $validated['nama_alumni'],
+                    'kelas'           => $validated['kelas'] ?? null,
+                    'no_wa'           => $validated['no_wa'] ?? null,
                     'perusahaan_nama' => $validated['detail_status'],
-                    'jabatan' => $validated['jabatan'],
+                    'jabatan'         => $validated['jabatan'],
                     'bidang_industri' => $validated['bidang_industri'],
-                    'lokasi_kerja' => $validated['lokasi_kerja'],
-                    'status_pekerjaan' => $validated['status_pekerjaan'],
-                    'tanggal_masuk' => $validated['tanggal_masuk'],
-                    'gaji' => $validated['gaji'] ?? null,
-                    'tahun_lulus' => $validated['tahun_lulus'],
+                    'lokasi_kerja'    => $validated['lokasi_kerja'],
+                    'status_pekerjaan'=> $validated['status_pekerjaan'],
+                    'tanggal_masuk'   => $validated['tanggal_masuk'],
+                    'gaji'            => $validated['gaji'] ?? null,
+                    'tahun_lulus'     => $validated['tahun_lulus'],
                 ]);
                 break;
 
@@ -169,25 +173,29 @@ class LandingController extends Controller
                 );
 
                 AlumniKuliah::create([
-                    'nama_alumni' => $validated['nama_alumni'],
-                    'nis' => $validated['nis'],
-                    'universitas_id' => $universitas->id,
+                    'nama_alumni'   => $validated['nama_alumni'],
+                    'kelas'         => $validated['kelas'] ?? null,
+                    'no_wa'         => $validated['no_wa'] ?? null,
+                    'nis'           => $validated['nis'],
+                    'universitas_id'=> $universitas->id,
                     'program_studi' => $validated['program_studi'],
-                    'email_alumni' => $validated['email_alumni'] ?? null,
+                    'email_alumni'  => $validated['email_alumni'] ?? null,
                     'nomor_telepon' => $validated['nomor_telepon'] ?? null,
-                    'cara_masuk' => $validated['cara_masuk'],
+                    'cara_masuk'    => $validated['cara_masuk'],
                     'status_alumni' => $validated['status_kuliah'],
-                    'tahun_lulus' => $validated['tahun_lulus'],
+                    'tahun_lulus'   => $validated['tahun_lulus'],
                 ]);
                 break;
 
             case 'Wirausaha':
                 AlumniWirausaha::create([
-                    'nama_alumni' => $validated['nama_alumni'],
-                    'nama_usaha' => $validated['detail_status'],
+                    'nama_alumni'  => $validated['nama_alumni'],
+                    'kelas'        => $validated['kelas'] ?? null,
+                    'no_wa'        => $validated['no_wa'] ?? null,
+                    'nama_usaha'   => $validated['detail_status'],
                     'bidang_usaha' => $validated['bidang_usaha'],
-                    'lama_usaha' => $validated['lama_usaha'],
-                    'tahun_lulus' => $validated['tahun_lulus'],
+                    'lama_usaha'   => $validated['lama_usaha'],
+                    'tahun_lulus'  => $validated['tahun_lulus'],
                 ]);
                 break;
 
