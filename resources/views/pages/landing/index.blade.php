@@ -417,7 +417,7 @@
                     <div class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span>Alumni Bekerja</span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <p class="text-xs text-black-500 dark:text-gray-400 leading-relaxed">
                         Data penyerapan lulusan di dunia usaha, industri komersial, maupun instansi pemerintahan.
                     </p>
                 </div>
@@ -432,7 +432,7 @@
                     <div class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span>Alumni Kuliah</span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <p class="text-xs text-black-500 dark:text-gray-400 leading-relaxed">
                         Lulusan yang melanjutkan jenjang pendidikan tinggi baik di perguruan tinggi negeri maupun swasta.
                     </p>
                 </div>
@@ -447,7 +447,7 @@
                     <div class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span>Alumni Wirausaha</span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <p class="text-xs text-black-500 dark:text-gray-400 leading-relaxed">
                         Lulusan yang merintis bisnis mandiri, start-up, UMKM, maupun usaha kreatif independen.
                     </p>
                 </div>
