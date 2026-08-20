@@ -113,8 +113,7 @@
                         <label for="tanggal_mulai" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Tanggal Mulai <span class="text-error-500">*</span>
                         </label>
-                        <input type="date" id="tanggal_mulai" name="tanggal_mulai" value="{{ old('tanggal_mulai', $kerjaSama->tanggal_mulai ? $kerjaSama->tanggal_mulai->format('Y-m-d') : '') }}" required
-                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                        <x-form.date-picker id="tanggal_mulai" name="tanggal_mulai" defaultDate="{{ old('tanggal_mulai', $kerjaSama->tanggal_mulai ? $kerjaSama->tanggal_mulai->format('Y-m-d') : '') }}" />
                     </div>
 
                     <!-- Tanggal Berakhir -->
@@ -122,8 +121,7 @@
                         <label for="tanggal_berakhir" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Tanggal Berakhir <span class="text-error-500">*</span>
                         </label>
-                        <input type="date" id="tanggal_berakhir" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', $kerjaSama->tanggal_berakhir ? $kerjaSama->tanggal_berakhir->format('Y-m-d') : '') }}" required
-                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                        <x-form.date-picker id="tanggal_berakhir" name="tanggal_berakhir" defaultDate="{{ old('tanggal_berakhir', $kerjaSama->tanggal_berakhir ? $kerjaSama->tanggal_berakhir->format('Y-m-d') : '') }}" />
                     </div>
 
                     <!-- Alamat -->
