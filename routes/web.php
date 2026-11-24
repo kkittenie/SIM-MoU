@@ -165,6 +165,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,bkk,admin_jurusan')->group(function () {
         Route::prefix('bkk')->name('bkk.')->group(function () {
             Route::get('/laporan', [LaporanBkkController::class, 'index'])->name('laporan.index');
+            Route::get('/laporan/export/excel', [LaporanBkkController::class, 'exportExcel'])->name('laporan.export-excel');
         });
     });
 
@@ -220,5 +221,6 @@ Route::middleware('auth')->group(function () {
     // Admin, BK & Admin Jurusan (Laporan BK)
     Route::middleware('role:admin,bk,admin_jurusan')->group(function () {
         Route::get('/bk/laporan', [LaporanBKController::class, 'index'])->name('bk.laporan.index');
+        Route::get('/bk/laporan/export/excel', [LaporanBKController::class, 'exportExcel'])->name('bk.laporan.export-excel');
     });
 });
