@@ -24,6 +24,11 @@ class MenuHelper
                 'name' => 'Kelola Pengguna',
                 'path' => '/pengguna',
             ];
+            $items[] = [
+                'icon' => 'tracer-study',
+                'name' => 'Data NIS Tracer Study',
+                'path' => '/nis-tracer',
+            ];
 
             // laporn sub-menu
             $items[] = [
@@ -126,14 +131,38 @@ class MenuHelper
                 'path' => '/dashboard',
             ];
             $items[] = [
+                'icon' => 'tracer-study',
+                'name' => 'Data NIS Tracer Study',
+                'path' => '/nis-tracer',
+            ];
+            $items[] = [
                 'icon' => 'forms',
                 'name' => 'Kelola Kerja Sama',
                 'path' => '/kerja-sama',
             ];
+
+            // laporn sub-menu
             $items[] = [
                 'icon' => 'laporan',
-                'name' => 'Laporan Kerja Sama',
-                'path' => '/laporan-kerja-sama',
+                'name' => 'Laporan',
+                'path' => '#',
+                'subItems' => [
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan BKK',
+                        'path' => '/bkk/laporan',
+                    ],
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan BK',
+                        'path' => '/bk/laporan',
+                    ],
+                    [
+                        'icon' => 'laporan',
+                        'name' => 'Laporan Kerja Sama',
+                        'path' => '/laporan-kerja-sama',
+                    ],
+                ],
             ];
         }
 

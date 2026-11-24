@@ -24,7 +24,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('pengguna.update', $user->id) }}" method="POST" class="space-y-6">
+            <form action="{{ route('pengguna.update', $user->id) }}" method="POST" class="space-y-6" x-data="{ role: '{{ old('role', $user->role) }}' }">
                 @csrf
                 @method('PUT')
 
@@ -60,12 +60,28 @@
                     <label for="role" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Peran (Role) <span class="text-error-500">*</span>
                     </label>
-                    <select id="role" name="role" required
+                    <select id="role" name="role" x-model="role" required
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="bk" {{ old('role', $user->role) === 'bk' ? 'selected' : '' }}>BK (Bimbingan Konseling)</option>
                         <option value="bkk" {{ old('role', $user->role) === 'bkk' ? 'selected' : '' }}>BKK (Bursa Kerja Khusus)</option>
                         <option value="admin_jurusan" {{ old('role', $user->role) === 'admin_jurusan' ? 'selected' : '' }}>Admin Jurusan</option>
+                    </select>
+                </div>
+
+                <!-- Program Keahlian (Khusus Admin Jurusan) -->
+                <div x-show="role === 'admin_jurusan'" x-cloak>
+                    <label for="program_keahlian_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Program Keahlian / Jurusan <span class="text-error-500">*</span>
+                    </label>
+                    <select id="program_keahlian_id" name="program_keahlian_id"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Jurusan --</option>
+                        @foreach ($programKeahlians ?? [] as $pk)
+                            <option value="{{ $pk->id }}" {{ (string) old('program_keahlian_id', $user->program_keahlian_id) === (string) $pk->id ? 'selected' : '' }}>
+                                {{ $pk->nama }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 

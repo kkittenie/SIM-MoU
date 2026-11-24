@@ -6,6 +6,7 @@ use App\Models\KerjaSama;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class KerjaSamaController extends Controller
 {
@@ -74,7 +75,14 @@ class KerjaSamaController extends Controller
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
         $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
 
-        return view('pages.kerja-sama.index', compact('kerjaSama', 'search', 'jenisMitra', 'status', 'years', 'year', 'categories', 'programKeahlians', 'programKeahlianId'));
+        $ptSuggestions = KerjaSama::distinct()->pluck('nama_mitra')
+            ->merge(\App\Models\PerusahaanMitra::distinct()->pluck('nama_perusahaan'))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('pages.kerja-sama.index', compact('kerjaSama', 'search', 'jenisMitra', 'status', 'years', 'year', 'categories', 'programKeahlians', 'programKeahlianId', 'ptSuggestions'));
     }
 
     /**
@@ -88,7 +96,8 @@ class KerjaSamaController extends Controller
 
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
         $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
-        return view('pages.kerja-sama.create', compact('categories', 'programKeahlians'));
+        $existingMitras = KerjaSama::distinct()->pluck('nama_mitra')->filter()->values();
+        return view('pages.kerja-sama.create', compact('categories', 'programKeahlians', 'existingMitras'));
     }
 
     public function store(Request $request)
@@ -98,20 +107,38 @@ class KerjaSamaController extends Controller
         }
 
         $validated = $request->validate([
-            'nama_mitra' => 'required|string|max:255',
+            'nama_mitra' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $cleanName = strtolower(trim(preg_replace('/\s+/', ' ', $value)));
+                    $existing = KerjaSama::whereRaw('LOWER(TRIM(nama_mitra)) = ?', [$cleanName])->first();
+                    if ($existing) {
+                        $fail("Kerja sama dengan mitra '{$value}' sudah terdaftar sebelumnya (Nomor MoU: {$existing->nomor_mou}).");
+                    }
+                },
+            ],
             'kategori_mitra_id' => 'required|exists:kategori_mitra,id',
             'program_keahlian_id' => 'nullable|exists:program_keahlians,id',
             'alamat' => 'required|string',
             'email' => 'required|email|max:255',
             'nomor_telepon' => 'required|string|max:50',
             'pic' => 'required|string|max:255',
-            'nomor_mou' => 'required|string|max:255',
+            'nomor_mou' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('kerja_sama', 'nomor_mou'),
+            ],
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
             'deskripsi' => 'nullable|string',
             'dokumen_pdf' => 'nullable|file|mimes:pdf|max:10240', // Maks 10MB
         ], [
             'nama_mitra.required' => 'Nama mitra wajib diisi.',
+            'nomor_mou.required' => 'Nomor MoU wajib diisi.',
+            'nomor_mou.unique' => 'Nomor MoU sudah pernah didaftarkan sebelumnya.',
             'kategori_mitra_id.required' => 'Jenis mitra wajib dipilih.',
             'kategori_mitra_id.exists' => 'Jenis mitra tidak valid.',
             'program_keahlian_id.exists' => 'Program Keahlian tidak valid.',
@@ -120,7 +147,6 @@ class KerjaSamaController extends Controller
             'email.email' => 'Format email tidak valid.',
             'nomor_telepon.required' => 'Nomor telepon wajib diisi.',
             'pic.required' => 'PIC wajib diisi.',
-            'nomor_mou.required' => 'Nomor MoU wajib diisi.',
             'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
             'tanggal_mulai.date' => 'Tanggal mulai harus berupa tanggal yang valid.',
             'tanggal_berakhir.required' => 'Tanggal berakhir wajib diisi.',
@@ -166,7 +192,8 @@ class KerjaSamaController extends Controller
         $kerjaSama = KerjaSama::findOrFail($id);
         $categories = \App\Models\KategoriMitra::orderBy('nama', 'asc')->get();
         $programKeahlians = \App\Models\ProgramKeahlian::orderBy('nama', 'asc')->get();
-        return view('pages.kerja-sama.edit', compact('kerjaSama', 'categories', 'programKeahlians'));
+        $existingMitras = KerjaSama::where('id', '!=', $id)->distinct()->pluck('nama_mitra')->filter()->values();
+        return view('pages.kerja-sama.edit', compact('kerjaSama', 'categories', 'programKeahlians', 'existingMitras'));
     }
 
     public function update(Request $request, $id)
@@ -178,20 +205,40 @@ class KerjaSamaController extends Controller
         $kerjaSama = KerjaSama::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_mitra' => 'required|string|max:255',
+            'nama_mitra' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) use ($id) {
+                    $cleanName = strtolower(trim(preg_replace('/\s+/', ' ', $value)));
+                    $existing = KerjaSama::where('id', '!=', $id)
+                        ->whereRaw('LOWER(TRIM(nama_mitra)) = ?', [$cleanName])
+                        ->first();
+                    if ($existing) {
+                        $fail("Kerja sama dengan mitra '{$value}' sudah terdaftar pada data lain (Nomor MoU: {$existing->nomor_mou}).");
+                    }
+                },
+            ],
             'kategori_mitra_id' => 'required|exists:kategori_mitra,id',
             'program_keahlian_id' => 'nullable|exists:program_keahlians,id',
             'alamat' => 'required|string',
             'email' => 'required|email|max:255',
             'nomor_telepon' => 'required|string|max:50',
             'pic' => 'required|string|max:255',
-            'nomor_mou' => 'required|string|max:255',
+            'nomor_mou' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('kerja_sama', 'nomor_mou')->ignore($id),
+            ],
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
             'deskripsi' => 'nullable|string',
             'dokumen_pdf' => 'nullable|file|mimes:pdf|max:10240', // Maks 10MB
         ], [
             'nama_mitra.required' => 'Nama mitra wajib diisi.',
+            'nomor_mou.required' => 'Nomor MoU wajib diisi.',
+            'nomor_mou.unique' => 'Nomor MoU sudah pernah didaftarkan pada data lain.',
             'kategori_mitra_id.required' => 'Jenis mitra wajib dipilih.',
             'kategori_mitra_id.exists' => 'Jenis mitra tidak valid.',
             'program_keahlian_id.exists' => 'Program Keahlian tidak valid.',
@@ -200,7 +247,6 @@ class KerjaSamaController extends Controller
             'email.email' => 'Format email tidak valid.',
             'nomor_telepon.required' => 'Nomor telepon wajib diisi.',
             'pic.required' => 'PIC wajib diisi.',
-            'nomor_mou.required' => 'Nomor MoU wajib diisi.',
             'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
             'tanggal_mulai.date' => 'Tanggal mulai harus berupa tanggal yang valid.',
             'tanggal_berakhir.required' => 'Tanggal berakhir wajib diisi.',

@@ -29,7 +29,14 @@ class LowonganKerjaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('pages.bkk.lowongan-kerja.index', compact('lowongans', 'search', 'status'));
+        $ptSuggestions = LowonganKerja::distinct()->pluck('perusahaan_nama')
+            ->merge(PerusahaanMitra::distinct()->pluck('nama_perusahaan'))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('pages.bkk.lowongan-kerja.index', compact('lowongans', 'search', 'status', 'ptSuggestions'));
     }
 
     /**

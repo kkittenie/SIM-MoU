@@ -8,8 +8,10 @@ use App\Models\AlumniBekerja;
 use App\Models\AlumniKuliah;
 use App\Models\AlumniWirausaha;
 use App\Models\ProgramKeahlian;
+use App\Models\TracerStudy;
 use App\Models\Universitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class LandingController extends Controller
@@ -65,7 +67,15 @@ class LandingController extends Controller
             ->paginate(9)
             ->withQueryString();
 
-        return view('pages.landing.lowongan-index', compact('lowongans', 'search'));
+        $ptSuggestions = LowonganKerja::where('status', 'Aktif')
+            ->distinct()
+            ->pluck('perusahaan_nama')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('pages.landing.lowongan-index', compact('lowongans', 'search', 'ptSuggestions'));
     }
 
     /**
@@ -80,24 +90,152 @@ class LandingController extends Controller
     }
 
     /**
-     * Tampilkan form tracer study di halaman publik.
+     * Tampilkan halaman verifikasi NIS sebelum mengakses form Tracer Study.
+     */
+    public function showVerifyNisForm()
+    {
+        return view('pages.landing.tracer-verify');
+    }
+
+    /**
+     * Proses verifikasi NIS alumni terhadap database.
+     */
+    public function verifyNis(Request $request)
+    {
+        $request->validate([
+            'nis' => 'required|string|max:50',
+        ], [
+            'nis.required' => 'NIS wajib diisi.',
+            'nis.string'   => 'Format NIS tidak valid.',
+            'nis.max'      => 'NIS maksimal 50 karakter.',
+        ]);
+
+        $nis = trim($request->input('nis'));
+        $alumni = TracerStudy::findRegisteredAlumniByNis($nis);
+
+        if (!$alumni) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'nis' => 'NIS tidak terdaftar dalam database alumni SMKN 1 Cirebon. Silakan periksa kembali NIS Anda.',
+                ]);
+        }
+
+        // Condition B: NIS sudah pernah mengisi Tracer Study
+        if (TracerStudy::hasSubmittedByNis($alumni['nis'])) {
+            session()->forget('verified_tracer_nis');
+            session(['tracer_status_nis' => $alumni['nis']]);
+
+            return redirect()->route('landing.tracer-study.status');
+        }
+
+        // Condition A: NIS terdaftar dan belum pernah mengisi Tracer Study
+        session()->forget('tracer_status_nis');
+        session(['verified_tracer_nis' => $alumni['nis']]);
+
+        return redirect()->route('landing.tracer-study');
+    }
+
+    /**
+     * Tampilkan halaman status notifikasi bagi NIS yang sudah pernah mengisi Tracer Study.
+     */
+    public function tracerStudyStatus()
+    {
+        $nis = session('tracer_status_nis') ?? session('verified_tracer_nis');
+
+        if (!$nis) {
+            return redirect()->route('landing.tracer-study.verify');
+        }
+
+        $submission = TracerStudy::where('nis', $nis)->first();
+        $alumni = TracerStudy::findRegisteredAlumniByNis($nis);
+
+        if (!$alumni && $submission) {
+            $alumni = [
+                'nis'              => $submission->nis,
+                'nama_alumni'      => $submission->nama_alumni,
+                'tahun_lulus'      => $submission->tahun_lulus,
+                'program_keahlian' => $submission->program_keahlian,
+            ];
+        }
+
+        if (!$alumni || !$submission) {
+            return redirect()->route('landing.tracer-study.verify');
+        }
+
+        return view('pages.landing.tracer-status', compact('alumni', 'submission'));
+    }
+
+    /**
+     * Tampilkan form tracer study di halaman publik (hanya untuk NIS yang sudah diverifikasi dan belum mengisi).
      */
     public function tracerStudyForm()
     {
+        $verifiedNis = session('verified_tracer_nis');
+
+        if (!$verifiedNis) {
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'Silakan verifikasi NIS Anda terlebih dahulu sebelum mengisi formulir Tracer Study.']);
+        }
+
+        $verifiedAlumni = TracerStudy::findRegisteredAlumniByNis($verifiedNis);
+
+        if (!$verifiedAlumni) {
+            session()->forget('verified_tracer_nis');
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'NIS tidak valid atau tidak terdaftar. Silakan verifikasi ulang.']);
+        }
+
+        if (TracerStudy::hasSubmittedByNis($verifiedAlumni['nis'])) {
+            session()->forget('verified_tracer_nis');
+            session(['tracer_status_nis' => $verifiedAlumni['nis']]);
+            return redirect()->route('landing.tracer-study.status');
+        }
+
         $programKeahlians = ProgramKeahlian::orderBy('nama', 'asc')->get();
 
-        return view('pages.landing.tracer-study', compact('programKeahlians'));
+        return view('pages.landing.tracer-study', compact('programKeahlians', 'verifiedAlumni'));
     }
 
     public function submitTracerStudy(Request $request)
     {
+        $verifiedNis = session('verified_tracer_nis');
+
+        // Jika akses langsung tanpa sesi verifikasi, tolak
+        if (!$verifiedNis) {
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'Silakan verifikasi NIS Anda terlebih dahulu sebelum mengirim formulir Tracer Study.']);
+        }
+
+        // Pastikan NIS yang dikirim dari form (jika ada) tidak dimanipulasi berbeda dari NIS sesi yang terverifikasi
+        if ($request->filled('nis') && strcasecmp(trim($request->input('nis')), trim($verifiedNis)) !== 0) {
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'NIS tidak sesuai dengan sesi verifikasi aktif. Silakan verifikasi ulang.']);
+        }
+
+        $alumni = TracerStudy::findRegisteredAlumniByNis($verifiedNis);
+
+        if (!$alumni) {
+            session()->forget('verified_tracer_nis');
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'NIS tidak terdaftar dalam database alumni.']);
+        }
+
+        // Cek di backend apakah NIS sudah pernah mengisi
+        if (TracerStudy::hasSubmittedByNis($alumni['nis'])) {
+            session()->forget('verified_tracer_nis');
+            session(['tracer_status_nis' => $alumni['nis']]);
+            return redirect()->route('landing.tracer-study.status');
+        }
+
+        $hasDbMajor = !empty($alumni['program_keahlian']);
+        $hasDbTahunLulus = !empty($alumni['tahun_lulus']);
+
         $validated = $request->validate([
-            'nama_alumni' => 'required|string|max:255',
             'kelas'       => 'nullable|string|max:50',
             'no_wa'       => 'nullable|string|max:20',
-            'nis' => 'required_if:status_alumni,Kuliah|nullable|string|max:20',
-            'tahun_lulus' => 'required|numeric|digits:4|min:1990|max:' . date('Y'),
-            'program_keahlian' => 'required|string|max:255',
+            'tahun_lulus' => ($hasDbTahunLulus ? 'nullable' : 'required') . '|numeric|digits:4|min:1990|max:' . date('Y'),
+            'program_keahlian' => ($hasDbMajor ? 'nullable' : 'required') . '|string|max:255',
             'status_alumni' => 'required|in:Bekerja,Kuliah,Wirausaha,Mencari Kerja',
             'detail_status' => 'required_unless:status_alumni,Mencari Kerja|nullable|string|max:255',
 
@@ -122,8 +260,6 @@ class LandingController extends Controller
 
             'testimoni' => 'nullable|string',
         ], [
-            'nama_alumni.required' => 'Nama lengkap wajib diisi.',
-            'nis.required' => 'NIS wajib diisi.',
             'tahun_lulus.required' => 'Tahun lulus wajib diisi.',
             'tahun_lulus.digits' => 'Tahun lulus harus 4 digit.',
             'program_keahlian.required' => 'Jurusan wajib dipilih.',
@@ -141,71 +277,148 @@ class LandingController extends Controller
             'lama_usaha.required_if' => 'Lama usaha wajib diisi.',
         ]);
 
-        // NIS hanya unik di tabel alumni_kuliah (kolom unik ada di migrasi tabel ini saja)
-        if ($validated['status_alumni'] === 'Kuliah') {
-            $request->validate([
-                'nis' => Rule::unique('alumni_kuliah', 'nis'),
-            ], [
-                'nis.unique' => 'NIS ini sudah terdaftar sebagai alumni yang melanjutkan kuliah.',
-            ]);
+        try {
+            DB::transaction(function () use ($verifiedNis, $validated, &$alumni) {
+                $lockedAlumni = TracerStudy::findRegisteredAlumniByNis($verifiedNis, true);
+                if (!$lockedAlumni) {
+                    throw new \RuntimeException('ALUMNI_NOT_FOUND');
+                }
+
+                $alumni = $lockedAlumni;
+                $nis = $alumni['nis'];
+
+                // Cek kembali di dalam transaksi terkunci (mencegah race condition / simultaneous requests)
+                if (TracerStudy::hasSubmittedByNis($nis, true)) {
+                    throw new \RuntimeException('ALREADY_SUBMITTED');
+                }
+
+                $namaAlumni = $alumni['nama_alumni'];
+                $tahunLulus = $alumni['tahun_lulus'] ?: ($validated['tahun_lulus'] ?? date('Y'));
+                $programKeahlian = $alumni['program_keahlian'] ?: ($validated['program_keahlian'] ?? null);
+                $kelas = $validated['kelas'] ?? $alumni['kelas'];
+                $noWa = $validated['no_wa'] ?? $alumni['no_wa'];
+
+                // Perbarui informasi tahun_lulus, kelas, & jurusan pada StudentNis jika belum terisi
+                if (($alumni['source'] ?? '') === 'student_nis' && isset($alumni['model'])) {
+                    $studentModel = $alumni['model'];
+                    $updates = [];
+                    if (empty($studentModel->tahun_lulus) && !empty($tahunLulus)) {
+                        $updates['tahun_lulus'] = $tahunLulus;
+                    }
+                    if (empty($studentModel->kelas) && !empty($kelas)) {
+                        $updates['kelas'] = $kelas;
+                    }
+                    if (empty($studentModel->program_keahlian_id) && !empty($programKeahlian)) {
+                        $pkId = \App\Models\ProgramKeahlian::where('nama', $programKeahlian)->value('id');
+                        if ($pkId) {
+                            $updates['program_keahlian_id'] = $pkId;
+                        }
+                    }
+                    if (!empty($updates)) {
+                        $studentModel->update($updates);
+                    }
+                }
+
+                // 1. Catat submission Tracer Study (kolom nis memiliki constraint UNIQUE di database)
+                TracerStudy::create([
+                    'nis'              => $nis,
+                    'nama_alumni'      => $namaAlumni,
+                    'tahun_lulus'      => $tahunLulus,
+                    'program_keahlian' => $programKeahlian,
+                    'kelas'            => $kelas,
+                    'no_wa'            => $noWa,
+                    'status_alumni'    => $validated['status_alumni'],
+                    'detail_status'    => $validated['status_alumni'] === 'Mencari Kerja' ? '-' : ($validated['detail_status'] ?? '-'),
+                    'testimoni'        => $validated['testimoni'] ?? null,
+                ]);
+
+                // 2. Simpan/perbarui ke tabel sesuai status alumni
+                switch ($validated['status_alumni']) {
+                    case 'Bekerja':
+                        AlumniBekerja::updateOrCreate(
+                            ['nis' => $nis],
+                            [
+                                'nama_alumni'      => $namaAlumni,
+                                'kelas'            => $kelas,
+                                'no_wa'            => $noWa,
+                                'perusahaan_nama'  => $validated['detail_status'],
+                                'jabatan'          => $validated['jabatan'],
+                                'bidang_industri'  => $validated['bidang_industri'],
+                                'lokasi_kerja'     => $validated['lokasi_kerja'],
+                                'status_pekerjaan' => $validated['status_pekerjaan'],
+                                'tanggal_masuk'    => $validated['tanggal_masuk'],
+                                'gaji'             => $validated['gaji'] ?? null,
+                                'tahun_lulus'      => $tahunLulus,
+                                'program_keahlian' => $programKeahlian,
+                            ]
+                        );
+                        break;
+
+                    case 'Kuliah':
+                        $universitas = Universitas::firstOrCreate(
+                            ['nama_universitas' => $validated['detail_status']]
+                        );
+
+                        AlumniKuliah::updateOrCreate(
+                            ['nis' => $nis],
+                            [
+                                'nama_alumni'      => $namaAlumni,
+                                'kelas'            => $kelas,
+                                'no_wa'            => $noWa,
+                                'universitas_id'   => $universitas->id,
+                                'program_studi'    => $validated['program_studi'],
+                                'email_alumni'     => $validated['email_alumni'] ?? null,
+                                'nomor_telepon'    => $validated['nomor_telepon'] ?? $noWa,
+                                'cara_masuk'       => $validated['cara_masuk'],
+                                'status_alumni'    => $validated['status_kuliah'],
+                                'tahun_lulus'      => $tahunLulus,
+                                'program_keahlian' => $programKeahlian,
+                            ]
+                        );
+                        break;
+
+                    case 'Wirausaha':
+                        AlumniWirausaha::updateOrCreate(
+                            ['nis' => $nis],
+                            [
+                                'nama_alumni'      => $namaAlumni,
+                                'kelas'            => $kelas,
+                                'no_wa'            => $noWa,
+                                'nama_usaha'       => $validated['detail_status'],
+                                'bidang_usaha'     => $validated['bidang_usaha'],
+                                'lama_usaha'       => $validated['lama_usaha'],
+                                'tahun_lulus'      => $tahunLulus,
+                                'program_keahlian' => $programKeahlian,
+                            ]
+                        );
+                        break;
+
+                    case 'Mencari Kerja':
+                        // Data sudah tersimpan di tabel tracer_studies
+                        break;
+                }
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            session()->forget('verified_tracer_nis');
+            session(['tracer_status_nis' => $alumni['nis']]);
+            return redirect()->route('landing.tracer-study.status');
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'ALREADY_SUBMITTED') {
+                session()->forget('verified_tracer_nis');
+                session(['tracer_status_nis' => $alumni['nis']]);
+                return redirect()->route('landing.tracer-study.status');
+            }
+
+            session()->forget('verified_tracer_nis');
+            return redirect()->route('landing.tracer-study.verify')
+                ->withErrors(['nis' => 'NIS tidak terdaftar dalam database alumni.']);
         }
 
-        switch ($validated['status_alumni']) {
-            case 'Bekerja':
-                AlumniBekerja::create([
-                    'nama_alumni'     => $validated['nama_alumni'],
-                    'kelas'           => $validated['kelas'] ?? null,
-                    'no_wa'           => $validated['no_wa'] ?? null,
-                    'perusahaan_nama' => $validated['detail_status'],
-                    'jabatan'         => $validated['jabatan'],
-                    'bidang_industri' => $validated['bidang_industri'],
-                    'lokasi_kerja'    => $validated['lokasi_kerja'],
-                    'status_pekerjaan'=> $validated['status_pekerjaan'],
-                    'tanggal_masuk'   => $validated['tanggal_masuk'],
-                    'gaji'            => $validated['gaji'] ?? null,
-                    'tahun_lulus'     => $validated['tahun_lulus'],
-                ]);
-                break;
+        session()->forget('verified_tracer_nis');
+        session(['tracer_status_nis' => $alumni['nis']]);
 
-            case 'Kuliah':
-                $universitas = Universitas::firstOrCreate(
-                    ['nama_universitas' => $validated['detail_status']]
-                );
-
-                AlumniKuliah::create([
-                    'nama_alumni'   => $validated['nama_alumni'],
-                    'kelas'         => $validated['kelas'] ?? null,
-                    'no_wa'         => $validated['no_wa'] ?? null,
-                    'nis'           => $validated['nis'],
-                    'universitas_id'=> $universitas->id,
-                    'program_studi' => $validated['program_studi'],
-                    'email_alumni'  => $validated['email_alumni'] ?? null,
-                    'nomor_telepon' => $validated['nomor_telepon'] ?? null,
-                    'cara_masuk'    => $validated['cara_masuk'],
-                    'status_alumni' => $validated['status_kuliah'],
-                    'tahun_lulus'   => $validated['tahun_lulus'],
-                ]);
-                break;
-
-            case 'Wirausaha':
-                AlumniWirausaha::create([
-                    'nama_alumni'  => $validated['nama_alumni'],
-                    'kelas'        => $validated['kelas'] ?? null,
-                    'no_wa'        => $validated['no_wa'] ?? null,
-                    'nama_usaha'   => $validated['detail_status'],
-                    'bidang_usaha' => $validated['bidang_usaha'],
-                    'lama_usaha'   => $validated['lama_usaha'],
-                    'tahun_lulus'  => $validated['tahun_lulus'],
-                ]);
-                break;
-
-            case 'Mencari Kerja':
-                // Belum ada tabel khusus untuk status ini.
-                // Untuk sekarang data ini tidak disimpan kemanapun.
-                break;
-        }
-
-        return back()->with('success', 'Terima kasih! Data tracer study Anda berhasil dikirim.');
+        return redirect()->route('landing.tracer-study.status')
+            ->with('success', 'Terima kasih! Data tracer study Anda berhasil dikirim.');
     }
 
     /**

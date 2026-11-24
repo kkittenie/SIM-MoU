@@ -40,7 +40,14 @@ class AlumniBekerjaController extends Controller
 
         $tahunLulusList = AlumniBekerja::distinct()->pluck('tahun_lulus')->sort()->toArray();
 
-        return view('pages.bkk.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'lokasiKerja', 'tahunLulusList'));
+        $ptSuggestions = AlumniBekerja::distinct()->pluck('perusahaan_nama')
+            ->merge(PerusahaanMitra::distinct()->pluck('nama_perusahaan'))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('pages.bkk.alumni-bekerja.index', compact('alumni', 'search', 'tahunLulus', 'statusPekerjaan', 'lokasiKerja', 'tahunLulusList', 'ptSuggestions'));
     }
 
     /**

@@ -123,7 +123,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
                     </a>
-                    <a href="#tracer-study" class="w-full sm:w-auto bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold px-6 py-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
+                    <a href="{{ route('landing.tracer-study.verify') }}" class="w-full sm:w-auto bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold px-6 py-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
                         <span>Isi Tracer Study</span>
                         <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
@@ -400,7 +400,7 @@
                     Bantu almamater memvalidasi kurikulum pengajaran dan melacak ke mana alumni berkarya. Kontribusi Anda sangat berharga bagi kualitas pembelajaran masa depan.
                 </p>
                 <div class="pt-2">
-                    <a href="{{ route('landing.tracer-study') }}" class="inline-flex bg-white hover:bg-gray-50 text-brand-600 font-bold px-6 py-3.5 rounded-xl shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm items-center gap-2">
+                    <a href="{{ route('landing.tracer-study.verify') }}" class="inline-flex bg-white hover:bg-gray-50 text-brand-600 font-bold px-6 py-3.5 rounded-xl shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm items-center gap-2">
                         <span>Formulir Tracer Study Alumni</span>
                         <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>

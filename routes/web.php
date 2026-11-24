@@ -17,6 +17,7 @@ use App\Http\Controllers\LaporanKerjaSamaController;
 use App\Http\Controllers\UniversitasController;
 use App\Http\Controllers\AlumniWirausahaController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\StudentNisController;
 
 // ════════════════════════════════════════════════
 // PUBLIC ROUTES
@@ -25,6 +26,9 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/lowongan', [LandingController::class, 'lowonganIndex'])->name('landing.lowongan.index');
 Route::get('/lowongan/{id}', [LandingController::class, 'lowonganDetail'])->name('landing.lowongan.detail');
 Route::post('/lowongan/{id}/lamar', [LandingController::class, 'submitLamaran'])->name('landing.lowongan.lamar');
+Route::get('/tracer-study/verifikasi', [LandingController::class, 'showVerifyNisForm'])->name('landing.tracer-study.verify');
+Route::post('/tracer-study/verifikasi', [LandingController::class, 'verifyNis'])->name('landing.tracer-study.verify.submit');
+Route::get('/tracer-study/status', [LandingController::class, 'tracerStudyStatus'])->name('landing.tracer-study.status');
 Route::get('/tracer-study', [LandingController::class, 'tracerStudyForm'])->name('landing.tracer-study');
 Route::post('/tracer-study', [LandingController::class, 'submitTracerStudy'])->name('landing.tracer-study.submit');
 
@@ -78,13 +82,22 @@ Route::middleware('auth')->group(function () {
         Route::put('/pengaturan', [SettingController::class, 'update'])->name('setting.update');
     });
 
-    // Admin & Admin Jurusan (Notifikasi)
+    // Admin & Admin Jurusan (Notifikasi & Data NIS Tracer Study)
     Route::middleware('role:admin,admin_jurusan')->group(function () {
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'readAndRedirect'])->name('notifikasi.read-and-redirect');
         Route::patch('/notifikasi/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.read');
         Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.mark-all-read');
         Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
+
+        // Data NIS Tracer Study
+        Route::get('/nis-tracer', [StudentNisController::class, 'index'])->name('nis-tracer.index');
+        Route::get('/nis-tracer/tambah', [StudentNisController::class, 'create'])->name('nis-tracer.create');
+        Route::post('/nis-tracer', [StudentNisController::class, 'store'])->name('nis-tracer.store');
+        Route::get('/nis-tracer/{id}', [StudentNisController::class, 'show'])->name('nis-tracer.show');
+        Route::get('/nis-tracer/{id}/ubah', [StudentNisController::class, 'edit'])->name('nis-tracer.edit');
+        Route::put('/nis-tracer/{id}', [StudentNisController::class, 'update'])->name('nis-tracer.update');
+        Route::delete('/nis-tracer/{id}', [StudentNisController::class, 'destroy'])->name('nis-tracer.destroy');
     });
 
     // BKK & Admin Jurusan (Kelola MoU)
@@ -148,8 +161,8 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Admin & BKK (Laporan BKK)
-    Route::middleware('role:admin,bkk')->group(function () {
+    // Admin, BKK & Admin Jurusan (Laporan BKK)
+    Route::middleware('role:admin,bkk,admin_jurusan')->group(function () {
         Route::prefix('bkk')->name('bkk.')->group(function () {
             Route::get('/laporan', [LaporanBkkController::class, 'index'])->name('laporan.index');
         });
@@ -204,8 +217,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/universitas/{universitas}', [UniversitasController::class, 'destroy'])->name('universitas.destroy');
     });
 
-    // Admin & BK (Laporan BK)
-    Route::middleware('role:admin,bk')->group(function () {
+    // Admin, BK & Admin Jurusan (Laporan BK)
+    Route::middleware('role:admin,bk,admin_jurusan')->group(function () {
         Route::get('/bk/laporan', [LaporanBKController::class, 'index'])->name('bk.laporan.index');
     });
 });

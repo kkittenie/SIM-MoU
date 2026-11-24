@@ -13,6 +13,7 @@ class AlumniWirausaha extends Model
     protected $table = 'alumni_wirausahas';
 
     protected $fillable = [
+        'nis',
         'nama_alumni',
         'kelas',
         'no_wa',
@@ -20,5 +21,6 @@ class AlumniWirausaha extends Model
         'bidang_usaha',
         'lama_usaha',
         'tahun_lulus',
+        'program_keahlian',
     ];
 }

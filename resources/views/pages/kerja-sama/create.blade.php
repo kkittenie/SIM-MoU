@@ -29,12 +29,34 @@
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <!-- Nama Mitra -->
-                    <div class="sm:col-span-2">
+                    <div class="sm:col-span-2" x-data="{
+                        nama: @js(old('nama_mitra') ?? ''),
+                        existing: @js($existingMitras ?? []),
+                        get isDuplicate() {
+                            if (!this.nama || !this.nama.trim()) return false;
+                            const clean = this.nama.toLowerCase().trim().replace(/\s+/g, ' ');
+                            return this.existing.some(m => m.toLowerCase().trim().replace(/\s+/g, ' ') === clean);
+                        }
+                    }">
                         <label for="nama_mitra" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Nama Mitra <span class="text-error-500">*</span>
                         </label>
-                        <input type="text" id="nama_mitra" name="nama_mitra" value="{{ old('nama_mitra') }}" placeholder="Contoh: PT. Maju Bersama" required
-                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                        <input type="text" id="nama_mitra" name="nama_mitra" value="{{ old('nama_mitra') }}" 
+                            x-model="nama"
+                            placeholder="Contoh: PT. Maju Bersama" required
+                            :class="{'!border-red-500 !ring-red-500/20': isDuplicate}"
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 @error('nama_mitra') border-red-500 @enderror" />
+                        
+                        <div x-show="isDuplicate" x-cloak class="mt-1.5 flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                            <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Perhatian: Kerja sama dengan nama mitra ini sudah pernah didaftarkan sebelumnya.</span>
+                        </div>
+
+                        @error('nama_mitra')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Jenis Mitra -->
@@ -104,7 +126,10 @@
                             Nomor MoU <span class="text-error-500">*</span>
                         </label>
                         <input type="text" id="nomor_mou" name="nomor_mou" value="{{ old('nomor_mou') }}" placeholder="Contoh: 123/MOU/VI/2026" required
-                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 @error('nomor_mou') border-red-500 @enderror" />
+                        @error('nomor_mou')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Tanggal Mulai -->

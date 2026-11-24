@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProgramKeahlian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -33,7 +34,8 @@ class PenggunaController extends Controller
      */
     public function create()
     {
-        return view('pages.pengguna.create');
+        $programKeahlians = ProgramKeahlian::orderBy('nama', 'asc')->get();
+        return view('pages.pengguna.create', compact('programKeahlians'));
     }
 
     /**
@@ -46,6 +48,7 @@ class PenggunaController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:4',
             'role' => 'required|in:admin,bk,bkk,admin_jurusan',
+            'program_keahlian_id' => 'required_if:role,admin_jurusan|nullable|exists:program_keahlians,id',
             'status' => 'required|in:aktif,nonaktif',
         ];
 
@@ -58,12 +61,17 @@ class PenggunaController extends Controller
             'password.min' => 'Password minimal terdiri dari 4 karakter.',
             'role.required' => 'Peran wajib dipilih.',
             'role.in' => 'Peran yang dipilih tidak valid.',
+            'program_keahlian_id.required_if' => 'Jurusan wajib dipilih untuk peran Admin Jurusan.',
+            'program_keahlian_id.exists' => 'Jurusan yang dipilih tidak valid.',
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status yang dipilih tidak valid.',
         ];
 
         $validated = $request->validate($rules, $messages);
         $validated['password'] = Hash::make($validated['password']);
+        if ($validated['role'] !== 'admin_jurusan') {
+            $validated['program_keahlian_id'] = null;
+        }
 
         User::create($validated);
 
@@ -86,7 +94,8 @@ class PenggunaController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('pages.pengguna.edit', compact('user'));
+        $programKeahlians = ProgramKeahlian::orderBy('nama', 'asc')->get();
+        return view('pages.pengguna.edit', compact('user', 'programKeahlians'));
     }
 
     /**
@@ -107,6 +116,7 @@ class PenggunaController extends Controller
             ],
             'password' => 'nullable|string|min:4',
             'role' => 'required|in:admin,bk,bkk,admin_jurusan',
+            'program_keahlian_id' => 'required_if:role,admin_jurusan|nullable|exists:program_keahlians,id',
             'status' => 'required|in:aktif,nonaktif',
         ];
 
@@ -118,11 +128,16 @@ class PenggunaController extends Controller
             'password.min' => 'Password minimal terdiri dari 4 karakter.',
             'role.required' => 'Peran wajib dipilih.',
             'role.in' => 'Peran yang dipilih tidak valid.',
+            'program_keahlian_id.required_if' => 'Jurusan wajib dipilih untuk peran Admin Jurusan.',
+            'program_keahlian_id.exists' => 'Jurusan yang dipilih tidak valid.',
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status yang dipilih tidak valid.',
         ];
 
         $validated = $request->validate($rules, $messages);
+        if ($validated['role'] !== 'admin_jurusan') {
+            $validated['program_keahlian_id'] = null;
+        }
 
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);

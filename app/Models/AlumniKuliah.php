@@ -18,6 +18,7 @@ class AlumniKuliah extends Model
         'no_wa',
         'nis',
         'tahun_lulus',
+        'program_keahlian',
         'universitas_id',
         'program_studi',
         'email_alumni',

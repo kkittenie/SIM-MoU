@@ -105,11 +105,14 @@
 
             <!-- Search Form -->
             <form action="{{ route('landing.lowongan.index') }}" method="GET" class="w-full md:max-w-md flex gap-2">
-                <div class="relative flex-1">
-                    <input type="text" name="search" value="{{ $search }}"
-                        class="landing-input w-full"
-                        placeholder="Cari posisi, judul, atau perusahaan...">
-                </div>
+                <!-- Search Input with Real-time PT Suggestions -->
+                <x-form.pt-search-input 
+                    name="search" 
+                    :value="$search" 
+                    placeholder="Cari posisi, judul, atau perusahaan..." 
+                    :suggestions="$ptSuggestions ?? []" 
+                    variant="landing"
+                />
                 <button type="submit"
                     class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition duration-200 text-sm flex items-center gap-1.5 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -125,7 +128,7 @@
 <!-- JOBS LIST SECTION -->
 <!-- ════════════════════════════════════════════════ -->
 <section class="py-12 lg:py-16 bg-white dark:bg-gray-900">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="table-container">
         
         <!-- Search Results Tag -->
         @if($search)

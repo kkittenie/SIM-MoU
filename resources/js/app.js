@@ -1,4 +1,5 @@
 import './bootstrap';
+import './floating-scrollbar';
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
 

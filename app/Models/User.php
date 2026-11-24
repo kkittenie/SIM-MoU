@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'program_keahlian_id',
         'status',
     ];
 
@@ -66,5 +67,27 @@ class User extends Authenticatable
     public function isAdminJurusan(): bool
     {
         return $this->role === 'admin_jurusan';
+    }
+
+    public function programKeahlian()
+    {
+        return $this->belongsTo(ProgramKeahlian::class, 'program_keahlian_id');
+    }
+
+    /**
+     * Get the assigned Program Keahlian ID for Admin Jurusan.
+     */
+    public function getAssignedProgramKeahlianId(): ?int
+    {
+        if ($this->program_keahlian_id) {
+            return (int) $this->program_keahlian_id;
+        }
+
+        if ($this->isAdminJurusan()) {
+            $firstId = ProgramKeahlian::orderBy('id')->value('id');
+            return $firstId ? (int) $firstId : null;
+        }
+
+        return null;
     }
 }

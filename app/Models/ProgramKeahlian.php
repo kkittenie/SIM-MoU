@@ -18,4 +18,14 @@ class ProgramKeahlian extends Model
     {
         return $this->hasMany(KerjaSama::class, 'program_keahlian_id');
     }
+
+    public function studentNis()
+    {
+        return $this->hasMany(StudentNis::class, 'program_keahlian_id');
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'program_keahlian_id');
+    }
 }

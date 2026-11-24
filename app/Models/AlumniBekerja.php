@@ -13,6 +13,7 @@ class AlumniBekerja extends Model
     protected $table = 'alumni_bekerjas';
 
     protected $fillable = [
+        'nis',
         'nama_alumni',
         'kelas',
         'no_wa',
@@ -21,6 +22,7 @@ class AlumniBekerja extends Model
         'jabatan',
         'tanggal_masuk',
         'tahun_lulus',
+        'program_keahlian',
         'bidang_industri',
         'gaji',
         'status_pekerjaan',

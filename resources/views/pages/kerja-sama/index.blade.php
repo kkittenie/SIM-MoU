@@ -35,16 +35,13 @@
 
             <!-- Filters Form -->
             <form action="{{ route('kerja-sama.index') }}" method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                <!-- Search Input -->
-                <div class="relative">
-                    <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
-                        <svg class="fill-gray-400 dark:fill-gray-500" width="18" height="18" viewBox="0 0 20 20" fill="none">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
-                        </svg>
-                    </span>
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Cari mitra, PIC, MoU..."
-                        class="dark:bg-dark-900 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 pl-10 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
+                <!-- Search Input with Real-time PT Suggestions -->
+                <x-form.pt-search-input 
+                    name="search" 
+                    :value="$search" 
+                    placeholder="Cari mitra, PIC, MoU..." 
+                    :suggestions="$ptSuggestions ?? []" 
+                />
 
                 <!-- Jenis Mitra -->
                 <div>
@@ -109,124 +106,127 @@
         </div>
 
         <!-- Table Content -->
-        <div class="overflow-x-auto w-full">
-            <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400">
-                <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                    <tr>
-                        <th class="px-6 py-4 min-w-[180px]">Mitra</th>
-                        <th class="px-6 py-4">Jenis</th>
-                        <th class="px-6 py-4">Program Keahlian</th>
-                        <th class="px-6 py-4 min-w-[120px]">PIC</th>
-                        <th class="px-6 py-4 min-w-[140px]">No. MoU</th>
-                        <th class="px-6 py-4">Masa Berlaku</th>
-                        <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4">Dokumen</th>
-                        <th class="px-6 py-4 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
-                    @forelse ($kerjaSama as $ks)
-                        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
-                            <td class="px-6 py-4 whitespace-normal font-medium text-gray-800 dark:text-white/95">
-                                {{ $ks->nama_mitra }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs">
-                                {{ $ks->jenis_mitra }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs">
-                                {{ $ks->programKeahlian ? $ks->programKeahlian->nama : 'Semua Jurusan' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-normal">{{ $ks->pic }}</td>
-                            <td class="px-6 py-4 whitespace-normal text-xs">{{ $ks->nomor_mou }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs">
-                                {{ $ks->tanggal_mulai ? $ks->tanggal_mulai->format('d/m/Y') : '-' }} s.d.
-                                {{ $ks->tanggal_berakhir ? $ks->tanggal_berakhir->format('d/m/Y') : '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($ks->status === 'Aktif')
-                                    <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
-                                        Aktif
-                                    </span>
-                                @elseif ($ks->status === 'Akan Berakhir')
-                                    <span class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-700 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:ring-yellow-500/20">
-                                        Akan Berakhir
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20">
-                                        Berakhir
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs">
-                                @if ($ks->dokumen_pdf)
-                                    <a href="{{ route('kerja-sama.download', $ks->id) }}" 
-                                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 font-medium">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        Unduh PDF
-                                    </a>
-                                @else
-                                    <span class="text-gray-400 italic">Tidak ada file</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('kerja-sama.show', $ks->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                        Detail
-                                    </a>
-                                    <!-- Edit & Delete are only visible to Admin, BKK & Admin Jurusan -->
-                                    @if (auth()->user()->isAdmin() || auth()->user()->isBKK() || auth()->user()->isAdminJurusan())
-                                        @if ($ks->status !== 'Aktif')
+        <div id="table-container">
+            <div class="overflow-x-auto w-full">
+                <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800 text-left text-sm text-gray-500 dark:text-gray-400">
+                    <thead class="bg-gray-50 dark:bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                        <tr>
+                            <th class="px-6 py-4 min-w-[180px]">Mitra</th>
+                            <th class="px-6 py-4">Jenis</th>
+                            <th class="px-6 py-4">Program Keahlian</th>
+                            <th class="px-6 py-4 min-w-[120px]">PIC</th>
+                            <th class="px-6 py-4 min-w-[140px]">No. MoU</th>
+                            <th class="px-6 py-4">Masa Berlaku</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Dokumen</th>
+                            <th class="px-6 py-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-transparent">
+                        @forelse ($kerjaSama as $ks)
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
+                                <td class="px-6 py-4 whitespace-normal font-medium text-gray-800 dark:text-white/95">
+                                    {{ $ks->nama_mitra }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                    {{ $ks->jenis_mitra }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                    {{ $ks->programKeahlian ? $ks->programKeahlian->nama : 'Semua Jurusan' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-normal">{{ $ks->pic }}</td>
+                                <td class="px-6 py-4 whitespace-normal text-xs">{{ $ks->nomor_mou }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                    {{ $ks->tanggal_mulai ? $ks->tanggal_mulai->format('d/m/Y') : '-' }} s.d.
+                                    {{ $ks->tanggal_berakhir ? $ks->tanggal_berakhir->format('d/m/Y') : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($ks->status === 'Aktif')
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
+                                            Aktif
+                                        </span>
+                                    @elseif ($ks->status === 'Akan Berakhir')
+                                        <span class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-700 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:ring-yellow-500/20">
+                                            Akan Berakhir
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20">
+                                            Berakhir
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                                    @if ($ks->dokumen_pdf)
+                                        <a href="{{ route('kerja-sama.download', $ks->id) }}" 
+                                            class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 font-medium">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            Unduh PDF
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400 italic">Tidak ada file</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('kerja-sama.show', $ks->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                            Detail
+                                        </a>
+                                        <!-- Edit & Delete are only visible to Admin, BKK & Admin Jurusan -->
+                                        @if (auth()->user()->isAdmin() || auth()->user()->isBKK() || auth()->user()->isAdminJurusan())
+                                            @if ($ks->status !== 'Aktif')
+                                                <span class="text-gray-300 dark:text-gray-700">|</span>
+                                                <form action="{{ route('kerja-sama.kirim-wa', $ks->id) }}" method="POST" class="inline-block wa-form" 
+                                                    data-name="{{ $ks->nama_mitra }}">
+                                                    @csrf
+                                                    <button type="submit" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                                        Ingatkan
+                                                    </button>
+                                                </form>
+                                            @endif
                                             <span class="text-gray-300 dark:text-gray-700">|</span>
-                                            <form action="{{ route('kerja-sama.kirim-wa', $ks->id) }}" method="POST" class="inline-block wa-form" 
+                                            <a href="{{ route('kerja-sama.edit', $ks->id) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
+                                                Ubah
+                                            </a>
+                                            <span class="text-gray-300 dark:text-gray-700">|</span>
+                                            <form action="{{ route('kerja-sama.destroy', $ks->id) }}" method="POST" class="inline-block delete-form" 
                                                 data-name="{{ $ks->nama_mitra }}">
                                                 @csrf
-                                                <button type="submit" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                                                    Ingatkan
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                    Hapus
                                                 </button>
                                             </form>
                                         @endif
-                                        <span class="text-gray-300 dark:text-gray-700">|</span>
-                                        <a href="{{ route('kerja-sama.edit', $ks->id) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
-                                            Ubah
-                                        </a>
-                                        <span class="text-gray-300 dark:text-gray-700">|</span>
-                                        <form action="{{ route('kerja-sama.destroy', $ks->id) }}" method="POST" class="inline-block delete-form" 
-                                            data-name="{{ $ks->nama_mitra }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                             </td>
-                         </tr>
-                     @empty
-                         <tr>
-                             <td colspan="9" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
-                                 Tidak ada data kerja sama ditemukan.
-                             </td>
-                         </tr>
-                     @endforelse
-                 </tbody>
-             </table>
-         </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
+                                    Tidak ada data kerja sama ditemukan.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
  
          <!-- Pagination Links -->
-         @if ($kerjaSama->hasPages())
-             <div class="border-t border-gray-100 p-5 dark:border-gray-800">
-                 {{ $kerjaSama->links() }}
-             </div>
-         @endif
-     </div>
+        @if ($kerjaSama->hasPages())
+            <div class="border-t border-gray-100 p-5 dark:border-gray-800">
+                {{ $kerjaSama->links() }}
+            </div>
+        @endif
+        </div>
+    </div>
  @endsection
  
  @push('scripts')
  <script>
-         // WhatsApp Reminder confirmation
+     // WhatsApp Reminder confirmation
     document.querySelectorAll('.wa-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();

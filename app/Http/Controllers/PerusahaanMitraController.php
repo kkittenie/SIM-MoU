@@ -31,7 +31,13 @@ class PerusahaanMitraController extends Controller
         // Ambil daftar bidang industri unik untuk filter
         $industriList = PerusahaanMitra::distinct()->pluck('bidang_industri')->filter()->toArray();
 
-        return view('pages.bkk.perusahaan-mitra.index', compact('mitras', 'search', 'industri', 'industriList'));
+        $ptSuggestions = PerusahaanMitra::distinct()->pluck('nama_perusahaan')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('pages.bkk.perusahaan-mitra.index', compact('mitras', 'search', 'industri', 'industriList', 'ptSuggestions'));
     }
 
     /**

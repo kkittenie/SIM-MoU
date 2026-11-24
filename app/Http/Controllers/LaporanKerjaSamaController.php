@@ -112,6 +112,13 @@ class LaporanKerjaSamaController extends Controller
         $categories = KategoriMitra::orderBy('nama', 'asc')->get();
         $programKeahlians = ProgramKeahlian::orderBy('nama', 'asc')->get();
 
+        $ptSuggestions = KerjaSama::distinct()->pluck('nama_mitra')
+            ->merge(\App\Models\PerusahaanMitra::distinct()->pluck('nama_perusahaan'))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
         return view('pages.laporan.kerja-sama', compact(
             'totalKerjaSama',
             'totalAktif',
@@ -128,7 +135,8 @@ class LaporanKerjaSamaController extends Controller
             'search',
             'kerjaSamaList',
             'categories',
-            'programKeahlians'
+            'programKeahlians',
+            'ptSuggestions'
         ));
     }
 
