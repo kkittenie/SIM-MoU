@@ -10,11 +10,6 @@ use App\Models\StudentNis;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class StudentNisController extends Controller
 {
@@ -176,69 +171,6 @@ class StudentNisController extends Controller
 
         return redirect()->route('nis-tracer.index')
             ->with('success', 'Data NIS siswa berhasil didaftarkan.');
-    }
-
-    /**
-     * Download template Excel untuk import data NIS siswa.
-     */
-    public function downloadTemplate()
-    {
-        $this->ensureAuthorizedRole();
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Data NIS Siswa');
-
-        // Atur Lebar Kolom
-        $sheet->getColumnDimension('A')->setWidth(8);
-        $sheet->getColumnDimension('B')->setWidth(25);
-        $sheet->getColumnDimension('C')->setWidth(35);
-
-        // Baris Header Kolom (Langsung di baris 1 agar bersih dan terstandar)
-        $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'NIS');
-        $sheet->setCellValue('C1', 'Nama Siswa');
-
-        $headerStyle = [
-            'font' => ['bold' => true, 'name' => 'Times New Roman', 'color' => ['rgb' => '000000']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E5E5E5']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-            'border' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]],
-        ];
-        $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
-        $sheet->getRowDimension(1)->setRowHeight(24);
-
-        // Contoh Data
-        $examples = [
-            [1, '222310001', 'Ahmad Fauzi'],
-            [2, '222310002', 'Budi Santoso'],
-            [3, '222310003', 'Citra Dewi Permata'],
-        ];
-
-        $rowNum = 2;
-        foreach ($examples as $item) {
-            $sheet->setCellValue('A' . $rowNum, $item[0]);
-            $sheet->setCellValueExplicit('B' . $rowNum, (string) $item[1], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValue('C' . $rowNum, $item[2]);
-
-            $sheet->getStyle('A' . $rowNum)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('B' . $rowNum)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('A' . $rowNum . ':C' . $rowNum)->applyFromArray([
-                'border' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CCCCCC']]],
-                'font' => ['name' => 'Times New Roman'],
-            ]);
-            $rowNum++;
-        }
-
-        $filename = 'template-import-nis-tracer.xlsx';
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
     }
 
     /**
