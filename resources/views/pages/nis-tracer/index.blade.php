@@ -47,7 +47,7 @@
                     </h3>
                     @if (auth()->user()->isAdminJurusan())
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                            Jurusan: <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $programKeahlians->first()?->nama ?? '-' }}</span>
+                            Jurusan: <span class="font-semibold text-gray-700 dark:text-gray-300">{{ \App\Models\ProgramKeahlian::find(auth()->user()->getAssignedProgramKeahlianId())?->nama ?? '-' }}</span>
                         </p>
                     @endif
                 </div>
@@ -74,8 +74,39 @@
                 </div>
             </div>
 
+            @if (auth()->user()->isAdmin())
+                <!-- Filter Jurusan Kecil Berjejer (Khusus Admin Utama / Super Admin) -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-thin border-t border-b border-gray-100 dark:border-gray-800/80 py-2.5">
+                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider shrink-0 flex items-center gap-1.5 mr-1">
+                        <svg class="w-3.5 h-3.5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        Jurusan:
+                    </span>
+
+                    <!-- Semua Jurusan Pill -->
+                    <a href="{{ route('nis-tracer.index', array_merge(request()->except(['program_keahlian_id', 'page']))) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors {{ empty($programKeahlianId) ? 'bg-brand-500 text-white shadow-xs' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10' }}">
+                        Semua Jurusan
+                    </a>
+
+                    <!-- Pill Tiap Jurusan (dari Master Setting / Database) -->
+                    @foreach ($programKeahlians as $pk)
+                        <a href="{{ route('nis-tracer.index', array_merge(request()->except(['page']), ['program_keahlian_id' => $pk->id])) }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors {{ (string) $programKeahlianId === (string) $pk->id ? 'bg-brand-500 text-white shadow-xs' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10' }}">
+                            {{ $pk->nama }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
             <!-- Filter Form -->
-            <form action="{{ route('nis-tracer.index') }}" method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <form id="nisFilterForm" action="{{ route('nis-tracer.index') }}" method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Keep Active Jurusan Filter in Form (Admin Only) -->
+                @if (auth()->user()->isAdmin() && $programKeahlianId)
+                    <input type="hidden" name="program_keahlian_id" value="{{ $programKeahlianId }}">
+                @endif
+
                 <!-- Real-time Search Input -->
                 <x-form.pt-search-input
                     name="search"
@@ -85,32 +116,30 @@
 
                 <!-- Status Tracer Study Filter -->
                 <div>
-                    <select name="status_tracer" onchange="this.form.submit()"
+                    <select name="status_tracer" onchange="document.getElementById('nisFilterForm').submit()"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="">Semua Siswa</option>
+                        <option value="">Semua Status</option>
                         <option value="Sudah Mengisi" {{ $statusFilter === 'Sudah Mengisi' ? 'selected' : '' }}>Sudah Mengisi</option>
                         <option value="Belum Mengisi" {{ $statusFilter === 'Belum Mengisi' ? 'selected' : '' }}>Belum Mengisi</option>
                     </select>
                 </div>
 
-                <!-- Program Keahlian Filter (Admin Only) -->
-                @if (auth()->user()->isAdmin())
-                    <div>
-                        <select name="program_keahlian_id" onchange="this.form.submit()"
-                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                            <option value="">Semua Jurusan</option>
-                            @foreach ($programKeahlians as $pk)
-                                <option value="{{ $pk->id }}" {{ (string) $programKeahlianId === (string) $pk->id ? 'selected' : '' }}>
-                                    {{ $pk->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @endif
+                <!-- Tahun Lulus Filter (Kelompokkan Berdasarkan Tahun) -->
+                <div>
+                    <select name="tahun_lulus" onchange="document.getElementById('nisFilterForm').submit()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Semua Tahun Lulus</option>
+                        @foreach ($availableYears as $year)
+                            <option value="{{ $year }}" {{ (string) $tahunLulusFilter === (string) $year ? 'selected' : '' }}>
+                                Lulusan {{ $year }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <!-- Reset Button -->
                 <div class="flex items-center">
-                    @if ($search || $statusFilter || (auth()->user()->isAdmin() && $programKeahlianId))
+                    @if ($search || $statusFilter || $tahunLulusFilter || $programKeahlianId)
                         <a href="{{ route('nis-tracer.index') }}"
                             class="bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 h-10 text-gray-700 dark:text-white/95 rounded-lg px-4 py-2.5 text-sm font-medium transition inline-flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
                             Reset Filter
@@ -128,7 +157,7 @@
                         <tr>
                             <th class="px-6 py-4">NIS</th>
                             <th class="px-6 py-4">Nama Siswa</th>
-                            <th class="px-6 py-4">Jurusan</th>
+                            <th class="px-6 py-4">Tahun Lulus</th>
                             <th class="px-6 py-4">Status Tracer Study</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -143,7 +172,13 @@
                                     {{ $student->nama_siswa }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs">
-                                    {{ $student->programKeahlian ? $student->programKeahlian->nama : '-' }}
+                                    @if ($student->tahun_lulus)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                                            {{ $student->tahun_lulus }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 italic">-</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if ($student->has_submitted)
@@ -237,7 +272,7 @@
                     </svg>
                     <div class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
                         <p class="font-medium">Otomatis Ekstrak Kolom:</p>
-                        <p>Jika file Excel Anda memiliki banyak kolom, sistem hanya akan mengambil kolom <strong>NIS</strong> dan <strong>Nama Siswa</strong>. Kolom lainnya akan otomatis diabaikan.</p>
+                        <p>Jika file Excel Anda memiliki banyak kolom, sistem otomatis mengambil kolom <strong>NIS</strong>, <strong>Nama Siswa</strong>, dan <strong>Tahun Lulus</strong> (jika ada). Kolom lainnya akan otomatis diabaikan.</p>
                     </div>
                 </div>
             </div>

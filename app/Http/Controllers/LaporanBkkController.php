@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AlumniBekerja;
 use App\Models\PerusahaanMitra;
 use App\Models\LowonganKerja;
+use App\Models\ProgramKeahlian;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -19,13 +20,34 @@ class LaporanBkkController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $tahunLulus = $request->has('tahun_lulus') ? $request->input('tahun_lulus') : \App\Models\Setting::getActiveTahunAjaran();
+        $programKeahlians = ProgramKeahlian::orderBy('nama', 'asc')->get();
+        $selectedProgramKeahlian = null;
+
+        if ($user && $user->isAdminJurusan()) {
+            $programKeahlianId = $user->getAssignedProgramKeahlianId();
+            $selectedProgramKeahlian = $user->programKeahlian ?: ProgramKeahlian::find($programKeahlianId);
+        } else {
+            $programKeahlianId = $request->input('program_keahlian_id');
+            $selectedProgramKeahlian = $programKeahlianId ? ProgramKeahlian::find($programKeahlianId) : null;
+        }
 
         // Metrik Ringkasan
         $queryAlumni = AlumniBekerja::query()->tahunAjaranAktif();
 
         if ($tahunLulus) {
             $queryAlumni->where('tahun_lulus', $tahunLulus);
+        }
+
+        if ($selectedProgramKeahlian) {
+            $deptNames = array_filter(array_unique([$selectedProgramKeahlian->nama, $selectedProgramKeahlian->singkatan]));
+            $queryAlumni->where(function ($q) use ($deptNames, $selectedProgramKeahlian) {
+                $q->whereIn('program_keahlian', $deptNames)
+                  ->orWhereIn('nis', function ($sub) use ($selectedProgramKeahlian) {
+                      $sub->select('nis')->from('student_nis')->where('program_keahlian_id', $selectedProgramKeahlian->id);
+                  });
+            });
         }
 
         $totalAlumniBekerja = $queryAlumni->count();
@@ -53,7 +75,17 @@ class LaporanBkkController extends Controller
             ->get();
 
         // Ambil list tahun lulus untuk dropdown filter
-        $tahunLulusList = AlumniBekerja::distinct()->pluck('tahun_lulus')->sort()->toArray();
+        $tahunQuery = AlumniBekerja::query();
+        if ($selectedProgramKeahlian) {
+            $deptNames = array_filter(array_unique([$selectedProgramKeahlian->nama, $selectedProgramKeahlian->singkatan]));
+            $tahunQuery->where(function ($q) use ($deptNames, $selectedProgramKeahlian) {
+                $q->whereIn('program_keahlian', $deptNames)
+                  ->orWhereIn('nis', function ($sub) use ($selectedProgramKeahlian) {
+                      $sub->select('nis')->from('student_nis')->where('program_keahlian_id', $selectedProgramKeahlian->id);
+                  });
+            });
+        }
+        $tahunLulusList = $tahunQuery->distinct()->pluck('tahun_lulus')->filter()->sort()->toArray();
 
         // Data list untuk dicetak
         $alumniList = (clone $queryAlumni)->latest()->paginate(10)->withQueryString();
@@ -67,6 +99,9 @@ class LaporanBkkController extends Controller
             'perusahaanStats',
             'tahunLulusList',
             'tahunLulus',
+            'programKeahlianId',
+            'selectedProgramKeahlian',
+            'programKeahlians',
             'alumniList'
         ));
     }
@@ -76,11 +111,30 @@ class LaporanBkkController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        $user = auth()->user();
         $tahunLulus = $request->input('tahun_lulus');
+
+        if ($user && $user->isAdminJurusan()) {
+            $programKeahlianId = $user->getAssignedProgramKeahlianId();
+        } else {
+            $programKeahlianId = $request->input('program_keahlian_id');
+        }
+
+        $selectedProgramKeahlian = $programKeahlianId ? ProgramKeahlian::find($programKeahlianId) : null;
 
         $query = AlumniBekerja::query()->with('perusahaanMitra')->tahunAjaranAktif();
         if ($tahunLulus) {
             $query->where('tahun_lulus', $tahunLulus);
+        }
+
+        if ($selectedProgramKeahlian) {
+            $deptNames = array_filter(array_unique([$selectedProgramKeahlian->nama, $selectedProgramKeahlian->singkatan]));
+            $query->where(function ($q) use ($deptNames, $selectedProgramKeahlian) {
+                $q->whereIn('program_keahlian', $deptNames)
+                  ->orWhereIn('nis', function ($sub) use ($selectedProgramKeahlian) {
+                      $sub->select('nis')->from('student_nis')->where('program_keahlian_id', $selectedProgramKeahlian->id);
+                  });
+            });
         }
 
         $alumni = $query->orderBy('tahun_lulus', 'desc')->latest()->get();
@@ -91,7 +145,11 @@ class LaporanBkkController extends Controller
 
         // Judul Laporan
         $sheet->mergeCells('A1:M1');
-        $sheet->setCellValue('A1', 'Laporan Data Alumni Bekerja (BKK) SMKN 1 Cirebon');
+        $judulLaporan = 'Laporan Data Alumni Bekerja (BKK) SMKN 1 Cirebon';
+        if ($selectedProgramKeahlian) {
+            $judulLaporan .= ' - ' . $selectedProgramKeahlian->nama;
+        }
+        $sheet->setCellValue('A1', $judulLaporan);
 
         $titleStyle = [
             'font' => [
@@ -111,6 +169,11 @@ class LaporanBkkController extends Controller
         // Subtitle / Info Filter
         $sheet->mergeCells('A2:M2');
         $infoText = 'Diekspor pada: ' . date('d F Y H:i:s');
+        if ($selectedProgramKeahlian) {
+            $infoText .= ' | Jurusan: ' . $selectedProgramKeahlian->nama;
+        } else {
+            $infoText .= ' | Semua Jurusan';
+        }
         if ($tahunLulus) {
             $infoText .= ' | Tahun Lulus: ' . $tahunLulus;
         } else {

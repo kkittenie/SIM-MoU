@@ -7,6 +7,7 @@ use App\Models\AlumniKuliah;
 use App\Models\AlumniWirausaha;
 use App\Models\ProgramKeahlian;
 use App\Models\StudentNis;
+use App\Models\TracerStudy;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -34,12 +35,8 @@ class StudentNisController extends Controller
         $user = auth()->user();
         if ($user->isAdminJurusan()) {
             $assignedDeptId = $user->getAssignedProgramKeahlianId();
-            if ($student->program_keahlian_id) {
-                if ((int) $student->program_keahlian_id !== (int) $assignedDeptId) {
-                    abort(403, 'Anda tidak memiliki akses untuk melihat atau mengelola data siswa dari jurusan lain.');
-                }
-            } elseif ($student->created_by && (int) $student->created_by !== (int) $user->id) {
-                abort(403, 'Anda tidak memiliki akses untuk melihat atau mengelola data siswa ini.');
+            if ((int) $student->program_keahlian_id !== (int) $assignedDeptId) {
+                abort(403, 'Anda tidak memiliki akses untuk melihat atau mengelola data siswa dari jurusan lain.');
             }
         }
     }
@@ -54,38 +51,27 @@ class StudentNisController extends Controller
         $user = auth()->user();
         $search = trim((string) $request->input('search', ''));
         $statusFilter = $request->input('status_tracer', '');
-        $programKeahlianId = $request->input('program_keahlian_id', '');
+        $programKeahlianId = (string) $request->input('program_keahlian_id', '');
+        $tahunLulusFilter = $request->input('tahun_lulus', '');
 
         $baseQuery = StudentNis::query();
+        $statsQuery = StudentNis::query();
 
-        // Pembatasan jurusan khusus Admin Jurusan di sisi backend
+        // Pembatasan ketat: Admin Jurusan HANYA melihat siswa dari jurusannya sendiri
         if ($user->isAdminJurusan()) {
             $assignedDeptId = $user->getAssignedProgramKeahlianId();
-            $baseQuery->where(function ($q) use ($assignedDeptId, $user) {
-                $q->where('program_keahlian_id', $assignedDeptId)
-                  ->orWhere(function ($sub) use ($user) {
-                      $sub->whereNull('program_keahlian_id')
-                          ->where('created_by', $user->id);
-                  });
-            });
-            $programKeahlianId = $assignedDeptId;
-        } elseif ($programKeahlianId) {
+            $baseQuery->where('program_keahlian_id', $assignedDeptId);
+            $statsQuery->where('program_keahlian_id', $assignedDeptId);
+            $programKeahlianId = (string) $assignedDeptId;
+        } elseif ($programKeahlianId !== '') {
             $baseQuery->where('program_keahlian_id', $programKeahlianId);
+            $statsQuery->where('program_keahlian_id', $programKeahlianId);
         }
 
-        // Statistik ringkasan (mengikuti cakupan jurusan pengguna)
-        $statsQuery = StudentNis::query();
-        if ($user->isAdminJurusan()) {
-            $assignedDeptId = $user->getAssignedProgramKeahlianId();
-            $statsQuery->where(function ($q) use ($assignedDeptId, $user) {
-                $q->where('program_keahlian_id', $assignedDeptId)
-                  ->orWhere(function ($sub) use ($user) {
-                      $sub->whereNull('program_keahlian_id')
-                          ->where('created_by', $user->id);
-                  });
-            });
-        } elseif ($programKeahlianId) {
-            $statsQuery->where('program_keahlian_id', $programKeahlianId);
+        // Filter Tahun Lulus
+        if ($tahunLulusFilter !== '') {
+            $baseQuery->where('tahun_lulus', $tahunLulusFilter);
+            $statsQuery->where('tahun_lulus', $tahunLulusFilter);
         }
 
         $totalStudents = (clone $statsQuery)->count();
@@ -112,14 +98,31 @@ class StudentNisController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Admin Jurusan hanya mendapatkan jurusannya sendiri, Admin Utama mendapatkan semua jurusan
         $programKeahlians = $user->isAdminJurusan()
             ? ProgramKeahlian::where('id', $user->getAssignedProgramKeahlianId())->get()
             : ProgramKeahlian::orderBy('nama', 'asc')->get();
+
+        // Ambil daftar tahun kelulusan unik untuk filter dropdown
+        $availableYearsQuery = StudentNis::query();
+        if ($user->isAdminJurusan()) {
+            $assignedDeptId = $user->getAssignedProgramKeahlianId();
+            $availableYearsQuery->where('program_keahlian_id', $assignedDeptId);
+        } elseif ($programKeahlianId) {
+            $availableYearsQuery->where('program_keahlian_id', $programKeahlianId);
+        }
+
+        $availableYears = $availableYearsQuery->whereNotNull('tahun_lulus')
+            ->distinct()
+            ->orderBy('tahun_lulus', 'desc')
+            ->pluck('tahun_lulus');
 
         return view('pages.nis-tracer.index', compact(
             'students',
             'search',
             'statusFilter',
+            'tahunLulusFilter',
+            'availableYears',
             'programKeahlianId',
             'programKeahlians',
             'totalStudents',
@@ -154,18 +157,24 @@ class StudentNisController extends Controller
                 'max:50',
                 Rule::unique('student_nis', 'nis'),
             ],
-            'nama_siswa' => 'required|string|max:255',
+            'nama_siswa'  => 'required|string|max:255',
+            'tahun_lulus' => 'nullable|integer|digits:4|min:1990|max:' . (date('Y') + 5),
         ], [
-            'nis.required' => 'NIS wajib diisi.',
-            'nis.unique' => 'NIS ini sudah terdaftar di dalam sistem.',
-            'nis.max' => 'NIS maksimal 50 karakter.',
+            'nis.required'        => 'NIS wajib diisi.',
+            'nis.unique'          => 'NIS ini sudah terdaftar di dalam sistem.',
+            'nis.max'             => 'NIS maksimal 50 karakter.',
             'nama_siswa.required' => 'Nama lengkap siswa wajib diisi.',
+            'tahun_lulus.digits'  => 'Tahun lulus harus berupa 4 digit angka (contoh: 2024).',
+            'tahun_lulus.integer' => 'Tahun lulus harus berupa angka tahun.',
         ]);
+
+        $assignedDeptId = $user->isAdminJurusan() ? $user->getAssignedProgramKeahlianId() : null;
 
         StudentNis::create([
             'nis'                 => trim($validated['nis']),
             'nama_siswa'          => trim($validated['nama_siswa']),
-            'program_keahlian_id' => null,
+            'tahun_lulus'         => !empty($validated['tahun_lulus']) ? (int) $validated['tahun_lulus'] : null,
+            'program_keahlian_id' => $assignedDeptId,
             'created_by'          => $user->id,
         ]);
 
@@ -199,9 +208,11 @@ class StudentNisController extends Controller
                 return redirect()->back()->with('error', 'File Excel kosong atau tidak dapat dibaca.');
             }
 
-            // 1. Deteksi kolom NIS dan Nama secara cerdas
+            // 1. Deteksi kolom NIS, Nama, Tahun Lulus, dan Jurusan secara cerdas
             $nisCol = null;
             $namaCol = null;
+            $tahunCol = null;
+            $jurusanCol = null;
             $headerRowIndex = null;
 
             $maxHeaderSearch = min(15, count($rows));
@@ -211,6 +222,8 @@ class StudentNisController extends Controller
 
                 $foundNis = null;
                 $foundNama = null;
+                $foundTahun = null;
+                $foundJurusan = null;
 
                 foreach ($row as $cIdx => $cell) {
                     $cellVal = strtolower(trim((string) $cell));
@@ -240,12 +253,36 @@ class StudentNisController extends Controller
                             $foundNama = $cIdx;
                         }
                     }
+
+                    // Deteksi kolom Tahun Lulus / Angkatan (opsional)
+                    if ($foundTahun === null) {
+                        if (preg_match('/^(tahun\s*lulus|thn\s*lulus|tahun_lulus|angkatan|thn_lulus|th\s*lulus)$/i', $cellVal)) {
+                            $foundTahun = $cIdx;
+                        } elseif (preg_match('/\b(tahun|angkatan)\b/i', $cellVal) && !preg_match('/(lahir|ajaran|masuk)/i', $cellVal)) {
+                            $foundTahun = $cIdx;
+                        }
+                    }
+
+                    // Deteksi kolom Jurusan / Program Keahlian (opsional)
+                    if ($foundJurusan === null) {
+                        if (preg_match('/^(jurusan|program\s*keahlian|kompetensi\s*keahlian|prodi|konsentrasi\s*keahlian)$/i', $cellVal)) {
+                            $foundJurusan = $cIdx;
+                        } elseif (preg_match('/\b(jurusan|keahlian)\b/i', $cellVal) && !preg_match('/(sekolah|mitra|perusahaan|kampus)/i', $cellVal)) {
+                            $foundJurusan = $cIdx;
+                        }
+                    }
                 }
 
                 // Kolom NIS dan Nama HARUS ditemukan dan merupakan dua kolom BERBEDA
                 if ($foundNis !== null && $foundNama !== null && $foundNis !== $foundNama) {
                     $nisCol = $foundNis;
                     $namaCol = $foundNama;
+                    if ($foundTahun !== null && $foundTahun !== $foundNis && $foundTahun !== $foundNama) {
+                        $tahunCol = $foundTahun;
+                    }
+                    if ($foundJurusan !== null && $foundJurusan !== $foundNis && $foundJurusan !== $foundNama) {
+                        $jurusanCol = $foundJurusan;
+                    }
                     $headerRowIndex = $r;
                     break;
                 }
@@ -259,6 +296,8 @@ class StudentNisController extends Controller
 
                     $tempNis = null;
                     $tempNama = null;
+                    $tempTahun = null;
+                    $tempJurusan = null;
 
                     foreach ($row as $cIdx => $cell) {
                         $cellVal = strtolower(trim((string) $cell));
@@ -271,11 +310,23 @@ class StudentNisController extends Controller
                         if ($tempNama === null && preg_match('/\bnama\b/i', $cellVal) && !preg_match('/(sekolah|ayah|ibu|wali)/i', $cellVal)) {
                             $tempNama = $cIdx;
                         }
+                        if ($tempTahun === null && preg_match('/(tahun\s*lulus|angkatan)/i', $cellVal)) {
+                            $tempTahun = $cIdx;
+                        }
+                        if ($tempJurusan === null && preg_match('/(jurusan|program\s*keahlian|keahlian)/i', $cellVal) && !preg_match('/(sekolah|mitra|perusahaan)/i', $cellVal)) {
+                            $tempJurusan = $cIdx;
+                        }
                     }
 
                     if ($tempNis !== null && $tempNama !== null && $tempNis !== $tempNama) {
                         $nisCol = $tempNis;
                         $namaCol = $tempNama;
+                        if ($tempTahun !== null && $tempTahun !== $tempNis && $tempTahun !== $tempNama) {
+                            $tahunCol = $tempTahun;
+                        }
+                        if ($tempJurusan !== null && $tempJurusan !== $tempNis && $tempJurusan !== $tempNama) {
+                            $jurusanCol = $tempJurusan;
+                        }
                         $headerRowIndex = $r;
                         break;
                     }
@@ -304,6 +355,7 @@ class StudentNisController extends Controller
             $startRow = ($headerRowIndex !== null) ? $headerRowIndex + 1 : 0;
             $dataRows = array_slice($rows, $startRow);
 
+            $allProgramKeahlians = ProgramKeahlian::all();
             $insertedCount = 0;
             $updatedCount = 0;
             $skippedCount = 0;
@@ -313,6 +365,8 @@ class StudentNisController extends Controller
 
                 $rawNis = $row[$nisCol] ?? '';
                 $rawNama = $row[$namaCol] ?? '';
+                $rawTahun = ($tahunCol !== null && isset($row[$tahunCol])) ? $row[$tahunCol] : null;
+                $rawJurusan = ($jurusanCol !== null && isset($row[$jurusanCol])) ? trim((string) $row[$jurusanCol]) : null;
 
                 // Format nilai NIS (hilangkan desimal seperti 12345.0 atau notasi ilmiah)
                 if (is_numeric($rawNis)) {
@@ -322,6 +376,40 @@ class StudentNisController extends Controller
                 }
 
                 $nama = trim((string) $rawNama);
+
+                // Ekstrak tahun kelulusan 4 digit jika ada
+                $tahunLulus = null;
+                if ($rawTahun !== null && $rawTahun !== '') {
+                    if (preg_match('/\b(19\d{2}|20\d{2})\b/', (string) $rawTahun, $matches)) {
+                        $tahunLulus = (int) $matches[1];
+                    }
+                }
+
+                // Ekstrak jurusan jika kolom jurusan terdeteksi di Excel
+                $programKeahlianId = null;
+                if (!empty($rawJurusan)) {
+                    $search = strtolower($rawJurusan);
+                    $matchedPk = $allProgramKeahlians->first(function ($pk) use ($search) {
+                        $pkNama = strtolower($pk->nama);
+                        $pkSingkatan = strtolower($pk->singkatan ?? '');
+                        return ($pkSingkatan !== '' && $search === $pkSingkatan)
+                            || $search === $pkNama
+                            || ($pkSingkatan !== '' && preg_match('/\b' . preg_quote($pkSingkatan, '/') . '\b/i', $search))
+                            || str_contains($search, $pkNama);
+                    });
+
+                    // Jika jurusan di Excel belum terdaftar di setting, otomatis daftarkan ke master ProgramKeahlian!
+                    if (!$matchedPk) {
+                        $cleanName = strtoupper(trim($rawJurusan));
+                        $matchedPk = ProgramKeahlian::create([
+                            'nama'      => $cleanName,
+                            'singkatan' => strlen($cleanName) <= 10 ? $cleanName : null,
+                        ]);
+                        $allProgramKeahlians->push($matchedPk);
+                    }
+
+                    $programKeahlianId = $matchedPk->id;
+                }
 
                 $lowerNis = strtolower($nis);
                 $lowerNama = strtolower($nama);
@@ -341,12 +429,18 @@ class StudentNisController extends Controller
                 $nis = substr($nis, 0, 50);
                 $nama = substr($nama, 0, 255);
 
+                // Jika Admin Jurusan yang mengimpor, selalu tetapkan ke jurusannya sendiri
+                $finalPkId = $assignedDeptId ?: $programKeahlianId;
+
                 $student = StudentNis::where('nis', $nis)->first();
 
                 if ($student) {
                     $student->nama_siswa = $nama;
-                    if ($assignedDeptId && empty($student->program_keahlian_id)) {
-                        $student->program_keahlian_id = $assignedDeptId;
+                    if ($tahunLulus) {
+                        $student->tahun_lulus = $tahunLulus;
+                    }
+                    if ($finalPkId) {
+                        $student->program_keahlian_id = $finalPkId;
                     }
                     $student->save();
                     $updatedCount++;
@@ -354,7 +448,8 @@ class StudentNisController extends Controller
                     StudentNis::create([
                         'nis'                 => $nis,
                         'nama_siswa'          => $nama,
-                        'program_keahlian_id' => $assignedDeptId,
+                        'tahun_lulus'         => $tahunLulus,
+                        'program_keahlian_id' => $finalPkId,
                         'created_by'          => $user->id,
                     ]);
                     $insertedCount++;
@@ -429,17 +524,31 @@ class StudentNisController extends Controller
                 'max:50',
                 Rule::unique('student_nis', 'nis')->ignore($student->id),
             ],
-            'nama_siswa' => 'required|string|max:255',
+            'nama_siswa'  => 'required|string|max:255',
+            'tahun_lulus' => 'nullable|integer|digits:4|min:1990|max:' . (date('Y') + 5),
         ], [
-            'nis.required' => 'NIS wajib diisi.',
-            'nis.unique' => 'NIS ini sudah digunakan oleh siswa lain.',
-            'nis.max' => 'NIS maksimal 50 karakter.',
+            'nis.required'        => 'NIS wajib diisi.',
+            'nis.unique'          => 'NIS ini sudah digunakan oleh siswa lain.',
+            'nis.max'             => 'NIS maksimal 50 karakter.',
             'nama_siswa.required' => 'Nama lengkap siswa wajib diisi.',
+            'tahun_lulus.digits'  => 'Tahun lulus harus berupa 4 digit angka (contoh: 2024).',
+            'tahun_lulus.integer' => 'Tahun lulus harus berupa angka tahun.',
         ]);
 
+        $oldNis = $student->nis;
+        $newNis = trim($validated['nis']);
+
+        if ($oldNis !== $newNis) {
+            TracerStudy::where('nis', $oldNis)->update(['nis' => $newNis]);
+            AlumniBekerja::where('nis', $oldNis)->update(['nis' => $newNis]);
+            AlumniKuliah::where('nis', $oldNis)->update(['nis' => $newNis]);
+            AlumniWirausaha::where('nis', $oldNis)->update(['nis' => $newNis]);
+        }
+
         $student->update([
-            'nis'        => trim($validated['nis']),
-            'nama_siswa' => trim($validated['nama_siswa']),
+            'nis'         => $newNis,
+            'nama_siswa'  => trim($validated['nama_siswa']),
+            'tahun_lulus' => !empty($validated['tahun_lulus']) ? (int) $validated['tahun_lulus'] : null,
         ]);
 
         return redirect()->route('nis-tracer.index')
@@ -447,16 +556,24 @@ class StudentNisController extends Controller
     }
 
     /**
-     * Hapus data pendaftaran NIS siswa tanpa menghapus riwayat Tracer Study yang sudah masuk.
+     * Hapus data pendaftaran NIS siswa beserta respon formulir Tracer Study terkait.
      */
     public function destroy($id)
     {
         $student = StudentNis::findOrFail($id);
         $this->authorizeRecordAccess($student);
 
+        // Hapus formulir Tracer Study dan rincian alumni terkait jika ada
+        if (!empty($student->nis)) {
+            TracerStudy::where('nis', $student->nis)->delete();
+            AlumniBekerja::where('nis', $student->nis)->delete();
+            AlumniKuliah::where('nis', $student->nis)->delete();
+            AlumniWirausaha::where('nis', $student->nis)->delete();
+        }
+
         $student->delete();
 
         return redirect()->route('nis-tracer.index')
-            ->with('success', 'Data NIS siswa berhasil dihapus.');
+            ->with('success', 'Data NIS siswa beserta data pengisian formulir Tracer Study berhasil dihapus.');
     }
 }

@@ -235,7 +235,7 @@ class LandingController extends Controller
             'kelas'       => 'nullable|string|max:50',
             'no_wa'       => 'nullable|string|max:20',
             'tahun_lulus' => ($hasDbTahunLulus ? 'nullable' : 'required') . '|numeric|digits:4|min:1990|max:' . date('Y'),
-            'program_keahlian' => ($hasDbMajor ? 'nullable' : 'required') . '|string|max:255',
+            'program_keahlian' => 'required|string|max:255',
             'status_alumni' => 'required|in:Bekerja,Kuliah,Wirausaha,Mencari Kerja',
             'detail_status' => 'required_unless:status_alumni,Mencari Kerja|nullable|string|max:255',
 
@@ -294,11 +294,11 @@ class LandingController extends Controller
 
                 $namaAlumni = $alumni['nama_alumni'];
                 $tahunLulus = $alumni['tahun_lulus'] ?: ($validated['tahun_lulus'] ?? date('Y'));
-                $programKeahlian = $alumni['program_keahlian'] ?: ($validated['program_keahlian'] ?? null);
+                $programKeahlian = !empty($validated['program_keahlian']) ? $validated['program_keahlian'] : ($alumni['program_keahlian'] ?? null);
                 $kelas = $validated['kelas'] ?? $alumni['kelas'];
                 $noWa = $validated['no_wa'] ?? $alumni['no_wa'];
 
-                // Perbarui informasi tahun_lulus, kelas, & jurusan pada StudentNis jika belum terisi
+                // Perbarui informasi tahun_lulus, kelas, & jurusan pada StudentNis
                 if (($alumni['source'] ?? '') === 'student_nis' && isset($alumni['model'])) {
                     $studentModel = $alumni['model'];
                     $updates = [];
@@ -308,7 +308,7 @@ class LandingController extends Controller
                     if (empty($studentModel->kelas) && !empty($kelas)) {
                         $updates['kelas'] = $kelas;
                     }
-                    if (empty($studentModel->program_keahlian_id) && !empty($programKeahlian)) {
+                    if (!empty($programKeahlian)) {
                         $pkId = \App\Models\ProgramKeahlian::where('nama', $programKeahlian)->value('id');
                         if ($pkId) {
                             $updates['program_keahlian_id'] = $pkId;

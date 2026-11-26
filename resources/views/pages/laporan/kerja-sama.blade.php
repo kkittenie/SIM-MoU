@@ -115,15 +115,21 @@
 
                 <!-- Program Keahlian / Jurusan -->
                 <div>
-                    <select name="program_keahlian_id" onchange="this.form.submit()"
-                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="">Semua Jurusan</option>
-                        @foreach ($programKeahlians as $pk)
-                            <option value="{{ $pk->id }}" {{ $programKeahlianId == $pk->id ? 'selected' : '' }}>
-                                {{ $pk->nama }}
-                            </option>
-                        @endforeach
-                    </select>
+                    @if(auth()->user()->isAdminJurusan())
+                        <input type="text" readonly value="Jurusan: {{ $selectedProgramKeahlian->nama ?? 'Jurusan Saya' }}"
+                            class="dark:bg-dark-900 shadow-theme-xs h-10 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:bg-white/[0.05] dark:text-gray-300 cursor-not-allowed">
+                        <input type="hidden" name="program_keahlian_id" value="{{ $programKeahlianId }}">
+                    @else
+                        <select name="program_keahlian_id" onchange="this.form.submit()"
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <option value="">Semua Jurusan</option>
+                            @foreach ($programKeahlians as $pk)
+                                <option value="{{ $pk->id }}" {{ $programKeahlianId == $pk->id ? 'selected' : '' }}>
+                                    {{ $pk->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
 
                 <!-- Status -->
@@ -153,6 +159,11 @@
     <div class="hidden print:block text-center mb-6">
         <h1 class="text-2xl font-extrabold uppercase">Laporan Kerja Sama dan MoU</h1>
         <h2 class="text-lg font-bold mt-1">SMK Negeri 1 Cirebon</h2>
+        @if($selectedProgramKeahlian)
+            <p class="text-sm font-bold text-gray-800 mt-1">Jurusan: {{ $selectedProgramKeahlian->nama }}</p>
+        @else
+            <p class="text-sm text-gray-600 mt-1">Semua Jurusan</p>
+        @endif
         @if($year)
             <p class="text-sm text-gray-600 mt-1">Tahun Mulai Kerja Sama: {{ $year }}</p>
         @else

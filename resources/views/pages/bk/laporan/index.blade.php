@@ -62,8 +62,23 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <!-- Filter Tahun Lulus -->
-            <form action="{{ route('bk.laporan.index') }}" method="GET" class="flex gap-2 items-center">
+            <!-- Filter Form -->
+            <form action="{{ route('bk.laporan.index') }}" method="GET" class="flex flex-wrap gap-2 items-center">
+                @if(auth()->user()->isAdminJurusan())
+                    <span class="inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-brand-50 text-brand-700 border border-brand-200 dark:bg-brand-900/20 dark:text-brand-300 dark:border-brand-800">
+                        Jurusan: {{ $selectedProgramKeahlian->nama ?? 'Jurusan Saya' }}
+                    </span>
+                    <input type="hidden" name="program_keahlian_id" value="{{ $programKeahlianId }}">
+                @else
+                    <select name="program_keahlian_id" onchange="this.form.submit()"
+                        class="dark:bg-dark-900 h-10 rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
+                        <option value="">Semua Jurusan</option>
+                        @foreach($programKeahlians as $pk)
+                            <option value="{{ $pk->id }}" {{ $programKeahlianId == $pk->id ? 'selected' : '' }}>{{ $pk->nama }}</option>
+                        @endforeach
+                    </select>
+                @endif
+
                 <select name="tahun_lulus" onchange="this.form.submit()"
                     class="dark:bg-dark-900 h-10 rounded-lg border border-gray-200 bg-transparent py-2 px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:focus:border-brand-800">
                     <option value="">Semua Tahun Lulus</option>
@@ -97,6 +112,11 @@
     <div class="hidden print:block text-center mb-6">
         <h1 class="text-2xl font-extrabold uppercase">Laporan Bimbingan Konseling (BK)</h1>
         <h2 class="text-lg font-bold mt-1">SMK Negeri 1 Cirebon</h2>
+        @if($selectedProgramKeahlian)
+            <p class="text-sm font-bold text-gray-800 mt-1">Jurusan: {{ $selectedProgramKeahlian->nama }}</p>
+        @else
+            <p class="text-sm text-gray-600 mt-1">Semua Jurusan</p>
+        @endif
         @if($tahunLulus)
             <p class="text-sm text-gray-600 mt-1">Tahun Lulus: {{ $tahunLulus }}</p>
         @else

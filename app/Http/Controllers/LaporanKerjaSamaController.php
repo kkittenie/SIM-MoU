@@ -22,11 +22,20 @@ class LaporanKerjaSamaController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $year = $request->input('year');
         $status = $request->input('status');
         $jenisMitra = $request->input('jenis_mitra');
-        $programKeahlianId = $request->input('program_keahlian_id');
         $search = $request->input('search');
+
+        // Batasi jurusan jika user adalah Admin Jurusan
+        if ($user && $user->isAdminJurusan()) {
+            $programKeahlianId = $user->getAssignedProgramKeahlianId();
+            $selectedProgramKeahlian = $user->programKeahlian ?: ProgramKeahlian::find($programKeahlianId);
+        } else {
+            $programKeahlianId = $request->input('program_keahlian_id');
+            $selectedProgramKeahlian = $programKeahlianId ? ProgramKeahlian::find($programKeahlianId) : null;
+        }
 
         // Query dasar
         $query = KerjaSama::with(['kategoriMitra', 'programKeahlian']);
@@ -132,6 +141,7 @@ class LaporanKerjaSamaController extends Controller
             'status',
             'jenisMitra',
             'programKeahlianId',
+            'selectedProgramKeahlian',
             'search',
             'kerjaSamaList',
             'categories',
@@ -145,11 +155,17 @@ class LaporanKerjaSamaController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        $user = auth()->user();
         $year = $request->input('year');
         $status = $request->input('status');
         $jenisMitra = $request->input('jenis_mitra');
-        $programKeahlianId = $request->input('program_keahlian_id');
         $search = $request->input('search');
+
+        if ($user && $user->isAdminJurusan()) {
+            $programKeahlianId = $user->getAssignedProgramKeahlianId();
+        } else {
+            $programKeahlianId = $request->input('program_keahlian_id');
+        }
 
         $query = KerjaSama::with(['kategoriMitra', 'programKeahlian']);
 

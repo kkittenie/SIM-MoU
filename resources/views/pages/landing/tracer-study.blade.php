@@ -195,7 +195,7 @@
                             @endif
                         </div>
 
-                        <!-- Jurusan (Otomatis dari Database jika tersedia) -->
+                        <!-- Jurusan / Program Keahlian -->
                         <div>
                             <label for="program_keahlian" class="block text-sm font-semibold mb-1.5 text-gray-700 dark:text-gray-200">
                                 Jurusan <span class="text-red-500">*</span>
@@ -294,7 +294,6 @@
                                     <option value="utbk" @selected(old('cara_masuk') == 'utbk')>SNBT / UTBK</option>
                                     <option value="ujian_masuk" @selected(old('cara_masuk') == 'ujian_masuk')>Ujian Mandiri</option>
                                     <option value="beasiswa" @selected(old('cara_masuk') == 'beasiswa')>Beasiswa</option>
-                                    <option value="transfer" @selected(old('cara_masuk') == 'transfer')>Transfer</option>
                                     <option value="lainnya" @selected(old('cara_masuk') == 'lainnya')>Lainnya</option>
                                 </select>
                             </div>

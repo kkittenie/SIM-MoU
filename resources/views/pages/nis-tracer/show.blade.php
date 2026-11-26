@@ -28,7 +28,7 @@
 
         <div class="p-6 space-y-6">
             <!-- Student Registration Data -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="rounded-xl border border-gray-100 dark:border-gray-800 p-4">
                     <span class="block text-xs font-medium text-gray-400 uppercase">NIS</span>
                     <span class="mt-1 block text-sm font-bold text-gray-800 dark:text-white/90">{{ $student->nis }}</span>
@@ -40,8 +40,17 @@
                 </div>
 
                 <div class="rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+                    <span class="block text-xs font-medium text-gray-400 uppercase">Tahun Lulus (Angkatan)</span>
+                    <span class="mt-1 block text-sm font-semibold text-gray-800 dark:text-white/90">
+                        {{ $student->tahun_lulus ? 'Tahun ' . $student->tahun_lulus : '-' }}
+                    </span>
+                </div>
+
+                <div class="rounded-xl border border-gray-100 dark:border-gray-800 p-4">
                     <span class="block text-xs font-medium text-gray-400 uppercase">Program Keahlian / Jurusan</span>
-                    <span class="mt-1 block text-sm font-semibold text-gray-800 dark:text-white/90">{{ $student->programKeahlian?->nama ?? '-' }}</span>
+                    <span class="mt-1 block text-sm font-semibold text-gray-800 dark:text-white/90">
+                        {{ $student->tracerStudy?->program_keahlian ?? ($student->programKeahlian?->nama ?? '-') }}
+                    </span>
                 </div>
 
                 <div class="rounded-xl border border-gray-100 dark:border-gray-800 p-4">
