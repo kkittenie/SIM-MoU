@@ -94,6 +94,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/nis-tracer', [StudentNisController::class, 'index'])->name('nis-tracer.index');
         Route::get('/nis-tracer/tambah', [StudentNisController::class, 'create'])->name('nis-tracer.create');
         Route::post('/nis-tracer', [StudentNisController::class, 'store'])->name('nis-tracer.store');
+        Route::get('/nis-tracer/download-template', [StudentNisController::class, 'downloadTemplate'])->name('nis-tracer.download-template');
+        Route::post('/nis-tracer/import', [StudentNisController::class, 'import'])->name('nis-tracer.import');
         Route::get('/nis-tracer/{id}', [StudentNisController::class, 'show'])->name('nis-tracer.show');
         Route::get('/nis-tracer/{id}/ubah', [StudentNisController::class, 'edit'])->name('nis-tracer.edit');
         Route::put('/nis-tracer/{id}', [StudentNisController::class, 'update'])->name('nis-tracer.update');

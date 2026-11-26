@@ -52,14 +52,26 @@
                     @endif
                 </div>
 
-                <!-- Add Student NIS Button -->
-                <a href="{{ route('nis-tracer.create') }}"
-                    class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition whitespace-nowrap">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Tambah NIS Siswa
-                </a>
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Import Excel Button -->
+                    <button type="button" onclick="openImportModal()"
+                        class="bg-green-600 hover:bg-green-700 shadow-theme-xs inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition whitespace-nowrap">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Import Excel
+                    </button>
+
+                    <!-- Add Student NIS Button -->
+                    <a href="{{ route('nis-tracer.create') }}"
+                        class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition whitespace-nowrap">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Tambah NIS Siswa
+                    </a>
+                </div>
             </div>
 
             <!-- Filter Form -->
@@ -184,10 +196,141 @@
             @endif
         </div>
     </div>
+
+    <!-- Modal Import Excel -->
+    <div id="importModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-xs transition-opacity" onclick="closeImportModal()"></div>
+
+        <!-- Modal Dialog -->
+        <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-gray-100 dark:border-gray-800 transition-all z-10">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-800 dark:text-white/90">
+                            Import Data NIS Siswa
+                        </h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Unggah file Excel untuk mendaftarkan NIS siswa secara massal
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeImportModal()"
+                    class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Petunjuk Otomatis Ekstrak Kolom -->
+            <div class="mt-4 rounded-xl bg-blue-50/80 p-3.5 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
+                <div class="flex items-start gap-2.5">
+                    <svg class="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
+                        <p class="font-medium">Otomatis Ekstrak Kolom:</p>
+                        <p>Jika file Excel Anda memiliki banyak kolom, sistem hanya akan mengambil kolom <strong>NIS</strong> dan <strong>Nama Siswa</strong>. Kolom lainnya akan otomatis diabaikan.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Upload -->
+            <form action="{{ route('nis-tracer.import') }}" method="POST" enctype="multipart/form-data" id="importNisForm" class="mt-4 space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
+                        Pilih File Excel (.xlsx / .xls)
+                    </label>
+                    <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-5 text-center hover:border-brand-500 dark:hover:border-brand-500 transition cursor-pointer" onclick="document.getElementById('excelFileInput').click()">
+                        <input type="file" name="file" id="excelFileInput" accept=".xlsx,.xls,.csv" class="hidden" required onchange="handleFileSelected(this)">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300" id="selectedFileName">
+                                Klik untuk memilih file Excel
+                            </span>
+                            <span class="text-xs text-gray-400">
+                                Format .xlsx atau .xls (Maksimal 10MB)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <a href="{{ route('nis-tracer.download-template') }}" class="text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400 inline-flex items-center gap-1.5 hover:underline">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Unduh Template Excel
+                    </a>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <button type="button" onclick="closeImportModal()"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitImport"
+                        class="bg-brand-500 hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition shadow-theme-xs">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        <span id="btnSubmitText">Mulai Import</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script>
+    function openImportModal() {
+        const modal = document.getElementById('importModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeImportModal() {
+        const modal = document.getElementById('importModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function handleFileSelected(input) {
+        const label = document.getElementById('selectedFileName');
+        if (input.files && input.files.length > 0) {
+            label.textContent = input.files[0].name;
+            label.classList.add('text-brand-600', 'font-semibold');
+        } else {
+            label.textContent = 'Klik untuk memilih file Excel';
+            label.classList.remove('text-brand-600', 'font-semibold');
+        }
+    }
+
+    // Handle submit state
+    document.getElementById('importNisForm')?.addEventListener('submit', function() {
+        const btn = document.getElementById('btnSubmitImport');
+        const text = document.getElementById('btnSubmitText');
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            if (text) text.textContent = 'Memproses...';
+        }
+    });
+
     document.addEventListener('submit', function(e) {
         const form = e.target.closest('.delete-form');
         if (!form) return;

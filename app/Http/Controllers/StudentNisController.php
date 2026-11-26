@@ -9,6 +9,12 @@ use App\Models\ProgramKeahlian;
 use App\Models\StudentNis;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class StudentNisController extends Controller
 {
@@ -170,6 +176,276 @@ class StudentNisController extends Controller
 
         return redirect()->route('nis-tracer.index')
             ->with('success', 'Data NIS siswa berhasil didaftarkan.');
+    }
+
+    /**
+     * Download template Excel untuk import data NIS siswa.
+     */
+    public function downloadTemplate()
+    {
+        $this->ensureAuthorizedRole();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data NIS Siswa');
+
+        // Atur Lebar Kolom
+        $sheet->getColumnDimension('A')->setWidth(8);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(35);
+
+        // Baris Header Kolom (Langsung di baris 1 agar bersih dan terstandar)
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'NIS');
+        $sheet->setCellValue('C1', 'Nama Siswa');
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'name' => 'Times New Roman', 'color' => ['rgb' => '000000']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E5E5E5']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+            'border' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]],
+        ];
+        $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(24);
+
+        // Contoh Data
+        $examples = [
+            [1, '222310001', 'Ahmad Fauzi'],
+            [2, '222310002', 'Budi Santoso'],
+            [3, '222310003', 'Citra Dewi Permata'],
+        ];
+
+        $rowNum = 2;
+        foreach ($examples as $item) {
+            $sheet->setCellValue('A' . $rowNum, $item[0]);
+            $sheet->setCellValueExplicit('B' . $rowNum, (string) $item[1], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue('C' . $rowNum, $item[2]);
+
+            $sheet->getStyle('A' . $rowNum)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B' . $rowNum)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A' . $rowNum . ':C' . $rowNum)->applyFromArray([
+                'border' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CCCCCC']]],
+                'font' => ['name' => 'Times New Roman'],
+            ]);
+            $rowNum++;
+        }
+
+        $filename = 'template-import-nis-tracer.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * IMPORT - Import data NIS siswa dari file Excel.
+     * Mengambil kolom NIS dan Nama Siswa saja meskipun file Excel berisi banyak kolom lainnya.
+     */
+    public function import(Request $request)
+    {
+        $this->ensureAuthorizedRole();
+
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'file.required' => 'File Excel wajib dipilih.',
+            'file.mimes'    => 'Format file harus berupa Excel (.xlsx atau .xls).',
+            'file.max'      => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $spreadsheet = IOFactory::load($file->path());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, false);
+
+            if (empty($rows)) {
+                return redirect()->back()->with('error', 'File Excel kosong atau tidak dapat dibaca.');
+            }
+
+            // 1. Deteksi kolom NIS dan Nama secara cerdas
+            $nisCol = null;
+            $namaCol = null;
+            $headerRowIndex = null;
+
+            $maxHeaderSearch = min(15, count($rows));
+            for ($r = 0; $r < $maxHeaderSearch; $r++) {
+                $row = $rows[$r];
+                if (!is_array($row)) continue;
+
+                $foundNis = null;
+                $foundNama = null;
+
+                foreach ($row as $cIdx => $cell) {
+                    $cellVal = strtolower(trim((string) $cell));
+                    if ($cellVal === '') continue;
+
+                    // Lewati baris teks pengantar, instruksi panjang, atau catatan
+                    if (strlen($cellVal) > 40 || preg_match('/^(catatan|note|petunjuk|template|perhatian)/i', $cellVal)) {
+                        continue;
+                    }
+
+                    // Deteksi kolom NIS (harus label kolom, bukan kalimat)
+                    if ($foundNis === null) {
+                        if (preg_match('/^(nis|nomor\s*induk(\s*siswa)?|no\.?\s*induk(\s*siswa)?|no_induk|id_siswa|student_id)$/i', $cellVal)) {
+                            $foundNis = $cIdx;
+                        } elseif (preg_match('/\bnis\b/i', $cellVal) && !preg_match('/\bnisn\b/i', $cellVal)) {
+                            $foundNis = $cIdx;
+                        } elseif ($cellVal === 'nisn') {
+                            $foundNis = $cIdx;
+                        }
+                    }
+
+                    // Deteksi kolom Nama (harus label nama siswa/peserta didik)
+                    if ($foundNama === null) {
+                        if (preg_match('/^(nama|nama\s*siswa|nama\s*lengkap|nama\s*peserta\s*didik|name|student_name|nama_siswa)$/i', $cellVal)) {
+                            $foundNama = $cIdx;
+                        } elseif (preg_match('/\bnama\b/i', $cellVal) && !preg_match('/(sekolah|ayah|ibu|wali|perusahaan|kampus|mitra|jurusan)/i', $cellVal)) {
+                            $foundNama = $cIdx;
+                        }
+                    }
+                }
+
+                // Kolom NIS dan Nama HARUS ditemukan dan merupakan dua kolom BERBEDA
+                if ($foundNis !== null && $foundNama !== null && $foundNis !== $foundNama) {
+                    $nisCol = $foundNis;
+                    $namaCol = $foundNama;
+                    $headerRowIndex = $r;
+                    break;
+                }
+            }
+
+            // Fallback jika tidak terdeteksi header lengkap di satu baris:
+            if ($nisCol === null || $namaCol === null || $nisCol === $namaCol) {
+                for ($r = 0; $r < $maxHeaderSearch; $r++) {
+                    $row = $rows[$r];
+                    if (!is_array($row)) continue;
+
+                    $tempNis = null;
+                    $tempNama = null;
+
+                    foreach ($row as $cIdx => $cell) {
+                        $cellVal = strtolower(trim((string) $cell));
+                        if (strlen($cellVal) > 40 || preg_match('/^(catatan|note|petunjuk|template)/i', $cellVal)) {
+                            continue;
+                        }
+                        if ($tempNis === null && preg_match('/\bnis\b/i', $cellVal) && !preg_match('/\bnisn\b/i', $cellVal)) {
+                            $tempNis = $cIdx;
+                        }
+                        if ($tempNama === null && preg_match('/\bnama\b/i', $cellVal) && !preg_match('/(sekolah|ayah|ibu|wali)/i', $cellVal)) {
+                            $tempNama = $cIdx;
+                        }
+                    }
+
+                    if ($tempNis !== null && $tempNama !== null && $tempNis !== $tempNama) {
+                        $nisCol = $tempNis;
+                        $namaCol = $tempNama;
+                        $headerRowIndex = $r;
+                        break;
+                    }
+                }
+            }
+
+            // Jika masih belum ketemu, coba urutan default (Kolom No, NIS, Nama Siswa atau NIS, Nama Siswa)
+            if ($nisCol === null || $namaCol === null || $nisCol === $namaCol) {
+                $sampleRow = $rows[0] ?? [];
+                if (count($sampleRow) >= 3) {
+                    $nisCol = 1;
+                    $namaCol = 2;
+                    $headerRowIndex = 0;
+                } elseif (count($sampleRow) >= 2) {
+                    $nisCol = 0;
+                    $namaCol = 1;
+                    $headerRowIndex = 0;
+                } else {
+                    return redirect()->back()->with('error', 'Format kolom Excel tidak dikenali. Pastikan terdapat kolom NIS dan Nama Siswa.');
+                }
+            }
+
+            $user = auth()->user();
+            $assignedDeptId = $user->isAdminJurusan() ? $user->getAssignedProgramKeahlianId() : null;
+
+            $startRow = ($headerRowIndex !== null) ? $headerRowIndex + 1 : 0;
+            $dataRows = array_slice($rows, $startRow);
+
+            $insertedCount = 0;
+            $updatedCount = 0;
+            $skippedCount = 0;
+
+            foreach ($dataRows as $row) {
+                if (!is_array($row)) continue;
+
+                $rawNis = $row[$nisCol] ?? '';
+                $rawNama = $row[$namaCol] ?? '';
+
+                // Format nilai NIS (hilangkan desimal seperti 12345.0 atau notasi ilmiah)
+                if (is_numeric($rawNis)) {
+                    $nis = (string) (is_float($rawNis) || is_int($rawNis) ? number_format((float) $rawNis, 0, '', '') : $rawNis);
+                } else {
+                    $nis = trim((string) $rawNis);
+                }
+
+                $nama = trim((string) $rawNama);
+
+                $lowerNis = strtolower($nis);
+                $lowerNama = strtolower($nama);
+
+                // Lewati jika kosong, header berulang, atau nilai nomor urut dummy
+                if (
+                    $nis === '' || $nama === '' ||
+                    $lowerNis === 'nis' || $lowerNama === 'nama' || $lowerNama === 'nama siswa' ||
+                    $lowerNis === 'no' || $lowerNis === 'nomor' || $lowerNama === 'no' ||
+                    $lowerNis === $lowerNama
+                ) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                // Batasi panjang string sesuai schema database
+                $nis = substr($nis, 0, 50);
+                $nama = substr($nama, 0, 255);
+
+                $student = StudentNis::where('nis', $nis)->first();
+
+                if ($student) {
+                    $student->nama_siswa = $nama;
+                    if ($assignedDeptId && empty($student->program_keahlian_id)) {
+                        $student->program_keahlian_id = $assignedDeptId;
+                    }
+                    $student->save();
+                    $updatedCount++;
+                } else {
+                    StudentNis::create([
+                        'nis'                 => $nis,
+                        'nama_siswa'          => $nama,
+                        'program_keahlian_id' => $assignedDeptId,
+                        'created_by'          => $user->id,
+                    ]);
+                    $insertedCount++;
+                }
+            }
+
+            $totalProcessed = $insertedCount + $updatedCount;
+            if ($totalProcessed === 0) {
+                return redirect()->route('nis-tracer.index')
+                    ->with('error', 'Tidak ada baris data valid yang berhasil diimpor. Pastikan file Excel berisi data NIS dan Nama Siswa.');
+            }
+
+            $msg = "Import data NIS berhasil: {$insertedCount} data baru ditambahkan";
+            if ($updatedCount > 0) {
+                $msg .= ", {$updatedCount} data diperbarui";
+            }
+            $msg .= '.';
+
+            return redirect()->route('nis-tracer.index')->with('success', $msg);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses file Excel: ' . $e->getMessage());
+        }
     }
 
     /**
